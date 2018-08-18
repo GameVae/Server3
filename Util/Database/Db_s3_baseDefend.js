@@ -22,7 +22,7 @@ var database_s3_basedefend   =    mysql.createPool({
 });
 
 
-database_s3_user.on('connection', function(connection) {
+database_s3_basedefend.on('connection', function(connection) {
  console.log('Connection established');
  connection.on('error', function(err) {
   console.error(new Date(), 'MySQL error', err.code);

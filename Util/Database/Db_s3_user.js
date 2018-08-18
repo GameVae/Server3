@@ -15,7 +15,7 @@ var database_s3_user    =    mysql.createPool({
   host               : db_host,
   user               : db_user,
   password           : db_password,
-  database           : 's3_user',
+  database           : db_database,
   debug              : db_debug,
   multipleStatements : db_multipleStatements,
   charset            : db_charset,
