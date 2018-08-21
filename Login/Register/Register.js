@@ -3,8 +3,8 @@
 var updateDatabaseUser	= require('./UpdateDatabaseUser');
 var functions 			= require('./../../Util/Functions.js');
 var db_user				= require('./../../Util/Database/Db_s3_user.js');
-var db_all_user				= require('./../../Util/Database/Db_all_user.js');
-
+var db_all_user			= require('./../../Util/Database/Db_all_user.js');
+var db_baseDefend		= require('./../../Util/Database/Db_s3_baseDefend.js');
 // var userBase		= require('./../../UserBase/userBase.js');
 // var sendMail 		= require('./../../Util/sendMail.js');
 var currentUser,DetailError;
@@ -49,22 +49,21 @@ function createUser(socket,data) {
 	+functions.GetTimeUTC_string()+","
 	+functions.GetTimeNow(functions.GetTimeNow_int(functions.GetTimeUTC_string()))+")";
 	
-	console.log(stringInsert);
+	console.log("stringInsert_AllUser: "+stringInsert_AllUser);
+	console.log("stringInsert: "+stringInsert);
 
-	db_user.query(stringInsert,function(error,resultsInsert){	
-		if (!!error){DetailError = ('Register: stringInsert  :'+ data.UserName); functions.WriteLogError(DetailError);}
+	db_all_user.query(stringInsert_AllUser,function(error,resultsInsert){	
+		if (!!error){DetailError = ('Register: stringInsert_AllUser: '+ data.UserName); functions.WriteLogError(DetailError);}
+		console.log('resultsInsert');
+		console.log(resultsInsert);
 	});
-
-
 	
-	console.log(stringInsert);
-
-	db_user.query(stringInsert,function(error,resultsInsert){	
-		if (!!error){DetailError = ('Register: stringInsert  :'+ data.UserName); functions.WriteLogError(DetailError);}
-	});
+	// db_user.query(stringInsert,function(error,resultsInsert){	
+	// 	if (!!error){DetailError = ('Register: stringInsert: '+ data.UserName); functions.WriteLogError(DetailError);}
+	// });
 
 
-	R_REGISTER(socket,1);
+	// R_REGISTER(socket,1);
 
 
 }
