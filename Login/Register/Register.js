@@ -55,23 +55,19 @@ function createUser(socket,data) {
 	db_all_user.query(stringInsert_AllUser,function(error,resultsInsert){	
 		if (!!error){DetailError = ('Register: stringInsert_AllUser: '+ data.UserName); functions.WriteLogError(DetailError);}
 		console.log('resultsInsert');
-		console.log(resultsInsert);
+		console.log(resultsInsert);				
 	});
 	
 	// db_user.query(stringInsert,function(error,resultsInsert){	
 	// 	if (!!error){DetailError = ('Register: stringInsert: '+ data.UserName); functions.WriteLogError(DetailError);}
 	// });
-
-
 	// R_REGISTER(socket,1);
-
-
 }
 function R_REGISTER(socket,boolSuccess){
 	socket.emit('R_REGISTER',{Message : boolSuccess});
 }
 function insertNewUserDatabase(argument) {
-	// body...
+	
 }
 // function getCurrentUser(data)
 // {

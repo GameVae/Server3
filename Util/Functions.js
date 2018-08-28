@@ -2,19 +2,22 @@
 const   fs          = require('fs');
 var datetime        = require('node-datetime');
 
-exports.GetTimeNow = function getTimeNow(dateString) {
-   var retString = new Date(dateString).toString();
-   return retString;     
+exports.GetTimeNow_int = function getTimeNow() {
+   var retInt = new Date().getTime();
+   return retInt;     
 }
-exports.GetTimeUTC_string = function () {
-    var retUTC = new Date().toUTCString().slice(5, 26);
-    return retUTC;
+exports.GetTimeNow_string = function GetTimeNow_string() {
+    // var retString = new Date().toString();
+    // return retString;   
+    var retUTC_string = new Date().toUTCString().slice(5, 26);
+    return retUTC_string;  
 }
+// exports.GetTimeNowUTC_string = function GetTimeNowUTC_string() {
+//     var retUTC_string = new Date().toUTCString().slice(5, 26);
+//     return retUTC_string;
+// }
 
-exports.GetTimeNow_int = function (dateString) {
-    var retInt = new Date(dateString).getTime();
-    return retInt;     
-}
+
 exports.WriteLogError = function(detailError){
     console.log(detailError);
     fs.appendFile('./LogError/LogError.txt', "\r\n"+ datetime.create().format('H:M:S d-m-Y')+" \r\n"+ new Date().toString().slice(25, 33)+" "+detailError, (err) => {
