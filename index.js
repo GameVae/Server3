@@ -7,16 +7,21 @@ var io 				= require('socket.io').listen(server);
 app.set('port', process.env.PORT);
 server.listen(process.env.PORT);
 
-var database 		= require('./Database/db_s3.js');
+//var database 		= require('./Database/db_s3.js');
 
-var CheckVersion 	= require('./CheckVersion/CheckVersion.js');
+//var CheckVersion 	= require('./CheckVersion/CheckVersion.js');
 
 io.sockets.setMaxListeners(0);
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 
+var register 		= require('./Login/Register/register.js');
+register.start(io);
 
-CheckVersion.start(io);
+//CheckVersion.start(io);
+
+
+
 // if (app.get('port') === "1010") {	
 // 	// console.log("here 1010");
 	
