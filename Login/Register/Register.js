@@ -21,19 +21,20 @@ function S_REGISTER (socket,data) {
 	console.log('S_REGISTER');
 	//console.log(data);
 
-	var queryString = "SELECT * FROM `users` WHERE `UserName`='"+data.UserName+"' OR `UserEmail`='"+data.Email+"'";
+	var queryString = "SELECT * FROM `all_users` WHERE `UserName`='"+data.UserName+"' OR `UserEmail`='"+data.Email+"'";
 	// var queryString = "SELECT * FROM `users`"
 	db_user.query(queryString,function(error,rows){
 		if (!!error){DetailError = ('Register: S_REGISTER queryUser :'+ data.UserName); functions.WriteLogError(DetailError);}
 		if (rows==undefined) {
 			createUser(socket,data);
+			R_REGISTER(socket,1)
 		}else{
 			R_REGISTER(socket,0);
 		}		
 	});
 }
 function createUser(socket,data) {
-	var stringInsert_AllUser = "INSERT INTO `all_user`(`UserName`, `Password`, `Email`, `NameInGame`,`DateCreate`, `DateCreate_int`) VALUES ("
+	var stringInsert_AllUser = "INSERT INTO `all_users`(`UserName`, `Password`, `Email`, `NameInGame`,`DateCreate`, `DateCreate_int`) VALUES ("
 	+data.UserName+","
 	+data.Password+","
 	+data.Email+","
