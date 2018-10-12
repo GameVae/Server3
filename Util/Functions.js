@@ -1,29 +1,27 @@
 'use strict';
 const   fs          = require('fs');
-var datetime        = require('node-datetime');
-
-exports.GetTimeNow_int = function getTimeNow() {
-   var retInt = new Date().getTime();
-   return retInt;     
-}
-exports.GetTimeNow_string = function GetTimeNow_string() {
-    // var retString = new Date().toString();
-    // return retString;   
-    var retUTC_string = new Date().toUTCString().slice(5, 26);
-    return retUTC_string;  
-}
-// exports.GetTimeNowUTC_string = function GetTimeNowUTC_string() {
-//     var retUTC_string = new Date().toUTCString().slice(5, 26);
-//     return retUTC_string;
-// }
-
 
 exports.WriteLogError = function(detailError){
-    console.log(detailError);
-    fs.appendFile('./LogError/LogError.txt', "\r\n"+ datetime.create().format('H:M:S d-m-Y')+" \r\n"+ new Date().toString().slice(25, 33)+" "+detailError, (err) => {
+    console.log(getTimeNow()+": "+detailError);
+    fs.appendFile('./LogError/LogError.txt', "\r\n"+ getTimeNow() +": "+detailError, (err) => {
         if (err) throw err;
     });
 }
+
+var getTimeNow = exports.GetTimeNow = function getTimeNow() {
+   var retInt = new Date().toISOString();
+   return retInt;     
+}
+
+exports.LogChange = function(logChangeDetail){
+    console.log(getTimeNow()+": "+logChangeDetail);
+    fs.appendFile('./LogChange/LogChange.txt', "\r\n"+ getTimeNow() +": "+logChangeDetail, (err) => {
+        if (err) throw err;
+    });
+}
+
+
+
 
 // 'use strict';
 // const   fs          = require('fs');
@@ -51,15 +49,6 @@ exports.WriteLogError = function(detailError){
 //     return Math.floor(Math.random() * (max - min + 1)) + min;
 // }
 
-// exports.writeLogErrror =  function writeLogErrror(Error)
-// {
-//     console.log(Error);
-//     fs.appendFile('LogError.txt', "\r\n"+ datetime.create().format('H:M:S d-m-Y')+" \r\n"+ new Date().toString().slice(25, 33)+" "+Error, (err) => {  
-//         if (err) throw err;
-//         //console.log('The lyrics were updated!');
-//     });
-
-// }
 // exports.sendMail = function sendMail(mailOptions)
 // {
 //     let transporter = nodemailer.createTransport({

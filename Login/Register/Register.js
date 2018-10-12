@@ -2,12 +2,17 @@
 
 var updateDatabaseUser	= require('./UpdateDatabaseUser');
 var functions 			= require('./../../Util/Functions.js');
-var db_user				= require('./../../Util/Database/Db_s3_user.js');
+var db_user				= require('./../../Util/Database/Db_s1_user.js');
 var db_all_user			= require('./../../Util/Database/Db_all_user.js');
-var db_baseDefend		= require('./../../Util/Database/Db_s3_baseDefend.js');
+var db_server_task 		= require('./../../Util/Database/Db_server_task.js');
+
+var db_s1_base_info 	= require('./../../Util/Database/Db_s1_base_info.js');
+var db_s1_base_defend 	= require('./../../Util/Database/Db_s1_base_defend.js');
+var db_s2_base_info 	= require('./../../Util/Database/Db_s2_base_info.js');
+var db_s2_base_defend 	= require('./../../Util/Database/Db_s2_base_defend.js');
 // var userBase		= require('./../../UserBase/userBase.js');
 // var sendMail 		= require('./../../Util/sendMail.js');
-var currentUser,DetailError;
+var currentUser, DetailError, logChangeDetail;
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
@@ -27,49 +32,115 @@ function S_REGISTER (socket,data) {
 		if (!!error){DetailError = ('Register: S_REGISTER queryUser :'+ data.UserName); functions.WriteLogError(DetailError);}
 		if (rows==undefined) {
 			createUser(socket,data);
-			R_REGISTER(socket,1)
+			R_REGISTER(socket,1);
+			logChangeDetail = "logChangeDetail: S_REGISTER: "+ S_REGISTER; functions.LogChange(logChangeDetail);
 		}else{
 			R_REGISTER(socket,0);
+			logChangeDetail = "logChangeDetail: Fail S_REGISTER: "+ S_REGISTER; functions.LogChange(logChangeDetail);
 		}		
 	});
 }
 function createUser(socket,data) {
-	var stringInsert_AllUser = "INSERT INTO `all_users`(`UserName`, `Password`, `Email`, `NameInGame`,`DateCreate`, `DateCreate_int`) VALUES ("
-	+data.UserName+","
-	+data.Password+","
-	+data.Email+","
-	+data.UserName+","
-	+functions.GetTimeUTC_string()+","
-	+functions.GetTimeNow(functions.GetTimeNow_int(functions.GetTimeUTC_string()))+")";
-
-	var stringInsert = "INSERT INTO `users`(`UserName`, `Password`, `Email`, `NameInGame`,`DateCreate`, `DateCreate_int`) VALUES ("
-	+data.UserName+","
-	+data.Password+","
-	+data.Email+","
-	+data.UserName+","
-	+functions.GetTimeUTC_string()+","
-	+functions.GetTimeNow(functions.GetTimeNow_int(functions.GetTimeUTC_string()))+")";
-	
-	console.log("stringInsert_AllUser: "+stringInsert_AllUser);
-	console.log("stringInsert: "+stringInsert);
-
-	db_all_user.query(stringInsert_AllUser,function(error,resultsInsert){	
-		if (!!error){DetailError = ('Register: stringInsert_AllUser: '+ data.UserName); functions.WriteLogError(DetailError);}
-		console.log('resultsInsert');
-		console.log(resultsInsert);				
-	});
-	
-	// db_user.query(stringInsert,function(error,resultsInsert){	
-	// 	if (!!error){DetailError = ('Register: stringInsert: '+ data.UserName); functions.WriteLogError(DetailError);}
-	// });
-	// R_REGISTER(socket,1);
+	insert_User_Game_Info (data);
 }
+
+var insert_User_Game_Info = exports.Test =function insert_User_Game_Info (data) {
+	var stringInsert_user_info = "INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`,`ResetVipTime`,`DateCreate`) VALUES ('"
+	+data.UserName+"','"
+	+data.Password+"','"
+	+data.Email+"','"
+	+data.UserName+"','"
+	+new Date().getUTCHours()+"','"
+	+functions.GetTimeNow()+"')";
+	// console.log(stringInsert_user_info);
+	db_all_user.query(stringInsert_user_info,function (error,result) {
+		if (!!error){DetailError = ('Register.js: Error stringInsert_user_info '+ data.UserName);functions.WriteLogError(DetailError);}
+		else{
+			var updateString = "UPDATE `user_info` SET `ID_User` = '"+result.insertId+"' WHERE `user_info`.`ID` = '"+result.insertId+"'";
+			//console.log(updateString);
+			db_all_user.query(updateString,function (error){
+				if (!!error){DetailError = ('Register.js: Error updateID_user_info '+ data.UserName); functions.WriteLogError(DetailError);}
+				logChangeDetail = "logChangeDetail: updateString: "+ updateString; functions.LogChange(logChangeDetail);
+			});
+			
+			var getServerString = "SELECT `Content` FROM `task` WHERE `ID`=1";
+			db_server_task.query(getServerString,function (error,rows) {
+				if (!!error){DetailError = ('Register.js: Error getServerString'+ data.UserName);functions.WriteLogError(DetailError);}
+
+				var stringInsert_game_info = "INSERT INTO `all_users`.`game_info` (`ID_User`, `NameInGame`,`Server_ID`) VALUES ('"
+				+result.insertId+"','"
+				+data.UserName+"','"
+				+rows[0].Content+"')";
+				// console.log(stringInsert_game_info);
+				db_all_user.query(stringInsert_game_info,function (error,result_StringInsert_game_info) {
+					if (!!error){DetailError = ('Register.js: Error stringInsert_game_info'+ data.UserName);functions.WriteLogError(DetailError);}
+					logChangeDetail = "logChangeDetail: stringInsert_game_info: "+ stringInsert_game_info; functions.LogChange(logChangeDetail);
+				});
+				insertNewUserDatabase(data,rows[0].Content);
+			});
+		}
+		logChangeDetail = "logChangeDetail: insert_User_Game_Info: "+ stringInsert_user_info; functions.LogChange(logChangeDetail);
+	});
+
+
+}
+
+
 function R_REGISTER(socket,boolSuccess){
 	socket.emit('R_REGISTER',{Message : boolSuccess});
 }
-function insertNewUserDatabase(argument) {
+
+function insertNewUserDatabase(data,Server_ID) {
+	var stringTable_base_info, createNewTable_base_info,stringTable_base_defend, createNewTable_base_defend;
 	
+	switch (Server_ID) {
+		case 1:
+		stringTable_base_defend ="`s1_base_defend`.`"+data.ID_User+"`";
+		stringTable_base_info ="`s1_base_info`.`"+data.ID_User+"`";
+		break;
+
+		case 2:
+		stringTable_base_defend ="`s2_base_defend`.`"+data.ID_User+"`";
+		stringTable_base_info ="`s2_base_info`.`"+data.ID_User+"`";
+		break;
+	}
+
+	createNewTable_base_defend = "DROP TABLE IF EXISTS "+stringTable_base_defend+";"+
+	"CREATE TABLE "+stringTable_base_defend+"( `ID` int(11) NOT NULL, `ID_Base` int(11) NOT NULL, `BaseNumber` int(11) NOT NULL, `UnitType` int(11) NOT NULL, `Level` int(11) NOT NULL, `Quality` int(11) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=latin1; "+
+	"ALTER TABLE "+stringTable_base_defend+" ADD PRIMARY KEY (`ID`);"+
+	"ALTER TABLE "+stringTable_base_defend+" MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT";
+
+	createNewTable_base_info = "DROP TABLE IF EXISTS "+stringTable_base_info+";"+ 
+	"CREATE TABLE "+stringTable_base_info+" ( `ID` int(11) NOT NULL, `ID_User` int(11) NOT NULL, `BaseNumber` int(11) NOT NULL, `Location` text NOT NULL, `Farm` double NOT NULL, `Wood` double NOT NULL, `Stone` double NOT NULL, `Metal` double NOT NULL, `UpgradeWaitType` int(11) NOT NULL, `UpgradeTime_int` int(11) NOT NULL, `UpgradeTime_text` text NOT NULL, `UnitTransferType` int(11) NOT NULL, `UnitTransferQuality` int(11) NOT NULL, `UnitTransferTime_int` int(11) NOT NULL, `UnitTransferTime_txt` text NOT NULL, `UnitTransfer_ID_Base` int(11) NOT NULL, `TrainingUnitType` int(11) NOT NULL, `TrainingTime_int` int(11) NOT NULL, `TrainingTime_text` text NOT NULL, `TrainingQuality` int(11) NOT NULL, `SumUnitQuality` int(11) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=latin1;"+ 
+	"ALTER TABLE "+stringTable_base_info+" ADD PRIMARY KEY (`ID`);"+ 
+	"ALTER TABLE "+stringTable_base_info+" MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;"
+
+	switch (Server_ID) {
+		case 1:
+		db_s1_base_defend.query(createNewTable_base_defend,function (error,result) {
+			if (!!error){DetailError = ("UpdateUser.js: createNewTable s1_base_info: "+data.ID_User);functions.WriteLogError(DetailError);}
+			logChangeDetail = "logChangeDetail: createNewTable_base_defend: "+ data.ID_User; functions.LogChange(logChangeDetail);
+		});
+		db_s1_base_info.query(createNewTable_base_info,function (error,result) {
+			if (!!error){DetailError = ('UpdateUser.js: createNewTable s1_base_defend: '+data.ID_User);functions.WriteLogError(DetailError);}
+			logChangeDetail = "logChangeDetail: createNewTable_base_info: "+ data.ID_User; functions.LogChange(logChangeDetail);
+		});
+		break;
+
+		case 2:
+		db_s2_base_defend.query(createNewTable_base_defend,function (error,result) {
+			if (!!error){DetailError = ('UpdateUser.js: createNewTable s1_base_info: '+data.ID_User);functions.WriteLogError(DetailError);}
+			logChangeDetail = "logChangeDetail: createNewTable_base_defend: "+ data.ID_User; functions.LogChange(logChangeDetail);
+		});
+		db_s2_base_info.query(createNewTable_base_info,function (error,result) {
+			if (!!error){DetailError = ('UpdateUser.js: createNewTable s1_base_info: '+data.ID_User);functions.WriteLogError(DetailError);}
+			logChangeDetail = "logChangeDetail: createNewTable_base_defend: "+ data.ID_User; functions.LogChange(logChangeDetail);
+		});
+		break;
+	}
+
 }
+
 // function getCurrentUser(data)
 // {
 // 	return currentUser =
@@ -82,7 +153,7 @@ function insertNewUserDatabase(argument) {
 // // }
 // function queryUser (currentUser,socket) {
 // 	database.query("SELECT * FROM `users` WHERE `UserName`='"+currentUser.name+"' OR `UserEmail`='"+currentUser.email+"'",function (error,rows) {
-// 		if (!!error){DetailError = ('register: Error queryUser '+ currentUser.name);functions.writeLogErrror(DetailError);}
+// 		if (!!error){DetailError = ('register: Error queryUser '+ currentUser.name);functions.WriteLogError(DetailError);}
 // 		if (rows.length>0) {
 // 			socket.emit('R_REGISTER_UNSUCCESS', {data : '0'});
 // 		}else {
@@ -95,7 +166,7 @@ function insertNewUserDatabase(argument) {
 // function R_REGISTER_SUCCESS (currentUser,socket) {
 // 	database.query( "INSERT INTO `users` (`UserID`,`UserName`,`UserPass`,`password_recover_key`,`password_recover_key_expire`,`UserEmail`,`Diamond`,`timeLogin`,`timeLogout`,`timeResetMine`, `ColorChatWorld`) VALUES ('"+""+"','"
 // 		+currentUser.name+"','"+currentUser.password+"','"+""+"','"+""+"','"+currentUser.email+"','"+1000+"','"+0+"','"+0+"','"+0+"','FFFFFFFF')",function (error,result) {			
-// 			if (!!error){DetailError = ('register: Error insertUser '+ currentUser.name);functions.writeLogErrror(DetailError);}
+// 			if (!!error){DetailError = ('register: Error insertUser '+ currentUser.name);functions.WriteLogError(DetailError);}
 // 			socket.emit('R_REGISTER_SUCCESS', {message : '1'});
 // 			console.log('đang ki thanh cong: '+currentUser.name);
 // 			R_USER_REGISTER (currentUser,socket);

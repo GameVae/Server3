@@ -32,7 +32,7 @@ database_s1_base_defend.on('connection', function(connection) {
 });
 });
 
-module.exports = database_s3_basedefend;
+module.exports = database_s1_base_defend;
 
 // exports.Database_s3_user          = database_s3_user;
 // exports.Database_s3_basedefend    = database_s3_basedefend;

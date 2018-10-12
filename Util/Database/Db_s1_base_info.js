@@ -5,12 +5,12 @@ var db_connectionLimit   =1000;
 var db_host  =   'localhost';
 var db_user  =   'gamevae';
 var db_password    =   'GWgUi2]&]aa';
-var db_database    =   's1_user';
+var db_database    =   's1_base_info';
 var db_debug =   false;
 var db_multipleStatements=   true;
 var db_charset     =   'utf8_unicode_ci';
 
-var database_s1_user    =    mysql.createPool({
+var database_s1_base_info   =    mysql.createPool({
   connectionLimit    : db_connectionLimit,
   host               : db_host,
   user               : db_user,
@@ -22,7 +22,7 @@ var database_s1_user    =    mysql.createPool({
 });
 
 
-database_s1_user.on('connection', function(connection) {
+database_s1_base_info.on('connection', function(connection) {
  console.log('Connection established');
  connection.on('error', function(err) {
   console.error(new Date(), 'MySQL error', err.code);
@@ -32,7 +32,7 @@ database_s1_user.on('connection', function(connection) {
 });
 });
 
-module.exports = database_s1_user;
+module.exports = database_s1_base_info;
 
 // exports.Database_s3_user          = database_s3_user;
 // exports.Database_s3_basedefend    = database_s3_basedefend;

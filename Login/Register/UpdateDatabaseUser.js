@@ -1,8 +1,8 @@
 'use strict';
 
 var functions 			= require('./../../Util/Functions.js');
-var db_user				= require('./../../Util/Database/Db_s3_user.js');
-var db_baseDefend		= require('./../../Util/Database/Db_s3_baseDefend.js');
+var db_user				= require('./../../Util/Database/Db_s1_user.js');
+var db_baseDefend		= require('./../../Util/Database/Db_s1_base_defend.js');
 
 var currentUser,DetailError;
 
