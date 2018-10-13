@@ -13,6 +13,7 @@ var db_s2_base_defend 	= require('./../../Util/Database/Db_s2_base_defend.js');
 // var userBase		= require('./../../UserBase/userBase.js');
 // var sendMail 		= require('./../../Util/sendMail.js');
 var currentUser, DetailError, logChangeDetail;
+var stringTable_base_info, createNewTable_base_info,stringTable_base_defend, createNewTable_base_defend;
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
@@ -33,10 +34,10 @@ function S_REGISTER (socket,data) {
 		if (rows==undefined) {
 			createUser(socket,data);
 			R_REGISTER(socket,1);
-			logChangeDetail = "logChangeDetail: S_REGISTER: "+ S_REGISTER; functions.LogChange(logChangeDetail);
+			logChangeDetail = "S_REGISTER: "+ S_REGISTER; functions.LogChange(logChangeDetail);
 		}else{
 			R_REGISTER(socket,0);
-			logChangeDetail = "logChangeDetail: Fail S_REGISTER: "+ S_REGISTER; functions.LogChange(logChangeDetail);
+			logChangeDetail = "Fail S_REGISTER: "+ S_REGISTER; functions.LogChange(logChangeDetail);
 		}		
 	});
 }
@@ -60,7 +61,7 @@ var insert_User_Game_Info = exports.Test =function insert_User_Game_Info (data) 
 			//console.log(updateString);
 			db_all_user.query(updateString,function (error){
 				if (!!error){DetailError = ('Register.js: Error updateID_user_info '+ data.UserName); functions.WriteLogError(DetailError);}
-				logChangeDetail = "logChangeDetail: updateString: "+ updateString; functions.LogChange(logChangeDetail);
+				logChangeDetail = "updateString: "+ updateString; functions.LogChange(logChangeDetail);
 			});
 			
 			var getServerString = "SELECT `Content` FROM `task` WHERE `ID`=1";
@@ -74,12 +75,12 @@ var insert_User_Game_Info = exports.Test =function insert_User_Game_Info (data) 
 				// console.log(stringInsert_game_info);
 				db_all_user.query(stringInsert_game_info,function (error,result_StringInsert_game_info) {
 					if (!!error){DetailError = ('Register.js: Error stringInsert_game_info'+ data.UserName);functions.WriteLogError(DetailError);}
-					logChangeDetail = "logChangeDetail: stringInsert_game_info: "+ stringInsert_game_info; functions.LogChange(logChangeDetail);
+					logChangeDetail = "stringInsert_game_info: "+ stringInsert_game_info; functions.LogChange(logChangeDetail);
 				});
 				insertNewUserDatabase(data,rows[0].Content);
 			});
 		}
-		logChangeDetail = "logChangeDetail: insert_User_Game_Info: "+ stringInsert_user_info; functions.LogChange(logChangeDetail);
+		logChangeDetail = "insert_User_Game_Info: "+ stringInsert_user_info; functions.LogChange(logChangeDetail);
 	});
 
 
@@ -91,7 +92,7 @@ function R_REGISTER(socket,boolSuccess){
 }
 
 function insertNewUserDatabase(data,Server_ID) {
-	var stringTable_base_info, createNewTable_base_info,stringTable_base_defend, createNewTable_base_defend;
+	
 	
 	switch (Server_ID) {
 		case 1:
@@ -119,22 +120,22 @@ function insertNewUserDatabase(data,Server_ID) {
 		case 1:
 		db_s1_base_defend.query(createNewTable_base_defend,function (error,result) {
 			if (!!error){DetailError = ("UpdateUser.js: createNewTable s1_base_info: "+data.ID_User);functions.WriteLogError(DetailError);}
-			logChangeDetail = "logChangeDetail: createNewTable_base_defend: "+ data.ID_User; functions.LogChange(logChangeDetail);
+			logChangeDetail = "createNewTable_base_defend: "+ data.ID_User; functions.LogChange(logChangeDetail);
 		});
 		db_s1_base_info.query(createNewTable_base_info,function (error,result) {
 			if (!!error){DetailError = ('UpdateUser.js: createNewTable s1_base_defend: '+data.ID_User);functions.WriteLogError(DetailError);}
-			logChangeDetail = "logChangeDetail: createNewTable_base_info: "+ data.ID_User; functions.LogChange(logChangeDetail);
+			logChangeDetail = "createNewTable_base_info: "+ data.ID_User; functions.LogChange(logChangeDetail);
 		});
 		break;
 
 		case 2:
 		db_s2_base_defend.query(createNewTable_base_defend,function (error,result) {
 			if (!!error){DetailError = ('UpdateUser.js: createNewTable s1_base_info: '+data.ID_User);functions.WriteLogError(DetailError);}
-			logChangeDetail = "logChangeDetail: createNewTable_base_defend: "+ data.ID_User; functions.LogChange(logChangeDetail);
+			logChangeDetail = "createNewTable_base_defend: "+ data.ID_User; functions.LogChange(logChangeDetail);
 		});
 		db_s2_base_info.query(createNewTable_base_info,function (error,result) {
 			if (!!error){DetailError = ('UpdateUser.js: createNewTable s1_base_info: '+data.ID_User);functions.WriteLogError(DetailError);}
-			logChangeDetail = "logChangeDetail: createNewTable_base_defend: "+ data.ID_User; functions.LogChange(logChangeDetail);
+			logChangeDetail = "createNewTable_base_defend: "+ data.ID_User; functions.LogChange(logChangeDetail);
 		});
 		break;
 	}

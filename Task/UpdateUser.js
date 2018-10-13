@@ -48,6 +48,17 @@ if (process.argv.length <=2) {
 			}
 		});
 		break;
+
+		case 3:
+		console.log("update user to base_info");
+		var queryString_user_info = "SELECT * FROM `game_info` WHERE 1";
+		db_all_user.query(queryString_user_info, function (error,rows) {
+			if (!!error){DetailError = ('UpdateUser.js: Error queryString_user_info ');functions.WriteLogError(DetailError);}
+			for (var i = 0; i < rows.length; i++) {
+				checkAndInsertToBaseInfo(rows[i]);	
+			}
+		});
+		break;
 	}
 }
 
@@ -123,6 +134,7 @@ function checkAndInsertToBaseInfo (data) {
 				"CREATE TABLE "+stringTable+" ( `ID` int(11) NOT NULL, `ID_User` int(11) NOT NULL, `BaseNumber` int(11) NOT NULL, `Location` text NOT NULL, `Farm` double NOT NULL, `Wood` double NOT NULL, `Stone` double NOT NULL, `Metal` double NOT NULL, `UpgradeWaitType` int(11) NOT NULL, `UpgradeTime_int` int(11) NOT NULL, `UpgradeTime_text` text NOT NULL, `UnitTransferType` int(11) NOT NULL, `UnitTransferQuality` int(11) NOT NULL, `UnitTransferTime_int` int(11) NOT NULL, `UnitTransferTime_txt` text NOT NULL, `UnitTransfer_ID_Base` int(11) NOT NULL, `TrainingUnitType` int(11) NOT NULL, `TrainingTime_int` int(11) NOT NULL, `TrainingTime_text` text NOT NULL, `TrainingQuality` int(11) NOT NULL, `SumUnitQuality` int(11) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=latin1;"+ 
 				"ALTER TABLE "+stringTable+" ADD PRIMARY KEY (`ID`);"+ 
 				"ALTER TABLE "+stringTable+" MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;"
+				
 				db_s1_base_info.query(createNewTable,function (error,result) {
 					if (!!error){DetailError = ('UpdateUser.js: createNewTable s1_base_info');functions.WriteLogError(DetailError);}
 				});

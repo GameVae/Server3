@@ -15,7 +15,7 @@ var getTimeNow = exports.GetTimeNow = function getTimeNow() {
 
 exports.LogChange = function(logChangeDetail){
     console.log(getTimeNow()+": "+logChangeDetail);
-    fs.appendFile('./LogChange/LogChange.txt', "\r\n"+ getTimeNow() +": "+logChangeDetail, (err) => {
+    fs.appendFile('./LogChange/LogChange.txt', "\r\n logChangeDetail: "+ getTimeNow() +": "+logChangeDetail, (err) => {
         if (err) throw err;
     });
 }

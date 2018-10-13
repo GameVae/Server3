@@ -57,3 +57,33 @@
 2018-10-12T10:29:13.928Z: logChangeDetail: createNewTable_base_info: 21
 2018-10-12T10:29:13.997Z: logChangeDetail: createNewTable_base_defend: 1
 2018-10-12T10:29:14.006Z: logChangeDetail: createNewTable_base_defend: 21
+ logChangeDetail: 2018-10-13T08:42:55.498Z: delete_base_info DROP TABLE IF EXISTS `21`
+ logChangeDetail: 2018-10-13T08:42:55.500Z: delete_base_info DROP TABLE IF EXISTS `21`
+ logChangeDetail: 2018-10-13T08:42:55.501Z: delete_base_defend DROP TABLE IF EXISTS `21`
+ logChangeDetail: 2018-10-13T08:42:55.504Z: DELETE FROM `user_info` WHERE `ID_User`= '21'
+ logChangeDetail: 2018-10-13T08:42:55.504Z: DELETE FROM `game_info` WHERE `ID_User`= '21'
+ logChangeDetail: 2018-10-13T08:43:12.992Z: delete_base_info DROP TABLE IF EXISTS `22`
+ logChangeDetail: 2018-10-13T08:43:12.993Z: delete_base_defend DROP TABLE IF EXISTS `22`
+ logChangeDetail: 2018-10-13T08:43:12.993Z: delete_base_info DROP TABLE IF EXISTS `22`
+ logChangeDetail: 2018-10-13T08:43:12.994Z: DELETE FROM `game_info` WHERE `ID_User`= '22'
+ logChangeDetail: 2018-10-13T08:43:12.996Z: DELETE FROM `user_info` WHERE `ID_User`= '22'
+ logChangeDetail: 2018-10-13T08:43:22.015Z: delete_base_info DROP TABLE IF EXISTS `23`
+ logChangeDetail: 2018-10-13T08:43:22.016Z: delete_base_defend DROP TABLE IF EXISTS `23`
+ logChangeDetail: 2018-10-13T08:43:22.017Z: delete_base_info DROP TABLE IF EXISTS `23`
+ logChangeDetail: 2018-10-13T08:43:22.018Z: DELETE FROM `game_info` WHERE `ID_User`= '23'
+ logChangeDetail: 2018-10-13T08:43:22.021Z: DELETE FROM `user_info` WHERE `ID_User`= '23'
+ logChangeDetail: 2018-10-13T08:43:24.821Z: delete_base_info DROP TABLE IF EXISTS `24`
+ logChangeDetail: 2018-10-13T08:43:24.822Z: delete_base_defend DROP TABLE IF EXISTS `24`
+ logChangeDetail: 2018-10-13T08:43:24.823Z: delete_base_info DROP TABLE IF EXISTS `24`
+ logChangeDetail: 2018-10-13T08:43:24.825Z: DELETE FROM `game_info` WHERE `ID_User`= '24'
+ logChangeDetail: 2018-10-13T08:43:24.826Z: DELETE FROM `user_info` WHERE `ID_User`= '24'
+ logChangeDetail: 2018-10-13T08:43:27.154Z: delete_base_info DROP TABLE IF EXISTS `25`
+ logChangeDetail: 2018-10-13T08:43:27.155Z: delete_base_info DROP TABLE IF EXISTS `25`
+ logChangeDetail: 2018-10-13T08:43:27.156Z: delete_base_defend DROP TABLE IF EXISTS `25`
+ logChangeDetail: 2018-10-13T08:43:27.156Z: DELETE FROM `game_info` WHERE `ID_User`= '25'
+ logChangeDetail: 2018-10-13T08:43:27.158Z: DELETE FROM `user_info` WHERE `ID_User`= '25'
+ logChangeDetail: 2018-10-13T08:43:49.035Z: delete_base_info DROP TABLE IF EXISTS `20`
+ logChangeDetail: 2018-10-13T08:43:49.035Z: delete_base_defend DROP TABLE IF EXISTS `20`
+ logChangeDetail: 2018-10-13T08:43:49.036Z: delete_base_info DROP TABLE IF EXISTS `20`
+ logChangeDetail: 2018-10-13T08:43:49.037Z: DELETE FROM `game_info` WHERE `ID_User`= '20'
+ logChangeDetail: 2018-10-13T08:43:49.039Z: DELETE FROM `user_info` WHERE `ID_User`= '20'

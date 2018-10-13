@@ -45,7 +45,7 @@ function delete_user_info (id) {
 	var deleteString_user_info = "DELETE FROM `user_info` WHERE `ID_User`= '"+id+"'";
 	db_all_user.query(deleteString_user_info,function (error) {
 		if (!!error) {DetailError =('DeleteUser.js: Error deleteString_user_info '+id); functions.WriteLogError(DetailError);}
-		logChangeDetail = "logChangeDetail: "+ deleteString_user_info;	functions.LogChange(logChangeDetail);
+		logChangeDetail = ""+ deleteString_user_info;	functions.LogChange(logChangeDetail);
 	});
 }
 function delete_game_info (id) {
@@ -53,7 +53,7 @@ function delete_game_info (id) {
 	var deleteString_game_info = "DELETE FROM `game_info` WHERE `ID_User`= '"+id+"'";
 	db_all_user.query(deleteString_game_info,function (error) {
 		if (!!error) {DetailError =('DeleteUser.js: Error deleteString_game_info '+id); functions.WriteLogError(DetailError);}
-		logChangeDetail = "logChangeDetail: "+ deleteString_game_info;	functions.LogChange(logChangeDetail);
+		logChangeDetail = ""+ deleteString_game_info;	functions.LogChange(logChangeDetail);
 	});
 }
 function delete_base_info (id) {
@@ -68,7 +68,7 @@ function delete_base_info (id) {
 		db_s2_base_info.query(dropTable,function (error) {
 			if (!!error) {DetailError=('DeleteUser.js: Error drop_s2_base_info '+id);functions.WriteLogError(DetailError);}
 		});
-		logChangeDetail = "logChangeDetail: delete_base_info "+ dropTable;	functions.LogChange(logChangeDetail);
+		logChangeDetail = "delete_base_info "+ dropTable;	functions.LogChange(logChangeDetail);
 	});
 }
 function delete_base_defend (id) {
@@ -83,6 +83,6 @@ function delete_base_defend (id) {
 		db_s2_base_defend.query(dropTable,function (error) {
 			if (!!error) {DetailError=('DeleteUser.js: Error drop_s2_base_defend '+id);functions.WriteLogError(DetailError);}
 		});
-		logChangeDetail = "logChangeDetail: delete_base_defend "+ dropTable;	functions.LogChange(logChangeDetail);
+		logChangeDetail = "delete_base_defend "+ dropTable;	functions.LogChange(logChangeDetail);
 	});
 }
