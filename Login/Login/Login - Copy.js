@@ -26,9 +26,11 @@ function getCurrentUser (data) {
 	}
 }
 
-function R_CHECK_DUPLICATE_LOGIN () {
+function R_CHECK_DUPLICATE_LOGIN (UserName) {
 	var queryCheckDuplicate = "SELECT `Socket` FROM `user_info` WHERE `UserName`='"+currentUser.UserName+"'";
-
+db_all_user.query(queryCheckDuplicate,function (error,rows) {
+	
+});
 }
 // // var async 			= require('async');
 // var lodash			= require('lodash');

@@ -1,7 +1,10 @@
 'use strict';
 
 var updateDatabaseUser	= require('./UpdateDatabaseUser');
+var sendMail 			= require('./../../Util/SendMail.js');
 var functions 			= require('./../../Util/Functions.js');
+
+
 var db_user				= require('./../../Util/Database/Db_s1_user.js');
 var db_all_user			= require('./../../Util/Database/Db_all_user.js');
 var db_server_task 		= require('./../../Util/Database/Db_server_task.js');
@@ -27,17 +30,19 @@ function S_REGISTER (socket,data) {
 	console.log('S_REGISTER');
 	//console.log(data);
 
-	var queryString = "SELECT * FROM `all_users` WHERE `UserName`='"+data.UserName+"' OR `UserEmail`='"+data.Email+"'";
+	var queryString = "SELECT * FROM `user_info` WHERE `UserName`='"+data.UserName+"' OR `UserEmail`='"+data.Email+"'";
 	// var queryString = "SELECT * FROM `users`"
-	db_user.query(queryString,function(error,rows){
+	db_all_user.query(queryString,function(error,rows){
 		if (!!error){DetailError = ('Register: S_REGISTER queryUser :'+ data.UserName); functions.WriteLogError(DetailError);}
 		if (rows==undefined) {
 			createUser(socket,data);
 			R_REGISTER(socket,1);
-			logChangeDetail = "S_REGISTER: "+ S_REGISTER; functions.LogChange(logChangeDetail);
+			logChangeDetail = "R_REGISTER: "+ data.UserName; functions.LogChange(logChangeDetail);
+			sendMail.Register(data.UserName,data.Email);
+
 		}else{
 			R_REGISTER(socket,0);
-			logChangeDetail = "Fail S_REGISTER: "+ S_REGISTER; functions.LogChange(logChangeDetail);
+			logChangeDetail = "R_REGISTER Fail: "+ data.UserName; functions.LogChange(logChangeDetail);
 		}		
 	});
 }
@@ -91,9 +96,7 @@ function R_REGISTER(socket,boolSuccess){
 	socket.emit('R_REGISTER',{Message : boolSuccess});
 }
 
-function insertNewUserDatabase(data,Server_ID) {
-	
-	
+function insertNewUserDatabase(data,Server_ID) {	
 	switch (Server_ID) {
 		case 1:
 		stringTable_base_defend ="`s1_base_defend`.`"+data.ID_User+"`";
@@ -139,7 +142,6 @@ function insertNewUserDatabase(data,Server_ID) {
 		});
 		break;
 	}
-
 }
 
 // function getCurrentUser(data)

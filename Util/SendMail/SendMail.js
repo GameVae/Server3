@@ -1,46 +1,38 @@
 'use strict';
-const   fs          = require('fs');
+var functions = require("./../Functions.js");
+//const nodemailer    = require('nodemailer');
 
-exports.WriteLogError = function(detailError){
-	console.log(getTimeNow()+": "+detailError);
-	fs.appendFile(getStringFile (), "\r\n"+ getTimeNow() +": "+detailError, (err) => {
-		if (err) throw err;
-	});
-}
+console.log(functions.Test("hre"));
 
-exports.LogChange = function(logChangeDetail){
-	console.log(getTimeNow()+": "+logChangeDetail);
-	fs.appendFile(getStringFile (), "\r\n logChangeDetail: "+ getTimeNow() +": "+logChangeDetail, (err) => {
-		if (err) throw err;
-	});
-}
+exports.Register = function reigister (UserName,Email) {
+	  let transporter = nodemailer.createTransport({
+	  	service: 'gmail',
+	  	auth: {
+	  		user: 'aloevera.hoang@gmail.com',
+	  		pass: '123456@A'
+	  	}
+	  });
 
-function getStringFile () {
-	var stringTime = "./LogError/LogError_"+getTimeNow().slice(0, 10);
-	var caseHour = parseInt((new Date().getHours()-1)/8);
-	var stringHour;
-	switch (caseHour) {
-		case 0:
-		stringHour = "_0-8";
-		break;
-		case 1:
-		stringHour = "_9-16";
-		break;
-		case 2:
-		stringHour = "_17-23";
-		break;
-	}
-	var stringFile = stringTime+stringHour+".txt";
-	return stringFile;
+    // setup email data with unicode symbols
+    let mailOptions = {
+        from: '"Game VAE" <gameVae@demandvi.com>', // sender address
+        to: currentUser.email, // list of receivers
+        subject: 'Thông báo đăng kí tài khoản', // Subject line
+        text: '✔ Đăng kí tài khoản thành công', // plain text body
+        html: '<b>Bạn đã đăng kí tài khoản thành công với tên: '+UserName+ ' và email:'+Email+'</b>' // html body
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, (error, info) => 
+    {
+    	if (error) {
+    		return console.log(error);
+    	}
+    	console.log('Message %s sent: %s', info.messageId, info.response);
+    });
 }
 
-var getTimeNow = exports.GetTimeNow = function getTimeNow() {
-	var retInt = new Date().toISOString();
-	return retInt;     
-}
-exports.Test = function (Para) {
-	console.log(Para)
-}
+
 // 'use strict';
 // const   fs          = require('fs');
 // var crypto          = require('crypto');
@@ -55,10 +47,6 @@ exports.Test = function (Para) {
 
 // var numberDistance, limitNumber = 200;
 
-
-// exports.randomInt = function randomInt (low,high) {
-//     return Math.floor(Math.random() * (high - low + 1) + low);
-// }
 // //Gọi trong login và move
 // exports.getRandomIntInclusive = function getRandomIntInclusive(min, max)
 // {
