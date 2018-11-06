@@ -3,19 +3,37 @@ const   fs          = require('fs');
 
 exports.WriteLogError = function(detailError){
 	console.log(getTimeNow()+": "+detailError);
-	fs.appendFile(getStringFile (), "\r\n"+ getTimeNow() +": "+detailError, (err) => {
+	fs.appendFile(getStringErrorFile (), "\r\n"+ getTimeNow() +": "+detailError, (err) => {
 		if (err) throw err;
 	});
 }
 
 exports.LogChange = function(logChangeDetail){
 	console.log(getTimeNow()+": "+logChangeDetail);
-	fs.appendFile(getStringFile (), "\r\n logChangeDetail: "+ getTimeNow() +": "+logChangeDetail, (err) => {
+	fs.appendFile(getStringChangeFile (), "\r\n logChangeDetail: "+ getTimeNow() +": "+logChangeDetail, (err) => {
 		if (err) throw err;
 	});
 }
 
-function getStringFile () {
+function getStringChangeFile () {
+	var stringTime = "./LogChange/LogChange_"+getTimeNow().slice(0, 10);
+	var caseHour = parseInt((new Date().getHours()-1)/8);
+	var stringHour;
+	switch (caseHour) {
+		case 0:
+		stringHour = "_0-8";
+		break;
+		case 1:
+		stringHour = "_9-16";
+		break;
+		case 2:
+		stringHour = "_17-23";
+		break;
+	}
+	var stringFile = stringTime+stringHour+".txt";
+	return stringFile;
+}
+function getStringErrorFile () {
 	var stringTime = "./LogError/LogError_"+getTimeNow().slice(0, 10);
 	var caseHour = parseInt((new Date().getHours()-1)/8);
 	var stringHour;
@@ -38,8 +56,10 @@ var getTimeNow = exports.GetTimeNow = function getTimeNow() {
 	var retInt = new Date().toISOString();
 	return retInt;     
 }
-exports.Test = function (Para) {
-	console.log(Para)
+
+exports.GetTime = function getTime() {
+	var retInt = new Date().getTime();
+	return retInt;     
 }
 // 'use strict';
 // const   fs          = require('fs');

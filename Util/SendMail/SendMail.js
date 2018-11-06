@@ -1,8 +1,7 @@
 'use strict';
-var functions = require("./../Functions.js");
-//const nodemailer    = require('nodemailer');
+const nodemailer    = require('nodemailer');
 
-console.log(functions.Test("hre"));
+var functions = require("./../Functions.js");
 
 exports.Register = function reigister (UserName,Email) {
 	  let transporter = nodemailer.createTransport({
@@ -16,7 +15,7 @@ exports.Register = function reigister (UserName,Email) {
     // setup email data with unicode symbols
     let mailOptions = {
         from: '"Game VAE" <gameVae@demandvi.com>', // sender address
-        to: currentUser.email, // list of receivers
+        to: Email, // list of receivers
         subject: 'Thông báo đăng kí tài khoản', // Subject line
         text: '✔ Đăng kí tài khoản thành công', // plain text body
         html: '<b>Bạn đã đăng kí tài khoản thành công với tên: '+UserName+ ' và email:'+Email+'</b>' // html body
@@ -28,7 +27,8 @@ exports.Register = function reigister (UserName,Email) {
     	if (error) {
     		return console.log(error);
     	}
-    	console.log('Message %s sent: %s', info.messageId, info.response);
+    	functions.LogChange("Send mail Register: "+UserName+"_Email: "+Email);
+    	// console.log('Message %s sent: %s', info.messageId, info.response);
     });
 }
 

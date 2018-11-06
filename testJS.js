@@ -1,15 +1,117 @@
-// console.log(new Date().getHours());
-// console.log(new Date().getUTCDay());
-var datetime = require('node-datetime');
-console.log(datetime.create().now().getUTCDay())
+var db_all_user			= require('./Util/Database/Db_all_user.js');
 
+var functions 			= require('./Util/Functions.js');
+var DetailError;
 
-
-function getFileTime () {
-	var date = new Date();
-	var hour = new Date().getHours();
-
+var dataTest={
+	UserName: 123456,
+	Password: 'e10adc3949ba59abbe56e057f20f883e'
 }
+
+var test = S_NULL(dataTest);
+
+function S_NULL (data) {
+	var queryString = "SELECT `BlockedTime` FROM `user_info` WHERE `UserName`='"+data.UserName+"'";
+	db_all_user.query(queryString,function (error,rows) {
+		// console.log('BlockedTime: '+rows[0].BlockedTime.getTime())
+		// console.log('GetTime: '+functions.GetTime())
+		// console.log('blocktime: '+(rows[0].BlockedTime.getTime() -functions.GetTime()))
+		var blockTime = rows[0].BlockedTime.getTime() -functions.GetTime();
+		if (blockTime>0) {
+			setTimeout(function updateUser (data) {
+				var updateSetTimeout = "UPDATE `user_info` SET `BlockedTime`= null WHERE `UserName`="+data.UserName;
+				db_all_user.query(updateSetTimeout, function (error,result) {
+					console.log(error);
+				});
+			}, blockTime, data);
+		}
+		
+		
+		// if (rows[0].BlockedForever==1) {
+		// 	//socket.emit('R_BLOCKED',{BlockedForever:1,Time:0});
+		// }
+		// else if (rows[0].BlockedTime.getTime()>=functions.GetTime()) {
+		// 	console.log('timeout: '+rows[0].BlockedTime.getTime()-functions.GetTime())
+		// 	// check time => lấy time chenh lech => chay settimeout  doi voi time lon hon hien tai, con nho hon thi reset ve null, va doi bien blockForever 
+
+		// 	//socket.emit('R_BLOCKED',{BlockedForever:0,Time:rows[0].BlockedTime});
+		// }else{
+		// 	console.log('timeout: '+rows[0].BlockedTime.getTime()-functions.GetTime())
+		// 	// if (rows[0].Password==currentUser.Password) {
+		// 	// 	//socket.emit(R_LOGIN,{LoginBool:1});
+		// 	// }
+		// 	// else{
+		// 	// 	//socket.emit(R_LOGIN,{LoginBool:0});
+		// 	// }
+
+		// }
+	});
+}
+
+
+
+
+// function R_CHECK_DUPLICATE_LOGIN (data, retBool) {
+// 	var queryCheckDuplicate = "SELECT `Socket` FROM `user_info` WHERE `UserName`='"+currentUser.UserName+"'";
+// 	db_all_user.query(queryCheckDuplicate,function (error,rows) {
+// 		if (!!error){DetailError = ('Login.js: R_CHECK_DUPLICATE_LOGIN queryUser :'+ data.UserName); functions.WriteLogError(DetailError);}
+// 		if (rows[0].Socket!=null||rows[0].Socket!=socket.id) {
+// 			LogChange='Login.js: DUPLICATE_LOGIN: '+data.UserName;functions.LogChange(LogChange);
+// 		}
+// 	});
+// }
+// function S_LOGIN (data) {
+	
+// 	//currentUser = getCurrentUser(data);
+// 	var queryUserNamePass = "SELECT * FROM `user_info` WHERE `UserName`='"+data.UserName+"'";
+// 	db_all_user.query(queryUserNamePass, function (error,rows) {
+// 		if (!!error){DetailError = ('Login.js: Error queryUserNamePass');functions.WriteLogError(DetailError);}
+// 		console.log(rows[0].BlockedTime.getTime())
+// 		console.log(functions.GetTime())
+// 		if (rows[0].BlockedTime.getTime()>=functions.GetTime()) {
+// 			console.log('rows[0].BlockedTime>=functions.GetTimeNow()')
+// 		}else{
+// 			console.log('rows[0].BlockedTime<functions.GetTimeNow()')
+// 		}
+// 	});
+// }
+
+
+// console.log(R_CHECK_DUPLICATE_LOGIN(dataTest));
+
+// function queryData (data) {
+// 	var queryString = "SELECT * FROM `user_info` WHERE `UserName`='"+data.UserName+"' OR `Email`='"+data.Email+"'";
+// 	console.log('queryString: '+queryString);
+// 	db_all_user.query(queryString,function(error,rows){
+// 		if (!!error){DetailError = ('Register: S_REGISTER queryUser :'+ data.UserName); functions.WriteLogError(DetailError);}
+// 		console.log('rows: '+rows.length);
+
+// 	});
+// }
+
+// function R_CHECK_DUPLICATE_LOGIN (data) {
+// 	var queryCheckDuplicate = "SELECT `Socket` FROM `user_info` WHERE `UserName`='"+data.UserName+"'";
+// 	console.log('queryCheckDuplicate: '+queryCheckDuplicate);
+// 	db_all_user.query(queryCheckDuplicate,function (error,rows) {
+// 		if (!!error){DetailError = ('Login.js: R_CHECK_DUPLICATE_LOGIN queryUser :'+ data.UserName); functions.WriteLogError(DetailError);}
+
+// 		if (rows[0].Socket!=null) {
+// 			console.log("here")
+// 		}
+
+// 	});
+// }
+
+// // console.log(new Date().getHours());
+// // console.log(new Date().getUTCDay());
+// var datetime = require('node-datetime');
+// console.log(datetime.create().now().getUTCDay())
+
+// function getFileTime () {
+// 	var date = new Date();
+// 	var hour = new Date().getHours();
+
+// }
 
 // var fs = require('fs');
 // var testApendFile =appendFile ("string") ;

@@ -1,0 +1,13 @@
+
+ logChangeDetail: 2018-10-24T01:12:52.487Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-10-24T01:13:50.017Z: TaskServer.js: removeUser ConnectUser
+ logChangeDetail: 2018-10-24T01:14:37.447Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-10-24T01:15:33.198Z: TaskServer.js: removeUser ConnectUser
+ logChangeDetail: 2018-10-24T01:18:53.171Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-10-24T01:18:57.915Z: TaskServer.js: removeUser ConnectUser
+ logChangeDetail: 2018-10-24T01:21:06.732Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-10-24T01:21:16.787Z: TaskServer.js: removeUser ConnectUser
+ logChangeDetail: 2018-10-24T01:22:16.413Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-10-24T01:22:25.057Z: TaskServer.js: removeUser ConnectUser
+ logChangeDetail: 2018-10-24T01:24:31.389Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-10-24T01:24:42.767Z: TaskServer.js: removeUser ConnectUser

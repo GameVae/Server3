@@ -17,29 +17,16 @@
 {
   "apps": [
     {
-      "name": "setSendPort",
-      "script": "./setSendPort.js",
+      "name": "server3",
+      "script": "./index.js",
       "instances": 1,
       "exec_mode": "cluster",
       "env": {
         "NODE_ENV": "development",
-        "PORT": "1020"
+        "PORT": "1010"
       }
     }    
   ]
-},
-{
-  "apps": [
-    {
-      "name": "setReceivePort",
-      "script": "./setReceivePort.js",
-      "instances": 1,
-      "exec_mode": "cluster",
-      "env": {
-        "NODE_ENV": "development",
-        "PORT": "1030"
-      }
-    }
-  ]
 }
+
 

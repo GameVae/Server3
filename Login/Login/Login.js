@@ -2,34 +2,74 @@
 
 var db_all_user			= require('./../../Util/Database/Db_all_user.js');
 
+var functions 			= require('./../../Util/Functions.js');
+
 var currentUser;
+
+var DetailError, LogChange;
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
-		S_LOGIN (socket);
+		socket.on('S_LOGIN', function (data){
+			S_LOGIN (socket,data);
+		});
 	});
 }
 
-function S_LOGIN (socket) {
-	socket.on('S_LOGIN',function (data) {
-		 currentUser = getCurrentUser(data);
+function S_LOGIN (socket,data) {
+	currentUser = getCurrentUser(data);
+	var queryUserNamePass = "SELECT * FROM `user_info` WHERE `UserName`="+currentUser.UserName+"'";
+	db_all_user.query(queryUserNamePass, function (error,rows) {
+		if (!!error){DetailError = ('Login.js: Error queryUserNamePass');functions.WriteLogError(DetailError);}
+		if (rows[0].BlockedForever==1) {
+			socket.emit('R_BLOCKED',{BlockedForever:1,Time:0});
+		}else{
+			if (rows[0].BlockedTime.getTime()>=functions.GetTime()) {
+				// check time => lấy time chenh lech => chay settimeout  doi voi time lon hon hien tai, con nho hon thi reset ve null, va doi bien blockForever 	
+				socket.emit('R_BLOCKED',{BlockedForever:0,Time:rows[0].BlockedTime});
+				updateSetBlockTime (blockTime,socket,data);
+			}else{
+				if (rows[0].Password==currentUser.Password) {
+					socket.emit('R_LOGIN',{LoginBool:1});
+				}
+				else{
+					socket.emit('R_LOGIN',{LoginBool:0});
+				}
+			}
+		}
+		LogChange='Login.js: queryUserNamePass: '+data.UserName;functions.LogChange(LogChange);	
 	});
-	
+}
+function updateSetBlockTime (blockTime,socket,data) {
+	setTimeout(function updateUser (data) {
+		var updateSetTimeout = "UPDATE `user_info` SET `BlockedTime`= null WHERE `UserName`="+data.UserName;
+		db_all_user.query(updateSetTimeout, function (error,result) {
+			socket.emit('R_LOGIN',{LoginBool:1});
+			LogChange='Login.js: updateSetBlockTime: '+data.UserName;functions.LogChange(LogChange);
+		});
+	}, blockTime, data);
+
+}
+function R_CHECK_DUPLICATE_LOGIN (socket,data) {
+	var queryCheckDuplicate = "SELECT `Socket` FROM `user_info` WHERE `UserName`='"+currentUser.UserName+"'";
+	db_all_user.query(queryCheckDuplicate,function (error,rows) {
+		if (!!error){DetailError = ('Login.js: R_CHECK_DUPLICATE_LOGIN queryUser :'+ data.UserName); functions.WriteLogError(DetailError);}
+		if (rows[0].Socket!=null||rows[0].Socket!=socket.id) {
+			LogChange='Login.js: DUPLICATE_LOGIN: '+data.UserName;functions.LogChange(LogChange);
+		}
+	});
 }
 
 function getCurrentUser (data) {
 	return currentUser ={
 		UserName: data.UserName,
 		Password: data.Password,
-		Model_Device: data.ModelDevide,
-		Ram_Devide: data.RamDevide
+		Model_Device: data.ModelDevice,
+		Ram_Device: data.RamDevice
 	}
 }
 
-function R_CHECK_DUPLICATE_LOGIN () {
-	var queryCheckDuplicate = "SELECT `Socket` FROM `user_info` WHERE `UserName`='"+currentUser.UserName+"'";
 
-}
 // // var async 			= require('async');
 // var lodash			= require('lodash');
 // // var math 			= require('mathjs');
@@ -119,19 +159,19 @@ function R_CHECK_DUPLICATE_LOGIN () {
 
 // function S_LOGIN (socket) {
 // 	socket.on('S_LOGIN', function (data){
-		
+
 // 		currentUser = getCurrentUser (data,shortId,socket);
 // 		// var size =Object.keys(currentUser).length;
 // 		// console.log(currentUser);
-		
+
 // 		var currentTime = Math.floor(new Date().getTime() / 1000);
 
 // 		console.log("Data receive Login1: "+currentUser.name+"_"+currentUser.password+"_"+socket.id);
-		
+
 // 		database.query(queryUserNamePass (currentUser),function (error,rows) {
 // 			if (!!error){DetailError = ('login.js: Error queryUserNamePass');functions.writeLogErrror(DetailError);}
 // 			if (rows.length>0) {
-				
+
 
 // 				return new Promise((resolve,reject)=>{
 // 					R_CHECK_DUPLICATE_LOGIN(currentUser,socket,resolve);	
@@ -197,7 +237,7 @@ function R_CHECK_DUPLICATE_LOGIN () {
 // 							//console.log("updateTimeGuildInvite");
 // 						});	
 // 					});
-					
+
 // 				}).then(()=>{
 // 					return new Promise((resolve,reject)=>{
 // 						guildManager.getTimeCancelGuild(currentUser, function (rows) {
@@ -259,7 +299,7 @@ function R_CHECK_DUPLICATE_LOGIN () {
 // 							resolve();
 // 						});
 // 					});
-					
+
 // 				}).then(()=>{
 // 					return new Promise((resolve,reject)=>{
 // 						getBlackListInfo (currentUser,function (rows) {
@@ -269,7 +309,7 @@ function R_CHECK_DUPLICATE_LOGIN () {
 // 							resolve();
 // 						});
 // 					});
-					
+
 // 				}).then(()=>{
 // 					return new Promise((resolve,reject)=>{
 // 						chatting.getarrayMessPrivateMember(currentUser,function (rows) {
@@ -277,8 +317,8 @@ function R_CHECK_DUPLICATE_LOGIN () {
 // 							resolve();
 // 						});
 // 					});
-					
-					
+
+
 // 				}).then(()=>{
 // 					return new Promise((resolve,reject)=>{
 // 						userBase.getarrayAllUsers (currentUser,function (rows) {
@@ -339,7 +379,7 @@ function R_CHECK_DUPLICATE_LOGIN () {
 
 // 				}).then(()=>{	
 // 					consoleLog();
-					
+
 // 					if (blockInfo===0) {
 // 						socket.emit('R_LOGIN_SUCCESS',{
 // 							message : '1',
@@ -385,7 +425,7 @@ function R_CHECK_DUPLICATE_LOGIN () {
 // 							arrayAllresourceupTower: arrayAllresourceupTower,
 
 // 							arrayAllUsers: arrayAllUsers,						
-							
+
 // 							arrayAddedFriend: arrayAddedFriend,
 // 							arrayWaitedFriend: arrayWaitedFriend,
 // 							arrayCancelFriend: arrayCancelFriend,
@@ -671,7 +711,7 @@ function R_CHECK_DUPLICATE_LOGIN () {
 // 				upgrade.updateCurrentUpgrade(rows[i],currentTime);
 // 				resourceTransfer.updateTimeTransferRes(rows[i],currentTime);
 // 				resourceTransfer.updateTimeTransferResToFriend(rows[i],currentTime);
-				
+
 // 			}			
 // 		}
 // 	});

@@ -4,30 +4,113 @@ var app				= express();
 var server			= require('http').createServer(app);
 var io 				= require('socket.io').listen(server);
 
-app.set('port', process.env.PORT);
+var functions 		= require('./Util/Functions.js');
+
+
+var db_server_task 	= require('./Util/Database/Db_server_task.js');
+
 server.listen(process.env.PORT);
-
-//var database 		= require('./Database/db_s3.js');
-
-//var CheckVersion 	= require('./CheckVersion/CheckVersion.js');
-
 io.sockets.setMaxListeners(0);
+app.set('port', process.env.PORT);
+console.log(functions.GetTimeNow()+": "+app.get('port'));
+
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
+var register 		= require('./Login/Register/Register.js');
+register.Start(io);
+var login 			= require('./Login/Login/Login.js');
+// login.Start(io);
 
-var register 		= require('./Login/Register/register.js');
-register.start(io);
-
+var taskServer 		= require('./Task/TaskServer.js');
+// taskServer.Start(io);
+//var CheckVersion 	= require('./CheckVersion/CheckVersion.js');
 //CheckVersion.start(io);
 
+if (app.get('port') === process.env.PORT)
+{	
+	var connectCounter=0;
+	checkConnect (connectCounter,io);
+	login.Start(io);
+}
+
+function checkConnect (connectCounter,io) {
+	io.on('connection', function (socket) {
+		var selectConnectServer ="SELECT `Content` FROM `task` WHERE `ID`='2'";
+		db_server_task.query(selectConnectServer, function (error,rows) {
+			if (rows[0].Content==1) {		
+				connectCounter++;
+				taskServer.ConnectSocket(socket.id);
+				socket.emit('connection',{});
+				console.log('connectCounter: '+connectCounter);		
+			}	
+		});
+		socket.on('disconnect', function () {
+			connectCounter--;
+			taskServer.RemoveConnectSocket(socket.id);
+			console.log('connectCounter: '+connectCounter);		
+		});
+	});
+}
 
 
-// if (app.get('port') === "1010") {	
-// 	// console.log("here 1010");
-	
+//-----
+// if (app.get('port') === process.env.PORT)
+// {	
+// 	var connectCounter=0;
+// 	io.on('connection', function (socket) {		
+
+// 		var selectConnectServer ="SELECT `Content` FROM `task` WHERE `ID`='2'";
+// 		//io.sockets.socket.close();
+// 		db_server_task.query(selectConnectServer, function (error,rows) {
+// 			if (rows[0].Content==1) {		
+// 				connectCounter++;
+// 				//SocketUser.push(socket.id);
+// 				taskServer.ConnectSocket(socket.id);
+// 				socket.emit('connection',{});
+// 				console.log(io);
+// 				module.exports.IO = io;
+// 				// console.log(io.engine.clientsCount)
+// 			}	
+// 		});
+
+// 		socket.on('disconnect', function () {
+// 			connectCounter--;
+// 			//socketUser.splice(socketUser.indexOf(socket.id), 1);	
+// 			taskServer.RemoveConnectSocket(socket.id);
+// 			module.exports.IO = io;
+// 		});
+
+// 	});
+
 // }
 
+// //CheckVersion.start(io);
+// var register 		= require('./Login/Register/Register.js');
+// register.Start(io);
+// ---
 
+
+// exports.App 	= app;
+// exports.Server 	= server;
+// -------
+
+
+//console.log("port: "+process.env.PORT);//port server
+
+// if (process.argv.length >2) {
+// 	switch (parseInt(process.argv[2])) {
+// 		case 0:
+// 		io.on('disconnect',function (socket) {
+// 			socket.on('disconnect', function () {});
+// 		});
+// 		//server.removeAllListeners();
+// 		// console.log(io.sockets.close());
+// 		// //console.log(server);
+// 		// io.close();
+// 		//console.log(server.getPort())
+// 		break;
+// 	}
+// }
 
 
 // var database 		= require('./Util/db.js');

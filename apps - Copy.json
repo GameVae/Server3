@@ -1,0 +1,45 @@
+// {
+//   "apps": [
+//     {
+//       "name": "server node.js",
+//       "script": "./server3.js",
+//       "instances": 1,
+//       "exec_mode": "cluster",
+//       "env": {
+//         "watch": true,
+//         "NODE_ENV": "development",
+//         "PORT": "1010"
+//       }
+//     }
+//   ]
+// }
+
+{
+  "apps": [
+    {
+      "name": "setSendPort",
+      "script": "./index.js",
+      "instances": 1,
+      "exec_mode": "cluster",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "1010"
+      }
+    }    
+  ]
+},
+{
+  "apps": [
+    {
+      "name": "setReceivePort",
+      "script": "./setReceivePort.js",
+      "instances": 1,
+      "exec_mode": "cluster",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "1030"
+      }
+    }
+  ]
+}
+
