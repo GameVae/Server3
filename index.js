@@ -25,6 +25,8 @@ var taskServer 		= require('./Task/TaskServer.js');
 // taskServer.Start(io);
 //var CheckVersion 	= require('./CheckVersion/CheckVersion.js');
 //CheckVersion.start(io);
+var getRss = require('./Map/GetRss.js');
+getRss.UpdateTimeHarvest();
 
 if (app.get('port') === process.env.PORT)
 {	
