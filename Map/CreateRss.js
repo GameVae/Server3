@@ -96,7 +96,7 @@ function createResource () {
 	// createLv (4);
 	createLv (5);
 	console.log(dictRssPos);
-
+	//insertToDatabase (dictRssPos);
 }
 var dictTest = {
 	'276,277,0': { RssType: 4, Quality: 2475000, Region_Position: 1 },
@@ -237,7 +237,7 @@ function addDict (dictionary,key,value) {
 // //getRssInfo (1)
 // function getRssInfo (server) {
 // 	var serverData = 's'+server+'_rss_test';
-	
+
 // 	var queryString = "SELECT * FROM `"+serverData+"`";
 // 	console.log(queryString);
 // 	db_s1_rss.query(queryString,function (error,rows) {

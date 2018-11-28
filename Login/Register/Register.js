@@ -5,7 +5,7 @@ var updateDatabaseUser	= require('./UpdateDatabaseUser');
 var functions 			= require('./../../Util/Functions.js');
 var sendMail 			= require('./../../Util/SendMail/SendMail.js');
 
-var db_user				= require('./../../Util/Database/Db_s1_user.js');
+//var db_user				= require('./../../Util/Database/Db_s1_user.js');
 var db_all_user			= require('./../../Util/Database/Db_all_user.js');
 var db_server_task 		= require('./../../Util/Database/Db_server_task.js');
 
@@ -72,7 +72,7 @@ var insert_User_Game_Info = exports.Test =function insert_User_Game_Info (data) 
 			db_server_task.query(getServerString,function (error,rows) {
 				if (!!error){DetailError = ('Register.js: Error getServerString'+ data.UserName);functions.WriteLogError(DetailError);}
 
-				var stringInsert_game_info = "INSERT INTO `all_users`.`game_info` (`ID_User`, `NameInGame`,`Server_ID`) VALUES ('"
+				var stringInsert_game_info = "INSERT INTO `all_users`.`game_info_s"+rows[0].Content+"` (`ID_User`, `NameInGame`,`Server_ID`) VALUES ('"
 				+result.insertId+"','"
 				+data.UserName+"','"
 				+rows[0].Content+"')";
