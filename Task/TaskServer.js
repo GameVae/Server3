@@ -8,7 +8,6 @@ var DetailError,logChangeDetail ;
 
 exports.ConnectSocket = function connectSocket (id) {
 	var insertUser = "INSERT INTO `socket_user`(`SocketID`, `Time`) VALUES ("+id+",'"+functions.GetTimeNow()+"')";
-	console.log('insertUser: '+insertUser);
 	db_server_task.query(insertUser,function (error,result) {
 		if (!!error){DetailError = ('TaskServer.js: insertUser ConnectUser'); functions.WriteLogError(DetailError);}
 		logChangeDetail =("TaskServer.js: insertUser ConnectUser"); functions.LogChange(logChangeDetail);
@@ -17,14 +16,13 @@ exports.ConnectSocket = function connectSocket (id) {
 
 exports.RemoveConnectSocket = function removeConnectSocket (id) {	
 	var removeUser = "DELETE FROM `socket_user` WHERE `SocketID`="+id;
-	console.log('removeUser: '+removeUser);
 	db_server_task.query(removeUser,function (error,result) {
-		if (!!error){DetailError = ('TaskServer.js: removeUser ConnectUser'); functions.WriteLogError(DetailError);}
-		logChangeDetail =("TaskServer.js: removeUser ConnectUser"); functions.LogChange(logChangeDetail);
+		if (!!error){DetailError = ('TaskServer.js: removeUser ConnectUser '+id); functions.WriteLogError(DetailError);}
+		logChangeDetail =("TaskServer.js: removeUser ConnectUser "+id); functions.LogChange(logChangeDetail);
 	});
 }
-if (process.argv.length <2) {
 
+if (process.argv.length <2) {
 	//console.log(process.argv.length)
 	console.log("Vui long chon tham so truyen vao:")
 	console.log("0: Current Server")
@@ -108,17 +106,17 @@ else{
 	}
 }
 
-exports.Start =  function start (io) {
-	// console.log('here length');
-	// if (process.argv.length >2 && parseInt(process.argv[2])===5) {
-	// 	io.on('connection', function(socket){
-	// 		console.log(io);
-	// 	});
-	// }
-	// io.on('connection', function(socket){
-	// 	if (process.argv.length >2 && parseInt(process.argv[2])===5) {
-	// 		console.log('here');
-	// 		console.log(io);
-	// 	}
-	// });
-}
+// exports.Start =  function start (io) {
+// 	// console.log('here length');
+// 	// if (process.argv.length >2 && parseInt(process.argv[2])===5) {
+// 	// 	io.on('connection', function(socket){
+// 	// 		console.log(io);
+// 	// 	});
+// 	// }
+// 	// io.on('connection', function(socket){
+// 	// 	if (process.argv.length >2 && parseInt(process.argv[2])===5) {
+// 	// 		console.log('here');
+// 	// 		console.log(io);
+// 	// 	}
+// 	// });
+// }

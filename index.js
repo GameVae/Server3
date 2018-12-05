@@ -12,21 +12,25 @@ var db_server_task 	= require('./Util/Database/Db_server_task.js');
 server.listen(process.env.PORT);
 io.sockets.setMaxListeners(0);
 app.set('port', process.env.PORT);
+
 console.log(functions.GetTimeNow()+": "+app.get('port'));
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 var register 		= require('./Login/Register/Register.js');
 register.Start(io);
+
 var login 			= require('./Login/Login/Login.js');
 // login.Start(io);
 
 var taskServer 		= require('./Task/TaskServer.js');
 // taskServer.Start(io);
-//var CheckVersion 	= require('./CheckVersion/CheckVersion.js');
-//CheckVersion.start(io);
+
+var CheckVersion 	= require('./CheckVersion/CheckVersion.js');
+CheckVersion.Start(io);
+
 var getRss = require('./Map/GetRss.js');
-getRss.UpdateTimeHarvest();
+// getRss.UpdateTimeHarvest();
 
 if (app.get('port') === process.env.PORT)
 {	
@@ -55,7 +59,7 @@ function checkConnect (connectCounter,io) {
 }
 
 
-//-----
+
 // if (app.get('port') === process.env.PORT)
 // {	
 // 	var connectCounter=0;

@@ -3,7 +3,7 @@ const   fs          = require('fs');
 
 exports.WriteLogError = function(detailError){
 	console.log(getTimeNow()+": "+detailError);
-	fs.appendFile(getStringErrorFile (), "\r\n"+ getTimeNow() +": "+detailError, (err) => {
+	fs.appendFile(getStringErrorFile (), "\r\n "+ getTimeNow() +": "+detailError, (err) => {
 		if (err) throw err;
 	});
 }

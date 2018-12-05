@@ -65,8 +65,9 @@ function updateTimeHarvest () {
 			for (var i = 0; i < rows.length; i++) {
 				rowTime = new Date(rows[i].TimePrepare).getTime();
 				if (rowTime>currentTime) {
-					console.log("here: "+rowTime);
+					console.log("do nothing: "+rowTime);
 				}else{
+					//bắt đầu khai thác, tính thời gian khai thác
 					console.log(rowTime);	
 					console.log(new Date(rowTime).getTime());	
 				}

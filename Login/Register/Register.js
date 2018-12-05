@@ -115,7 +115,7 @@ function insertNewUserDatabase(ID_User,Server_ID) {
 	"ALTER TABLE "+stringTable_base_defend+" MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT";
 
 	createNewTable_base_info = "DROP TABLE IF EXISTS "+stringTable_base_info+";"+ 
-	"CREATE TABLE "+stringTable_base_info+" ( `ID` int(11) NOT NULL, `ID_User` int(11) NOT NULL, `BaseNumber` int(11) NOT NULL, `Location` text NOT NULL, `Farm` double NOT NULL, `Wood` double NOT NULL, `Stone` double NOT NULL, `Metal` double NOT NULL, `UpgradeWaitType` int(11) NOT NULL, `UpgradeTime_int` int(11) NOT NULL, `UpgradeTime_text` text NOT NULL, `UnitTransferType` int(11) NOT NULL, `UnitTransferQuality` int(11) NOT NULL, `UnitTransferTime_int` int(11) NOT NULL, `UnitTransferTime_txt` text NOT NULL, `UnitTransfer_ID_Base` int(11) NOT NULL, `TrainingUnitType` int(11) NOT NULL, `TrainingTime_int` int(11) NOT NULL, `TrainingTime_text` text NOT NULL, `TrainingQuality` int(11) NOT NULL, `SumUnitQuality` int(11) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=latin1;"+ 
+	"CREATE TABLE "+stringTable_base_info+" ( `ID` int(11) NOT NULL, `ID_User` int(11) NOT NULL, `BaseNumber` int(11) NOT NULL, `Location` text NOT NULL, `Farm` double NOT NULL, `Wood` double NOT NULL, `Stone` double NOT NULL, `Metal` double NOT NULL, `UpgradeWait_ID` int(11) NULL, `UpgradeTime` DATETIME NULL, `ResearchWait_ID` int(11) NULL, `ResearchTime` DATETIME NULL,`UnitTransferType` int(11) NULL, `UnitTransferQuality` int(11) NULL, `UnitTransferTime` DATETIME NULL, `UnitTransfer_ID_Base` int(11) NULL, `TrainingUnitType` int(11) NULL, `TrainingTime` DATETIME NULL, `TrainingQuality` int(11) NULL, `SumUnitQuality` int(11) NULL ) ENGINE=InnoDB DEFAULT CHARSET=latin1;"+ 
 	"ALTER TABLE "+stringTable_base_info+" ADD PRIMARY KEY (`ID`);"+ 
 	"ALTER TABLE "+stringTable_base_info+" MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;"
 
@@ -179,4 +179,3 @@ function insertNewUserDatabase(ID_User,Server_ID) {
 // function R_USER_REGISTER (currentUser,socket) {
 // 	socket.emit('R_USER_REGISTER', { UserName : currentUser.name,});
 // }
-
