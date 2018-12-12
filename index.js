@@ -27,7 +27,7 @@ var taskServer 		= require('./Task/TaskServer.js');
 // taskServer.Start(io);
 
 var CheckVersion 	= require('./CheckVersion/CheckVersion.js');
-CheckVersion.Start(io);
+// CheckVersion.Start(io);
 
 var getRss = require('./Map/GetRss.js');
 // getRss.UpdateTimeHarvest();
@@ -37,10 +37,13 @@ if (app.get('port') === process.env.PORT)
 	var connectCounter=0;
 	checkConnect (connectCounter,io);
 	login.Start(io);
+	CheckVersion.Start(io);
+	getRss.Start(io);
 }
 
 function checkConnect (connectCounter,io) {
 	io.on('connection', function (socket) {
+		
 		var selectConnectServer ="SELECT `Content` FROM `task` WHERE `ID`='2'";
 		db_server_task.query(selectConnectServer, function (error,rows) {
 			if (rows[0].Content==1) {		

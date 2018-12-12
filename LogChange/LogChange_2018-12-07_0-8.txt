@@ -1,0 +1,14 @@
+
+ logChangeDetail: 2018-12-07T01:49:32.628Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-12-07T01:49:47.869Z: TaskServer.js: removeUser ConnectUser noYcRrR0jO3HVsbaAAAA
+ logChangeDetail: 2018-12-07T01:50:01.206Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-12-07T01:50:01.346Z: TaskServer.js: removeUser ConnectUser Y3zM_sqWSlFZLMZFAAAA
+ logChangeDetail: 2018-12-07T01:50:12.181Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-12-07T01:50:43.410Z: TaskServer.js: removeUser ConnectUser t5e-3WAhR05AVhi6AAAA
+ logChangeDetail: 2018-12-07T01:51:51.266Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-12-07T01:51:51.630Z: TaskServer.js: removeUser ConnectUser dWEJVoDRLC5IJOUwAAAA
+ logChangeDetail: 2018-12-07T01:51:58.508Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-12-07T01:52:28.893Z: TaskServer.js: removeUser ConnectUser rpsk-m4NPRwvhdlZAAAA
+ logChangeDetail: 2018-12-07T01:55:13.921Z: TaskServer.js: insertUser ConnectUser
+ logChangeDetail: 2018-12-07T01:55:14.036Z: TaskServer.js: removeUser ConnectUser yschEK4LDk9erlkbAAAA
+ logChangeDetail: 2018-12-07T01:55:17.080Z: TaskServer.js: insertUser ConnectUser

@@ -1,5 +1,6 @@
 'use strict';
 const   fs          = require('fs');
+var path 			= require('path');
 
 exports.WriteLogError = function(detailError){
 	console.log(getTimeNow()+": "+detailError);
@@ -9,7 +10,7 @@ exports.WriteLogError = function(detailError){
 }
 
 exports.LogChange = function(logChangeDetail){
-	console.log(getTimeNow()+": "+logChangeDetail);
+	//console.log(getTimeNow()+": "+logChangeDetail);
 	fs.appendFile(getStringChangeFile (), "\r\n logChangeDetail: "+ getTimeNow() +": "+logChangeDetail, (err) => {
 		if (err) throw err;
 	});
@@ -35,6 +36,9 @@ function getStringChangeFile () {
 }
 function getStringErrorFile () {
 	var stringTime = "./LogError/LogError_"+getTimeNow().slice(0, 10);
+	//var stringTime = "./../LogError/LogError_"+getTimeNow().slice(0, 10);
+
+
 	var caseHour = parseInt((new Date().getHours()-1)/8);
 	var stringHour;
 	switch (caseHour) {

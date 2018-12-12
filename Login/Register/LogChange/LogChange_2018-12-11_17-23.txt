@@ -1,0 +1,11 @@
+
+ logChangeDetail: 2018-12-11T10:02:03.056Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`,`ResetVipTime`,`DateCreate`) VALUES ('Mquan','undefined','homanhquan@gmail.com','Mquan','10','2018-12-11T10:02:03.052Z')
+ logChangeDetail: 2018-12-11T10:02:03.060Z: updateString: UPDATE `user_info` SET `ID_User` = '8' WHERE `user_info`.`ID` = '8'
+ logChangeDetail: 2018-12-11T10:02:03.065Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`,`Server_ID`) VALUES ('8','Mquan','1')
+ logChangeDetail: 2018-12-11T10:02:03.394Z: createNewTable_base_defend: 8
+ logChangeDetail: 2018-12-11T10:02:03.399Z: createNewTable_base_info: 8
+ logChangeDetail: 2018-12-11T10:03:20.505Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`,`ResetVipTime`,`DateCreate`) VALUES ('Mquan','undefined','homanhquan@gmail.com','Mquan','10','2018-12-11T10:03:20.500Z')
+ logChangeDetail: 2018-12-11T10:03:20.507Z: updateString: UPDATE `user_info` SET `ID_User` = '9' WHERE `user_info`.`ID` = '9'
+ logChangeDetail: 2018-12-11T10:03:20.513Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`,`Server_ID`) VALUES ('9','Mquan','1')
+ logChangeDetail: 2018-12-11T10:03:20.588Z: createNewTable_base_info: 9
+ logChangeDetail: 2018-12-11T10:03:20.597Z: createNewTable_base_defend: 9

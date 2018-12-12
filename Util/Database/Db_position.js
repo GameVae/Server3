@@ -5,12 +5,12 @@ var max                  =  10000;
 var db_host              =  'localhost';
 var db_user              =  'gamevae';
 var db_password          =  'GWgUi2]&]aa';
-var db_database          =  'rss';
+var db_database          =  'position';
 var db_debug             =  false;
 var db_multipleStatements=  true;
 var db_charset           =  'utf8_unicode_ci';
 
-var database_rss    =    mysql.createPool({
+var database_position    =    mysql.createPool({
   max                : max,
   host               : db_host,
   user               : db_user,
@@ -22,7 +22,7 @@ var database_rss    =    mysql.createPool({
 });
 
 
-database_rss.on('connection', function(connection) {
+database_position.on('connection', function(connection) {
  console.log('Connection established');
  connection.on('error', function(err) {
   console.error(new Date(), 'MySQL error', err.code);
@@ -32,4 +32,4 @@ database_rss.on('connection', function(connection) {
 });
 });
 
-module.exports = database_rss;
+module.exports = database_position;

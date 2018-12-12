@@ -22,13 +22,19 @@ function S_GATHER_RSS (socket,data) {
 	console.log('S_GATHER_RSS '+"update database");
 	console.log('R_GATHER_RSS');
 }
-function S_GET_RSS (socket,data) {
-	var table = "s_"+data+"_rss_test";
-	var queryString = "SELECT * FROM "+table;
 
-	db_rss.query(queryString,function (error,rows) {
+
+function S_GET_RSS (socket,data) {
+	//console.log(data)
+
+	var table = "s"+data.Server+"_rss";
+	//console.log(table)
+ 	var queryString = "SELECT * FROM "+table;
+ //console.log(queryString)
+	 db_rss.query(queryString,function (error,rows) {
 		if (!!error){DetailError = ('GetRss.js: Error query getDataRss');functions.WriteLogError(DetailError);}
-		socket.emit('R_GET_RSS',{data:rows});
+		console.log(rows);
+		socket.emit('R_GET_RSS',{Data:rows});
 	});
 }
 
@@ -51,7 +57,7 @@ exports.UpdateTimeHarvest = function updateTimeHarvest () {
 
 }
 
-updateTimeHarvest();
+//updateTimeHarvest();
 function updateTimeHarvest () {
 	console.log('UpdateTimeHarvest');
 	var queryStringTimePrepare = "SELECT * FROM `s1_rss_test` WHERE `TimePrepare`<> 'NULL'";

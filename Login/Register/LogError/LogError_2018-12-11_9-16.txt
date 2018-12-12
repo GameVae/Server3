@@ -1,0 +1,8 @@
+
+ 2018-12-11T09:47:48.272Z: UpdateUser.js: createNewTable s1_base_defend: 6
+ 2018-12-11T09:49:11.679Z: UpdateUser.js: createNewTable s1_base_defend: 7
+ 2018-12-11T09:51:40.541Z: UpdateUser.js: createNewTable_base_info s1_base_defend: 1
+ 2018-12-11T09:52:54.854Z: UpdateUser.js: createNewTable_base_info s1_base_defend: 2
+ 2018-12-11T09:53:57.579Z: UpdateUser.js: createNewTable_base_info s1_base_defend: 3
+ 2018-12-11T09:56:04.741Z: UpdateUser.js: createNewTable_base_info s1_base_defend: 4
+ 2018-12-11T09:56:54.840Z: UpdateUser.js: createNewTable_base_info s1_base_defend: 5
