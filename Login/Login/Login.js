@@ -2,10 +2,11 @@
 
 var db_all_user			= require('./../../Util/Database/Db_all_user.js');
 
+var getRss 				= require('./../../Map/GetRss.js');
 var functions 			= require('./../../Util/Functions.js');
 
 var currentUser;
-
+var dataUser={}
 var DetailError, LogChange;
 
 exports.Start = function start (io) {
@@ -30,6 +31,8 @@ function S_LOGIN (socket,data) {
 				updateSetBlockTime (blockTime,socket,data);
 			}else{
 				if (rows[0].Password==currentUser.Password) {
+					S_USER_INFO (socket,rows[0].Server_ID);
+
 					socket.emit('R_LOGIN',{LoginBool:1});
 				}
 				else{
@@ -40,6 +43,21 @@ function S_LOGIN (socket,data) {
 		LogChange='Login.js: queryUserNamePass: '+data.UserName;functions.LogChange(LogChange);	
 	});
 }
+
+
+
+
+function S_USER_INFO (socket,ID_User) {
+	var queryString = "SELECT * FROM `game_info_s1` WHERE `ID_User`='"+ID_User+"'";
+	db_all_user.query(queryString,function (error,rows) {
+		if (!!error){DetailError = ('Login.js: S_USER_INFO queryUser :'+ ID_User); functions.WriteLogError(DetailError);}
+		dataUser= rows[0];
+		delete dataUser.ID;
+		socket.emit('S_USER_INFO',{Data:dataUser});
+		getRss.S_GET_RSS(socket,serverInt)
+	});
+}
+
 function updateSetBlockTime (blockTime,socket,data) {
 	setTimeout(function updateUser (data) {
 		var updateSetTimeout = "UPDATE `user_info` SET `BlockedTime`= null WHERE `UserName`="+data.UserName;

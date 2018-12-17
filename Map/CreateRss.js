@@ -276,7 +276,7 @@ var lv5 ={
 	All:{minX:224,maxX:288,minY:224,maxY:288},
 	quantitySide : 20,
 }
-createResource ();
+//createResource ();
 
 function createResource () {
 	createLv (1);

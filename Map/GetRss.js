@@ -8,9 +8,9 @@ var arrayTimeRSS_s1 =[];
 var arrayTimeRSS_s2 =[];
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
-		socket.on('S_GET_RSS', function (data){
-			S_GET_RSS (socket,data);
-		});
+		// socket.on('S_GET_RSS', function (data){
+		// 	S_GET_RSS (socket,data);
+		// });
 		socket.on('S_GATHER_RSS', function (data){
 			S_GATHER_RSS (socket,data);
 		});
@@ -23,11 +23,13 @@ function S_GATHER_RSS (socket,data) {
 	console.log('R_GATHER_RSS');
 }
 
-
-function S_GET_RSS (socket,data) {
+exports.Test = function Test () {
+	console.log("Test")
+}
+exports.S_GET_RSS = function S_GET_RSS (socket,serverInt) {
 	//console.log(data)
 
-	var table = "s"+data.Server+"_rss";
+	var table = "s"+serverInt+"_rss";
 	//console.log(table)
  	var queryString = "SELECT * FROM "+table;
  //console.log(queryString)
