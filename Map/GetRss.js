@@ -23,19 +23,12 @@ function S_GATHER_RSS (socket,data) {
 	console.log('R_GATHER_RSS');
 }
 
-exports.Test = function Test () {
-	console.log("Test")
-}
-exports.S_GET_RSS = function S_GET_RSS (socket,serverInt) {
-	//console.log(data)
 
+exports.R_GET_RSS = function R_GET_RSS (socket,serverInt) {
 	var table = "s"+serverInt+"_rss";
-	//console.log(table)
- 	var queryString = "SELECT * FROM "+table;
- //console.log(queryString)
-	 db_rss.query(queryString,function (error,rows) {
+	var queryString = "SELECT * FROM "+table;
+	db_rss.query(queryString,function (error,rows) {
 		if (!!error){DetailError = ('GetRss.js: Error query getDataRss');functions.WriteLogError(DetailError);}
-		console.log(rows);
 		socket.emit('R_GET_RSS',{Data:rows});
 	});
 }

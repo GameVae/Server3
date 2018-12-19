@@ -205,9 +205,6 @@ var lv1={
 var newPos,caseHour,locationPos, posLoc;
 
 
-// createPos (1,function (returnValue) {
-// 	console.log(returnValue)
-// });
 
 exports.CreatePos = function createPos (serverInt,returnValue) {
 	var queryPos = "SELECT * FROM `s"+serverInt+"_position`";
@@ -215,7 +212,7 @@ exports.CreatePos = function createPos (serverInt,returnValue) {
 	db_position.query(queryPos,function (error,rows) {
 		if (!!error){DetailError = ('CreatePosition.js: queryPos');functions.WriteLogError(DetailError);}
 		for (var i = 0; i < rows.length; i++) {
-			addDict(dictPos,rows[i].Position_Cell,rows[i].Comment);
+			functions.AddDict(dictPos,rows[i].Position_Cell,rows[i].Comment);
 		}
 
 		caseHour = parseInt((new Date().getHours()-1)/6);
@@ -234,42 +231,13 @@ exports.CreatePos = function createPos (serverInt,returnValue) {
 			posLoc = lv1.Left;
 			break;
 		}
-		newPos = randomPos(posLoc);
-		while (checkKey(dictPos,newPos)==true) {
-			newPos = randomPos (posLoc);
+		newPos = functions.RandomPos(posLoc);
+		while (functions.CheckKey(dictPos,newPos)==true) {
+			newPos = functions.RandomPos (posLoc);
 		}
 		// console.log(newPos);
-		// addDict(dictPos,newPos,'newPos')
+		// functions.AddDict(dictPos,newPos,'newPos')
 		returnValue(newPos);
 	});
 
-}
-
-
-function randomPos (Dict_regionPostion) {
-	
-	var posX,posY,posRss;
-	var minX,maxX,minY,maxY;
-
-	minX 	= Dict_regionPostion.minX;
-	maxX 	= Dict_regionPostion.maxX;
-	minY 	= Dict_regionPostion.minY;
-	maxY 	= Dict_regionPostion.minY;
-	
-	posX 	= randomInt(minX,maxX);
-	posY 	= randomInt(minY,maxY);
-	posRss 	= posX+","+posY+","+0;
-	return posRss;
-}
-function randomInt (minInt,maxInt) {
-	return Math.floor(Math.random() * (maxInt - minInt + 1)) + minInt;
-}
-function addDict (dictionary,key,value) {
-	var pos = key;
-	dictionary[pos]=value;
-}
-function checkKey (dictionary,key) {
-	var checkBool = false;
-	if (key in dictionary) {checkBool = true;}
-	return checkBool;
 }

@@ -3,6 +3,7 @@
 var db_all_user			= require('./../../Util/Database/Db_all_user.js');
 
 var getRss 				= require('./../../Map/GetRss.js');
+var getPosition			= require('./../../Map/GetPosition.js');
 var functions 			= require('./../../Util/Functions.js');
 
 var currentUser;
@@ -54,7 +55,8 @@ function S_USER_INFO (socket,ID_User) {
 		dataUser= rows[0];
 		delete dataUser.ID;
 		socket.emit('S_USER_INFO',{Data:dataUser});
-		getRss.S_GET_RSS(socket,serverInt)
+		getRss.R_GET_RSS(socket,serverInt);
+		getPosition.R_GET_POSITION(socket,serverInt);
 	});
 }
 

@@ -3,7 +3,7 @@ const   fs          = require('fs');
 var path 			= require('path');
 
 exports.WriteLogError = function(detailError){
-	console.log(getTimeNow()+": "+detailError);
+	console.log(getTimeNow()+": Error "+detailError);
 	fs.appendFile(getStringErrorFile (), "\r\n "+ getTimeNow() +": "+detailError, (err) => {
 		if (err) throw err;
 	});
@@ -64,6 +64,34 @@ var getTimeNow = exports.GetTimeNow = function getTimeNow() {
 exports.GetTime = function getTime() {
 	var retInt = new Date().getTime();
 	return retInt;     
+}
+
+exports.RandomPos = function randomPos (Dict_regionPostion) {
+	
+	var posX,posY,posRss;
+	var minX,maxX,minY,maxY;
+	var posRss;
+	minX 	= Dict_regionPostion.minX;
+	maxX 	= Dict_regionPostion.maxX;
+	minY 	= Dict_regionPostion.minY;
+	maxY 	= Dict_regionPostion.minY;
+	
+	posX 	= randomInt(minX,maxX);
+	posY 	= randomInt(minY,maxY);
+	posRss 	= posX+","+posY+","+0;
+	return posRss;
+}
+exports.AddDict =function addDict (dictionary,key,value) {
+	var pos = key;
+	dictionary[pos] = value;
+}
+exports.CheckKey =function checkKey (dictionary,key) {
+	var checkBool = false;
+	if (key in dictionary) {checkBool = true;}
+	return checkBool;
+}
+function randomInt (minInt,maxInt) {
+	return Math.floor(Math.random() * (maxInt - minInt + 1)) + minInt;
 }
 // 'use strict';
 // const   fs          = require('fs');
