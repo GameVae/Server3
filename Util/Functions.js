@@ -93,6 +93,15 @@ exports.CheckKey =function checkKey (dictionary,key) {
 function randomInt (minInt,maxInt) {
 	return Math.floor(Math.random() * (maxInt - minInt + 1)) + minInt;
 }
+
+exports.ExportTimeDatabase = function exportTimeDatabase (stringDaTaTime) {
+	var stringTime = stringDaTaTime+"Z";
+	return new Date(stringTime).getTime();
+}
+exports.ImportTimeToDatabase = function importTimeToDatabase (stringTime) {
+	var stringReturn = stringTime.substring(0,stringTime.length - 1);
+	return stringReturn;
+}
 // 'use strict';
 // const   fs          = require('fs');
 // var crypto          = require('crypto');
