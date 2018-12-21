@@ -12,34 +12,18 @@ var db_upgrade				= require('./../Util/Database/Db_upgrade_database.js');
 
 var functions 				= require('./../Util/Functions.js');
 
-
 var DetailError, LogChange;
-var arraySetTimeOut = exports.ArraySetTimeOut = [];
 
-// exports.Start = function start (io) {
-// 	io.on('connection', function(socket){
-// 		getS1Pos ();
-// 		socket.on('S_UPGRADE', function (data){
-// 			//console.log('socketID: '+socket.id);
-// 			S_UPGRADE (socket,data);
-// 		});
-// 	});
-// }
-var data = {
-	ID_Server:'1',
-	ID_User: '9',
-	ID_Base: '1',
-	ID_Upgrade: '1',
-	Level:'2'
+exports.Start = function start (io) {
+	io.on('connection', function(socket){
+		socket.on('S_UPGRADE', function (data){
+			//console.log('socketID: '+socket.id);
+			S_UPGRADE (socket,data);
+		});
+	});
 }
-// function S_UPGRADE (socket,data) {
-// 	console.log('S_UPGRADE'+ data);
-// }
 
-
-
-
-function S_UPGRADE (data) {
+function S_UPGRADE (socket,data) {
 	var stringQuery = "SELECT * FROM `upgrade` WHERE `ID`="+data.ID_Upgrade;
 	db_upgrade.query(stringQuery,function(error,rows){
 		var tableQuery = "SELECT * FROM `"+rows[0].Name_Upgrade +"` WHERE `Level`= "+data.Level;
@@ -48,20 +32,15 @@ function S_UPGRADE (data) {
 			checkUpgrade (data,rows[0].UpgradeType,rowsUpgrade);
 		});
 	});
-
-
-
 }
 
 function checkUpgrade (dataUser,upgradeType,rowsUpgrade) {
 	var tableQuery 	= dataUser.ID_User+"_"+dataUser.ID_Base;
 	var stringQuery = "SELECT * FROM `"+tableQuery+"` WHERE `ID`="+dataUser.ID_Upgrade;
 	var dbQuery;
-	//console.log(stringQuery);
 	switch (parseInt(dataUser.ID_Server)) {
 		case 1:
-		dbQuery = db_s1_upgrade;
-		
+		dbQuery = db_s1_upgrade;	
 		break;
 		case 2:
 		dbQuery = db_s2_upgrade;
@@ -72,6 +51,7 @@ function checkUpgrade (dataUser,upgradeType,rowsUpgrade) {
 		if((rows[0].Level+1)==dataUser.Level){
 			updateUpgrade (dataUser,upgradeType,rowsUpgrade);
 		}else{
+			// emit restart app
 			console.log(false);
 		}
 	});
@@ -109,12 +89,12 @@ function updateUpgrade (dataUser,upgradeType,rowsUpgrade) {
 	dbQuery.query(stringUpdate,function (error,result) {
 		if (!!error){DetailError = ('Upgrade.js: updateUpgrade' + data.ID_User);functions.WriteLogError(DetailError);}
 		LogChange='Upgrade.js: updateUpgrade: '+data.ID_User;functions.LogChange(LogChange);
-		//setTimerUpdateDatabase (owsUpgrade[0].TimeInt*1000,dataUser,upgradeType);
+		setTimerUpdateDatabase (rowsUpgrade[0].TimeInt*1000,dataUser,upgradeType);
 	});
 
 }
-//S_UPGRADE (data);
-test(data,1);
+
+
 function test (dataUser,upgradeType) {
 
 	var dbQuery_base_info,dbQuery_base_upgrade;
@@ -151,13 +131,13 @@ function test (dataUser,upgradeType) {
 			+" `ResearchTime`= NULL;";
 			break;
 		}
+
 		dbQuery_base_info.query(stringQueryMightBounus,function(error,rows){
 			stringUpdate_Game_info +=rows[0].Might;
 			db_all_user.query(stringUpdate_Game_info,function (error,result_stringUpdate_Game_info) {
 				if (!!error){DetailError = ('Upgrade.js: updateMight' + data.ID_User);functions.WriteLogError(DetailError);}
 				LogChange='Upgrade.js: updateMight: '+data.ID_User;functions.LogChange(LogChange);
-			})
-
+			});
 		});
 		dbQuery_base_upgrade.query(stringUpdateBaseUpgrade,function (error,result) {
 			if (!!error){DetailError = ('Upgrade.js: updateLevel' + data.ID_User);functions.WriteLogError(DetailError);}
@@ -170,42 +150,186 @@ function test (dataUser,upgradeType) {
 	});
 }
 
+
 function setTimerUpdateDatabase (time,dataUser,upgradeType) {
 	var thisTime = setTimeout(function (dataUser,upgradeType) {
-		var dbQuery;
+		
+		var dbQuery_base_info,dbQuery_base_upgrade;
 		var stringQuery = "SELECT * FROM `user_info` WHERE `ID_User`="+dataUser.ID_User;
-		db_all_user.query(stringQuery, function (error,rows) {
-			console.log(error);
-			console.log(rows);
-		});
+		var stringQueryMightBounus,stringUpdateBaseInfo, stringUpdate_Game_info, stringUpdateBaseUpgrade;
 
-		// var stringUpdate;
-		// switch (upgradeType) {
-		// 	case 1:
-		// 	stringUpdate = "UPDATE `"+dataUser.ID_User+"` SET `UpgradeWait_ID`= NULL,"
-		// 	+" `UpgradeWait_Might`= NULL,"
-		// 	+" `UpgradeTime`= NULL;";
-		// 	console.log(stringUpdate);
-		// 	break;
-		// 	case 2:
-		// 	stringUpdate = "UPDATE `"+dataUser.ID_User+"` SET `ResearchWait_ID`= NULL,"
-		// 	+" `ResearchWait_Might`= NULL,"
-		// 	+" `ResearchTime`= NULL;";
-		// 	break;
-		// }
-		// dbQuery.query(stringUpdate,function (error,result) {
-		// 	console.log(error);
-		// 	console.log(result);
-		// });
+		db_all_user.query(stringQuery, function (error,rows) {
+			stringUpdate_Game_info 	= "UPDATE `game_info_s"+rows[0].Server_ID+"` SET `Might`=`Might`+";
+			stringUpdateBaseUpgrade = "UPDATE `"+dataUser.ID_User+"_"+dataUser.ID_Base+"` SET `Level`="+dataUser.Level+" WHERE `ID` = "+ dataUser.ID_Upgrade;
+
+			checkBoolUpgrade (dataUser,rows[0].Server_ID,upgradeType,function (checkBool) {
+				if (checkBool==true) {
+					switch (rows[0].Server_ID) {
+						case 1:
+						dbQuery_base_info = db_s1_base_info;
+						dbQuery_base_upgrade = db_s1_upgrade;
+						break;
+
+						case 2:
+						dbQuery_base_info = db_s2_base_info;
+						dbQuery_base_upgrade = db_s2_upgrade;
+						break;
+					}
+
+					switch (upgradeType) {
+						case 1:
+						stringQueryMightBounus = "SELECT `UpgradeWait_Might` AS Might FROM `"+dataUser.ID_User+"`";
+						stringUpdateBaseInfo = "UPDATE `"+dataUser.ID_User+"` SET `UpgradeWait_ID`= NULL,"
+						+" `UpgradeWait_Might`= NULL,"
+						+" `UpgradeTime`= NULL;";
+						break;
+						case 2:
+						stringQueryMightBounus = "SELECT `ResearchWait_Might` AS Might FROM `"+dataUser.ID_User+"`";
+						stringUpdateBaseInfo = "UPDATE `"+dataUser.ID_User+"` SET `ResearchWait_ID`= NULL,"
+						+" `ResearchWait_Might`= NULL,"
+						+" `ResearchTime`= NULL;";
+						break;
+					}
+
+					dbQuery_base_info.query(stringQueryMightBounus,function(error,rows){
+						stringUpdate_Game_info +=rows[0].Might;
+						db_all_user.query(stringUpdate_Game_info,function (error,result_stringUpdate_Game_info) {
+							if (!!error){DetailError = ('Upgrade.js: updateMight' + data.ID_User);functions.WriteLogError(DetailError);}
+							LogChange='Upgrade.js: updateMight: '+data.ID_User;functions.LogChange(LogChange);
+						});
+					});
+					dbQuery_base_upgrade.query(stringUpdateBaseUpgrade,function (error,result) {
+						if (!!error){DetailError = ('Upgrade.js: updateLevel' + data.ID_User);functions.WriteLogError(DetailError);}
+						LogChange='Upgrade.js: updateLevel: '+data.ID_User;functions.LogChange(LogChange);
+					});
+					dbQuery_base_info.query(stringUpdateBaseInfo,function(error,result){
+						if (!!error){DetailError = ('Upgrade.js: resetBaseInfoUpdate' + data.ID_User);functions.WriteLogError(DetailError);}
+						LogChange='Upgrade.js: resetBaseInfoUpdate: '+data.ID_User;functions.LogChange(LogChange);
+					});
+				}
+			});
+
+		});
 		
 	},time, dataUser,upgradeType);
-	arraySetTimeOut.push(thisTime);
+
 }
 
+function checkBoolUpgrade (dataUser,serverInt,upgradeType,checkBool) {
+	var returnBool = false;
+	var tableQuery = dataUser.ID_User+"_"+dataUser.ID_Base;
 
+	var serverQuery,stringQuery;
+	switch (serverInt) {
+		case 1:
+		serverQuery = db_s1_upgrade;
+		break;
+		case 2:
+		serverQuery = db_s2_upgrade;
+		break;
+	}
+	stringQuery = "SELECT `Level` FROM `"+tableQuery+"` WHERE `ID`="+dataUser.ID_Upgrade;
+	serverQuery.query(stringQuery, function (error,rows) {
+		if (!!error){DetailError = ('Upgrade.js: query checkBoolUpgrade' + data.ID_User);functions.WriteLogError(DetailError);}
+		if (rows[0].Level+1==dataUser.Level) {
+			returnBool = true;
+		}
+		checkBool(returnBool);
+	});
+}
 
+exports.UpdateDatabase = function updateDatabase (serverInt) {
+	var database = "s"+serverInt+"_base_info";
+	var stringQuery = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='"+database+"'"
+	var serverBase,serverUpdate;
+	switch (serverInt) {
+		case 1:
+		serverBase = db_s1_base_info;
+		serverUpdate = db_s1_upgrade;
+		break;
+		case 2:
+		serverBase = db_s2_base_info;
+		serverUpdate = db_s2_upgrade;
+		break;
+	}
 
-function clearTimer (param) {
-	clearTimeout(arraySetTimeOut.find(item=>item._timerArgs==param));
-	arraySetTimeOut = arraySetTimeOut.filter(item=>item._timerArgs==param);
+	serverBase.query(stringQuery,function (error,rows) {
+		if (!!error){DetailError = ('Upgrade.js: query tableDatabase: ' + serverInt);functions.WriteLogError(DetailError);}
+		
+		for (var i = 0; i < rows.length; i++) {
+			if (rows[i].TABLE_NAME.toString().trim()!==database) {
+				updateTime(serverInt,serverBase,serverUpdate,rows[i].TABLE_NAME);
+			}
+		}
+	});
+}
+
+function updateTime (serverInt,serverBase,serverUpdate, tableQuery) {
+	var stringQueryBaseUpgrade = "SELECT `ID_User`,`BaseNumber`,`UpgradeWait_ID` AS LevelUp_ID ,`UpgradeWait_Might` AS Might,`UpgradeTime` AS Time FROM `"+tableQuery+"`";
+	var stringQueryBaseResearch="SELECT `ID_User`,`BaseNumber`,`ResearchWait_ID` AS LevelUp_ID ,`ResearchWait_Might` AS Might,`ResearchTime` AS Time FROM `"+tableQuery+"`";
+
+	var currentTime = functions.GetTime();
+	var dataTime;
+
+	serverBase.query(stringQueryBaseUpgrade,function (error,rows) {	
+		if (!!error){DetailError = ('Upgrade.js: query stringQueryBaseUpgrade: ' + tableQuery);functions.WriteLogError(DetailError);}		
+		for (var i = 0; i < rows.length; i++) {
+			if (rows[i].Time!=null) {
+				dataTime = functions.ExportTimeDatabase(rows[i].Time);
+				if (dataTime<currentTime) {
+					updateTimeUpgrade (serverInt,serverBase,serverUpdate,rows[i]);
+				}
+			}
+		}
+	});
+
+	serverBase.query(stringQueryBaseResearch,function (error,rows) {	
+		if (!!error){DetailError = ('Upgrade.js: query stringQueryBaseResearch: ' + tableQuery);functions.WriteLogError(DetailError);}
+		for (var i = 0; i < rows.length; i++) {
+			if (rows[i].Time!=null) {
+				dataTime = functions.ExportTimeDatabase(rows[i].Time);
+				if (dataTime<currentTime) {
+					updateTimeResearch (serverInt,serverBase,serverUpdate,rows[i]);
+				}
+			}
+		}
+	});
+}
+
+function updateTimeUpgrade (serverInt,serverBase,serverUpdate,rowsQuery) {
+	var stringUpdateAllUser = "UPDATE `game_info_s"+serverInt+"` SET `Might` = `Might`+"+rowsQuery.Might;
+	var stringUpdateUpgrade = "UPDATE `"+rowsQuery.ID_User+"_"+rowsQuery.BaseNumber+"` SET `Level`=`Level`+1 WHERE `ID`="+rowsQuery.LevelUp_ID;
+	var stringClearUpgrade = "UPDATE `s"+serverInt+"_base_info` SET `UpgradeWait_ID`= NULL ,`UpgradeWait_Might`= NULL,`UpgradeTime`= NULL";
+	
+	db_all_user.query(stringUpdateAllUser,function (error,result) {
+		if (!!error){DetailError = ('Upgrade.js: updateTimeUpgrade stringUpdateAllUser: ' + rowsQuery.ID_User);functions.WriteLogError(DetailError);}
+		LogChange='Upgrade.js: updateTimeUpgrade_stringUpdateAllUser: '+rowsQuery.ID_User;functions.LogChange(LogChange);
+	});
+	serverUpdate.query(stringUpdateUpgrade,function (error,result) {
+		if (!!error){DetailError = ('Upgrade.js: updateTimeUpgrade stringUpdateUpgrade: ' + rowsQuery.ID_User);functions.WriteLogError(DetailError);}
+		LogChange='Upgrade.js: updateTimeUpgrade_stringUpdateUpgrade: '+rowsQuery.ID_User;functions.LogChange(LogChange);
+	});
+	serverBase.query(stringClearUpgrade,function (error,result) {
+		if (!!error){DetailError = ('Upgrade.js: updateTimeUpgrade stringClearUpgrade: ' + rowsQuery.ID_User);functions.WriteLogError(DetailError);}
+		LogChange='Upgrade.js: updateTimeUpgrade_stringClearUpgrade: '+rowsQuery.ID_User;functions.LogChange(LogChange);
+	});
+}
+
+function updateTimeResearch (serverInt,serverBase,serverUpdate,rowsQuery) {
+	var stringUpdateAllUser = "UPDATE `game_info_s"+serverInt+"` SET `Might` = `Might`+"+rowsQuery.Might;
+	var stringUpdateUpgrade = "UPDATE `"+rowsQuery.ID_User+"_"+rowsQuery.BaseNumber+"` SET `Level`=`Level`+1 WHERE `ID`="+rowsQuery.LevelUp_ID;
+	var stringClearUpgrade = "UPDATE `s"+serverInt+"_base_info` SET `ResearchWait_ID`= NULL ,`ResearchWait_Might`= NULL,`ResearchTime`= NULL";
+	
+	db_all_user.query(stringUpdateAllUser,function (error,result) {
+		if (!!error){DetailError = ('Upgrade.js: updateTimeResearch stringUpdateAllUser: ' + rowsQuery.ID_User);functions.WriteLogError(DetailError);}
+		LogChange='Upgrade.js: updateTimeResearch_stringUpdateAllUser: '+rowsQuery.ID_User;functions.LogChange(LogChange);
+	});
+	serverUpdate.query(stringUpdateUpgrade,function (error,result) {
+		if (!!error){DetailError = ('Upgrade.js: updateTimeResearch stringUpdateUpgrade: ' + rowsQuery.ID_User);functions.WriteLogError(DetailError);}
+		LogChange='Upgrade.js: updateTimeResearch_stringUpdateUpgrade: '+rowsQuery.ID_User;functions.LogChange(LogChange);
+	});
+	serverBase.query(stringClearUpgrade,function (error,result) {
+		if (!!error){DetailError = ('Upgrade.js: updateTimeResearch stringClearUpgrade: ' + rowsQuery.ID_User);functions.WriteLogError(DetailError);}
+		LogChange='Upgrade.js: updateTimeResearch_stringClearUpgrade: '+rowsQuery.ID_User;functions.LogChange(LogChange);
+	});
 }

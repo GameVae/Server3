@@ -95,8 +95,15 @@ function randomInt (minInt,maxInt) {
 }
 
 exports.ExportTimeDatabase = function exportTimeDatabase (stringDaTaTime) {
-	var stringTime = stringDaTaTime+"Z";
-	return new Date(stringTime).getTime();
+	var stringTime = stringDaTaTime.toString();
+	var timeReturn;
+	if (stringTime.includes('Z')) {
+		timeReturn = new Date(stringTime).getTime()
+	}else{
+		stringTime = stringDaTaTime+"Z";
+		timeReturn = new Date(stringTime).getTime()
+	}
+	return timeReturn;
 }
 exports.ImportTimeToDatabase = function importTimeToDatabase (stringTime) {
 	var stringReturn = stringTime.substring(0,stringTime.length - 1);

@@ -1,6 +1,0 @@
-
- logChangeDetail: 2018-10-22T10:19:54.812Z: userConnected: 1
- logChangeDetail: 2018-10-22T10:20:04.137Z: userConnected: 0
- logChangeDetail: 2018-10-22T10:20:53.819Z: userConnected: 1
- logChangeDetail: 2018-10-22T10:20:57.650Z: userConnected: 0
- logChangeDetail: 2018-10-22T10:29:48.440Z: userConnected: 1

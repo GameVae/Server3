@@ -684,20 +684,43 @@
 // }
 
 
-var db_s1_base_upgrade	= require('./Util/Database/Db_s1_base_upgrade.js');
-Test(1,9);
-function Test (serverInt,ID_User) {
-	stringTable_base_upgrade = "`s"+serverInt+"_base_upgrade`.`"+ID_User+"_01`";
+// var db_s1_base_upgrade	= require('./Util/Database/Db_s1_base_upgrade.js');
+// Test(1,9);
+// function Test (serverInt,ID_User) {
+// 	stringTable_base_upgrade = "`s"+serverInt+"_base_upgrade`.`"+ID_User+"_01`";
 
-	createNewTable_base_upgrade = "DROP TABLE IF EXISTS "+stringTable_base_upgrade+" ;"+
-	"CREATE TABLE "+stringTable_base_upgrade+" ("+
-	"`ID` int(2) NOT NULL, `Name_Upgrade` varchar(16) DEFAULT NULL,`Level` int(1) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8;"+
-	"ALTER TABLE "+stringTable_base_upgrade+" ADD PRIMARY KEY (`ID`);"+
-	"ALTER TABLE "+stringTable_base_upgrade+" MODIFY `ID` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48 ;"+
-	"SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO';"+
-	"INSERT INTO "+stringTable_base_upgrade+"(`ID`, `Name_Upgrade`, `Level`) SELECT `ID`, `Name_Upgrade`, `Level` FROM `s1_base_upgrade`.`upgrade`;"
-	console.log(createNewTable_base_upgrade);
-	db_s1_base_upgrade.query(createNewTable_base_upgrade,function (error,result) {
-		console.log(error)
-	})
+// 	createNewTable_base_upgrade = "DROP TABLE IF EXISTS "+stringTable_base_upgrade+" ;"+
+// 	"CREATE TABLE "+stringTable_base_upgrade+" ("+
+// 	"`ID` int(2) NOT NULL, `Name_Upgrade` varchar(16) DEFAULT NULL,`Level` int(1) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8;"+
+// 	"ALTER TABLE "+stringTable_base_upgrade+" ADD PRIMARY KEY (`ID`);"+
+// 	"ALTER TABLE "+stringTable_base_upgrade+" MODIFY `ID` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48 ;"+
+// 	"SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO';"+
+// 	"INSERT INTO "+stringTable_base_upgrade+"(`ID`, `Name_Upgrade`, `Level`) SELECT `ID`, `Name_Upgrade`, `Level` FROM `s1_base_upgrade`.`upgrade`;"
+// 	console.log(createNewTable_base_upgrade);
+// 	db_s1_base_upgrade.query(createNewTable_base_upgrade,function (error,result) {
+// 		console.log(error)
+// 	})
+// }
+var testString1 = "2018-12-21T07:47:00.000Z";
+var testString2 = "2018-12-21T07:47:00.000";
+var testString3	="2018-12-21T00:47:00.000Z"
+// console.log("test:"+ new Date("2018-12-21T00:47:00.000Z").getTime())
+// console.log("test2:"+ new Date("2018-12-21T00:47:00.000").getTime())
+// console.log("currentTime:"+ new Date().getTime())
+
+1545353220000
+1545328020000
+console.log(exportTimeDatabase(testString1))
+console.log(exportTimeDatabase(testString2))
+console.log(exportTimeDatabase(testString3))
+function exportTimeDatabase (stringDaTaTime) {
+	var stringTime = stringDaTaTime.toString();
+	var timeReturn;
+	if (stringTime.includes('Z')) {
+		timeReturn = new Date(stringTime).getTime()
+	}else{
+		stringTime = stringDaTaTime+"Z";
+		timeReturn = new Date(stringTime).getTime()
+	}
+	return timeReturn;
 }

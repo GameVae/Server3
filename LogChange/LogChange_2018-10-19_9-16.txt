@@ -1,6 +1,0 @@
-
- logChangeDetail: 2018-10-19T02:49:44.700Z: R_REGISTER: 12345644
- logChangeDetail: 2018-10-19T02:49:44.775Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`,`ResetVipTime`,`DateCreate`) VALUES ('12345644','e10adc3949ba59abbe56e057f20f883e','1234445@gmail.com','12345644','2','2018-10-19T02:49:44.697Z')
- logChangeDetail: 2018-10-19T02:49:44.822Z: updateString: UPDATE `user_info` SET `ID_User` = '30' WHERE `user_info`.`ID` = '30'
- logChangeDetail: 2018-10-19T02:49:44.827Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info` (`ID_User`, `NameInGame`,`Server_ID`) VALUES ('30','12345644','1')
- logChangeDetail: 2018-10-19T04:33:31.168Z: R_REGISTER Fail: 123456
