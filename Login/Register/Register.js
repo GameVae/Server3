@@ -20,8 +20,6 @@ var db_s2_base_upgrade 	= require('./../../Util/Database/Db_s2_base_upgrade.js')
 //var server_Info			= require('./ServerInfo.js');
 // var userBase		= require('./../../UserBase/userBase.js');
 // var sendMail 		= require('./../../Util/sendMail.js');
-var s1_pos={};
-var s2_pos={};
 
 var currentUser, DetailError, logChangeDetail;
 var stringTable_base_info, createNewTable_base_info,stringTable_base_defend, createNewTable_base_defend, stringTable_base_upgrade,createNewTable_base_upgrade;

@@ -33,7 +33,6 @@ function S_LOGIN (socket,data) {
 			}else{
 				if (rows[0].Password==currentUser.Password) {
 					S_USER_INFO (socket,rows[0].Server_ID);
-
 					socket.emit('R_LOGIN',{LoginBool:1});
 				}
 				else{
