@@ -36,6 +36,7 @@ function S_LOGIN (socket,data) {
 					socket.emit('R_LOGIN',{LoginBool:1});
 				}
 				else{
+
 					socket.emit('R_LOGIN',{LoginBool:0});
 				}
 			}
@@ -53,9 +54,9 @@ function S_USER_INFO (socket,ID_User) {
 		if (!!error){DetailError = ('Login.js: S_USER_INFO queryUser :'+ ID_User); functions.WriteLogError(DetailError);}
 		dataUser= rows[0];
 		delete dataUser.ID;
-		socket.emit('S_USER_INFO',{Data:dataUser});
-		getRss.R_GET_RSS(socket,serverInt);
-		getPosition.R_GET_POSITION(socket,serverInt);
+		socket.emit('S_USER_INFO',{Data:dataUser,Server:rows[0].Server_ID});
+		getRss.R_GET_RSS(socket,rows[0].Server_ID);
+		getPosition.R_GET_POSITION(socket,rows[0].Server_ID);
 	});
 }
 

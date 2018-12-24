@@ -8,9 +8,9 @@ var arrayTimeRSS_s1 =[];
 var arrayTimeRSS_s2 =[];
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
-		// socket.on('S_GET_RSS', function (data){
-		// 	S_GET_RSS (socket,data);
-		// });
+		socket.on('S_GET_RSS', function (data){
+			R_GET_RSS (socket,data.["Server"]);
+		});
 		socket.on('S_GATHER_RSS', function (data){
 			S_GATHER_RSS (socket,data);
 		});
