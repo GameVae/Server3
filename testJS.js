@@ -701,26 +701,59 @@
 // 		console.log(error)
 // 	})
 // }
-var testString1 = "2018-12-21T07:47:00.000Z";
-var testString2 = "2018-12-21T07:47:00.000";
-var testString3	="2018-12-21T00:47:00.000Z"
-// console.log("test:"+ new Date("2018-12-21T00:47:00.000Z").getTime())
-// console.log("test2:"+ new Date("2018-12-21T00:47:00.000").getTime())
-// console.log("currentTime:"+ new Date().getTime())
+// var testString1 = "2018-12-21T07:47:00.000Z";
+// var testString2 = "2018-12-21T07:47:00.000";
+// var testString3	="2018-12-21T00:47:00.000Z"
+// // console.log("test:"+ new Date("2018-12-21T00:47:00.000Z").getTime())
+// // console.log("test2:"+ new Date("2018-12-21T00:47:00.000").getTime())
+// // console.log("currentTime:"+ new Date().getTime())
 
-1545353220000
-1545328020000
-console.log(exportTimeDatabase(testString1))
-console.log(exportTimeDatabase(testString2))
-console.log(exportTimeDatabase(testString3))
-function exportTimeDatabase (stringDaTaTime) {
-	var stringTime = stringDaTaTime.toString();
-	var timeReturn;
-	if (stringTime.includes('Z')) {
-		timeReturn = new Date(stringTime).getTime()
-	}else{
-		stringTime = stringDaTaTime+"Z";
-		timeReturn = new Date(stringTime).getTime()
-	}
-	return timeReturn;
+// 1545353220000
+// 1545328020000
+// console.log(exportTimeDatabase(testString1))
+// console.log(exportTimeDatabase(testString2))
+// console.log(exportTimeDatabase(testString3))
+// function exportTimeDatabase (stringDaTaTime) {
+// 	var stringTime = stringDaTaTime.toString();
+// 	var timeReturn;
+// 	if (stringTime.includes('Z')) {
+// 		timeReturn = new Date(stringTime).getTime()
+// 	}else{
+// 		stringTime = stringDaTaTime+"Z";
+// 		timeReturn = new Date(stringTime).getTime()
+// 	}
+// 	return timeReturn;
+// }
+
+var db_s1_base_info			= require('./Util/Database/Db_s1_base_info.js');
+var db_s1_base_defend		= require('./Util/Database/Db_s1_base_defend.js');
+dataTraining={
+	Server_ID: 			1,
+	ID_User: 			9,
+	BaseNumber: 		1,
+	TrainingUnit_ID: 	1,
+	TrainingTime: 		600,
+	TrainingQuality: 	200,
+	TrainingMight: 		220,
 }
+// var stringQuery = "SELECT * FROM `"+dataTraining.ID_User+"` WHERE "+
+//  "`BaseNumber`="+dataTraining.BaseNumber+" AND"+
+//  "`TrainingUnit_ID`="+dataTraining.TrainingUnit_ID+" AND "+
+// // "`TrainingTime`="+dataTraining.TrainingTime+","+
+// "`TrainingQuality`="+dataTraining.TrainingQuality;
+// // +","+
+// // "`Training_Might`="+dataTraining.Training_Might;
+// console.log(stringQuery)
+// db_s1_base_info.query(stringQuery,function (error,rows) {
+// 	if (rows==undefined) {console.log("here")}
+// 	else{
+// 		console.log(rows)
+// 	}
+// });
+var clearString = "UPDATE `"+dataTraining.ID_User+"` SET "+
+	"`TrainingUnit_ID` = null, `TrainingTime`=null, `TrainingQuality`=null,`Training_Might`=null"
+	+" WHERE `BaseNumber` = "+dataTraining.BaseNumber;
+console.log(clearString)
+db_s1_base_info.query(clearString, function (error,result) {
+	console.log(error);
+})

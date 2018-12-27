@@ -6,7 +6,6 @@ var io 				= require('socket.io').listen(server);
 
 var functions 		= require('./Util/Functions.js');
 
-
 var db_server_task 	= require('./Util/Database/Db_server_task.js');
 
 server.listen(process.env.PORT);
@@ -26,20 +25,26 @@ var login 			= require('./Login/Login/Login.js');
 var taskServer 		= require('./Task/TaskServer.js');
 // taskServer.Start(io);
 
-var CheckVersion 	= require('./CheckVersion/CheckVersion.js');
-// CheckVersion.Start(io);
+var checkVersion 	= require('./CheckVersion/CheckVersion.js');
+// checkVersion.Start(io);
 
-var getRss = require('./Map/GetRss.js');
+var getRss 			= require('./Map/GetRss.js');
 // getRss.UpdateTimeHarvest();
+var upgrade 		= require('./Upgrade/Upgrade.js');
+upgrade.UpdateDatabase(1);
+//upgrade.UpdateDatabase(2);
+var training	= require('./TrainingUnit/Training.js')
+// training.UpdateDatabase(1);
+// training.UpdateDatabase(2);
 
 if (app.get('port') === process.env.PORT)
 {	
 	var connectCounter=0;
 	checkConnect (connectCounter,io);
 	login.Start(io);
-	CheckVersion.Start(io);
+	checkVersion.Start(io);
 	getRss.Start(io);
-	
+	upgrade.Start(io);
 }
 
 function checkConnect (connectCounter,io) {
@@ -94,7 +99,7 @@ function checkConnect (connectCounter,io) {
 
 // }
 
-// //CheckVersion.start(io);
+// //checkVersion.start(io);
 // var register 		= require('./Login/Register/Register.js');
 // register.Start(io);
 // ---

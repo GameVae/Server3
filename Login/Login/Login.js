@@ -45,9 +45,6 @@ function S_LOGIN (socket,data) {
 	});
 }
 
-
-
-
 function S_USER_INFO (socket,ID_User) {
 	var queryString = "SELECT * FROM `game_info_s1` WHERE `ID_User`='"+ID_User+"'";
 	db_all_user.query(queryString,function (error,rows) {
@@ -90,9 +87,9 @@ function getCurrentUser (data) {
 }
 
 
-// // var async 			= require('async');
+// var async 			= require('async');
 // var lodash			= require('lodash');
-// // var math 			= require('mathjs');
+// var math 			= require('mathjs');
 // var shortId 		= require('shortid');
 // var Promise 		= require('promise');
 // // var sqrt 			= require('math-sqrt');
