@@ -725,17 +725,17 @@
 // 	return timeReturn;
 // }
 
-var db_s1_base_info			= require('./Util/Database/Db_s1_base_info.js');
-var db_s1_base_defend		= require('./Util/Database/Db_s1_base_defend.js');
-dataTraining={
-	Server_ID: 			1,
-	ID_User: 			9,
-	BaseNumber: 		1,
-	TrainingUnit_ID: 	1,
-	TrainingTime: 		600,
-	TrainingQuality: 	200,
-	TrainingMight: 		220,
-}
+// var db_s1_base_info			= require('./Util/Database/Db_s1_base_info.js');
+// var db_s1_base_defend		= require('./Util/Database/Db_s1_base_defend.js');
+// dataTraining={
+// 	Server_ID: 			1,
+// 	ID_User: 			9,
+// 	BaseNumber: 		1,
+// 	TrainingUnit_ID: 	1,
+// 	TrainingTime: 		600,
+// 	TrainingQuality: 	200,
+// 	TrainingMight: 		220,
+// }
 // var stringQuery = "SELECT * FROM `"+dataTraining.ID_User+"` WHERE "+
 //  "`BaseNumber`="+dataTraining.BaseNumber+" AND"+
 //  "`TrainingUnit_ID`="+dataTraining.TrainingUnit_ID+" AND "+
@@ -750,10 +750,66 @@ dataTraining={
 // 		console.log(rows)
 // 	}
 // });
-var clearString = "UPDATE `"+dataTraining.ID_User+"` SET "+
-	"`TrainingUnit_ID` = null, `TrainingTime`=null, `TrainingQuality`=null,`Training_Might`=null"
-	+" WHERE `BaseNumber` = "+dataTraining.BaseNumber;
-console.log(clearString)
-db_s1_base_info.query(clearString, function (error,result) {
-	console.log(error);
-})
+// var clearString = "UPDATE `"+dataTraining.ID_User+"` SET "+
+// 	"`TrainingUnit_ID` = null, `TrainingTime`=null, `TrainingQuality`=null,`Training_Might`=null"
+// 	+" WHERE `BaseNumber` = "+dataTraining.BaseNumber;
+// console.log(clearString)
+// db_s1_base_info.query(clearString, function (error,result) {
+// 	console.log(error);
+// })
+
+// var db_all_friend		= require('./Util/Database/Db_all_friend.js');
+
+// test(9)
+// function test (ID_User) {
+// 	var createNewFriendTable = "CREATE TABLE `"+ID_User+"` AS  (SELECT * FROM `friends`);"+
+// 	"ALTER TABLE `"+ID_User+"` ADD PRIMARY KEY (`ID`);"+
+// 	"ALTER TABLE `"+ID_User+"` MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT";
+// 	console.log(createNewFriendTable)
+// 	db_all_friend.query(createNewFriendTable,function (error,result) {
+// 		console.log(error)
+// 	})
+// }
+
+// var db_s1_base_info			= require('./Util/Database/Db_s1_base_info.js');
+// var Promise 				= require('promise');
+// var timeOut;
+// Test1();
+// function Test1 () {
+// 	var queryString = "SELECT * FROM `s1_base_info`";
+// 	db_s1_base_info.query(queryString,function (error,rows) {
+// 		timeOut = setTimeout(function() {
+// 			console.log('timeOut1');
+// 			console.log(timeOut);
+// 		}, 5000);
+
+// 	});
+// 	setTimeout(function() {
+// 		console.log('clear');
+// 		clearTimeout(timeOut);
+// 	}, 3000);
+// 	// new Promise((resolve,reject)=>{
+// 	// 	db_s1_base_info.query(queryString,function (error,rows) {
+// 	// 		timeOut = setTimeout(function() {
+// 	// 			console.log('timeOut1');
+// 	// 			console.log(timeOut);
+// 	// 		}, 5000);
+// 	// 		resolve();
+// 	// 	});
+// 	// }).then(()=>{
+// 	// 	console.log('timeOut2');
+// 	// 	console.log(timeOut);
+// 	// });
+	
+
+// }
+
+// Test2();
+// function Test2 () {
+// 	setTimeout(function() {
+// 		console.log('timeOut');
+// 		console.log(timeOut);
+// 	}, 3000);
+
+// }
+

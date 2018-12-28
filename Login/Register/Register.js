@@ -7,6 +7,8 @@ var sendMail 			= require('./../../Util/SendMail/SendMail.js');
 
 //var db_user				= require('./../../Util/Database/Db_s1_user.js');
 var db_all_user			= require('./../../Util/Database/Db_all_user.js');
+var db_all_friend		= require('./../../Util/Database/Db_all_friend.js');
+
 var db_position			= require('./../../Util/Database/Db_position.js');
 var db_server_task 		= require('./../../Util/Database/Db_server_task.js');
 
@@ -23,6 +25,7 @@ var db_s2_base_upgrade 	= require('./../../Util/Database/Db_s2_base_upgrade.js')
 
 var currentUser, DetailError, logChangeDetail;
 var stringTable_base_info, createNewTable_base_info,stringTable_base_defend, createNewTable_base_defend, stringTable_base_upgrade,createNewTable_base_upgrade;
+var createNewFriendTable;
 
 var ChatWorldColor = "FFFFFF";
 
@@ -53,6 +56,8 @@ function S_REGISTER (socket,data) {
 		}		
 	});
 }
+
+
 
 function createUser(data) {
 	insert_User_Game_Info (data);
@@ -92,6 +97,8 @@ function insert_User_Game_Info (data) {
 					if (!!error){DetailError = ('Register.js: Error updateID_user_info '+ data.UserName); functions.WriteLogError(DetailError);}
 					logChangeDetail = "updateString: "+ updateString; functions.LogChange(logChangeDetail);
 				});
+
+				createFriendTable (result.insertId);
 			});
 		}
 		logChangeDetail = "insert_User_Game_Info: "+ stringInsert_user_info; functions.LogChange(logChangeDetail);
@@ -100,7 +107,15 @@ function insert_User_Game_Info (data) {
 
 }
 
-
+function createFriendTable (ID_User) {
+	var createNewFriendTable = "CREATE TABLE `"+ID_User+"` AS  (SELECT * FROM `friends`);"+
+	"ALTER TABLE `"+ID_User+"` ADD PRIMARY KEY (`ID`);"+
+	"ALTER TABLE `"+ID_User+"` MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT";
+	
+	db_all_friend.query(createNewFriendTable,function (error,result) {
+		if (!!error){DetailError = ('Register.js: createFriendTable '+ ID_User); functions.WriteLogError(DetailError);}				
+	});
+}
 function R_REGISTER(socket,boolSuccess){
 	socket.emit('R_REGISTER',{Message : boolSuccess});
 }
@@ -112,9 +127,15 @@ function insertNewUserDatabase(ID_User,serverInt) {
 	stringTable_base_upgrade	="`s"+serverInt+"_base_upgrade`";
 
 	createNewTable_base_info = "CREATE TABLE `"+ID_User+"` AS  (SELECT * FROM "+stringTable_base_info+");"
-	+"UPDATE `"+ID_User+"` SET `ID_User` = '"+ID_User+"'";
-	createNewTable_base_defend ="CREATE TABLE `"+ID_User+"` AS  (SELECT * FROM "+stringTable_base_defend+")";
-	createNewTable_base_upgrade= "CREATE TABLE `"+ID_User+"_1` AS  (SELECT * FROM "+stringTable_base_upgrade+")";
+	+"UPDATE `"+ID_User+"` SET `ID_User` = '"+ID_User+"'"+
+	"ALTER TABLE `"+ID_User+"` ADD PRIMARY KEY (`ID`);"+
+	"ALTER TABLE `"+ID_User+"` MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT";
+	createNewTable_base_defend = "CREATE TABLE `"+ID_User+"` AS  (SELECT * FROM "+stringTable_base_defend+")"+
+	"ALTER TABLE `"+ID_User+"` ADD PRIMARY KEY (`ID`);"+
+	"ALTER TABLE `"+ID_User+"` MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT";
+	createNewTable_base_upgrade= "CREATE TABLE `"+ID_User+"_1` AS  (SELECT * FROM "+stringTable_base_upgrade+")"+
+	"ALTER TABLE `"+ID_User+"_1` ADD PRIMARY KEY (`ID`);"+
+	"ALTER TABLE `"+ID_User+"_1` MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT";
 
 	switch (serverInt) {
 		case 1:

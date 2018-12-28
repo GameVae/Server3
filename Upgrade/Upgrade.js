@@ -12,7 +12,11 @@ var db_upgrade				= require('./../Util/Database/Db_upgrade_database.js');
 
 var functions 				= require('./../Util/Functions.js');
 
+// var Promise 				= require('promise');
+
 var DetailError, LogChange;
+
+var thisTimeOut,upgradeTimeout, researchTimeout;
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
@@ -20,11 +24,19 @@ exports.Start = function start (io) {
 			//console.log('socketID: '+socket.id);
 			S_UPGRADE (socket,data);
 		});
+		socket.on('S_UPGRADE_SPEEDUP',function (data) {
+			S_UPGRADE_SPEEDUP(socket,data);
+		});
 	});
+}
+
+function S_UPGRADE_SPEEDUP(socket,data) {
+	//clearTimeout(thisTimeOut);
 }
 
 function S_UPGRADE (socket,data) {
 	var stringQuery = "SELECT * FROM `upgrade` WHERE `ID`="+data.ID_Upgrade;
+
 	db_upgrade.query(stringQuery,function(error,rows){
 		var tableQuery = "SELECT * FROM `"+rows[0].Name_Upgrade +"` WHERE `Level`= "+data.Level;
 		db_upgrade.query(tableQuery,function(error,rowsUpgrade){
@@ -152,7 +164,7 @@ function test (dataUser,upgradeType) {
 
 
 function setTimerUpdateDatabase (time,dataUser,upgradeType) {
-	var thisTime = setTimeout(function (dataUser,upgradeType) {
+	thisTimeOut = setTimeout(function (dataUser,upgradeType) {
 		
 		var dbQuery_base_info,dbQuery_base_upgrade;
 		var stringQuery = "SELECT * FROM `user_info` WHERE `ID_User`="+dataUser.ID_User;
@@ -213,6 +225,14 @@ function setTimerUpdateDatabase (time,dataUser,upgradeType) {
 		
 	},time, dataUser,upgradeType);
 
+	switch (upgradeType) {
+		case 1:
+		upgradeTime = thisTimeOut;
+		break;
+		case 2:
+		researchTimeout = thisTimeOut;
+		break;
+	}
 }
 
 function checkBoolUpgrade (dataUser,serverInt,upgradeType,checkBool) {
