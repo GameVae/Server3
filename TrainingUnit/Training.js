@@ -69,7 +69,7 @@ function S_TRAINING (data) {
 	}).then(()=>{
 		setTimeout(function (dataTraining) {
 			setTimeUpdate (dataTraining);
-		},trainingTimeOut , dataTraining)
+		},trainingTimeOut , dataTraining);
 		
 	});
 }
@@ -77,6 +77,9 @@ function S_TRAINING (data) {
 function setTimeUpdate (dataTraining) {
 	var queryServer = "SELECT `Server_ID` FROM `user_info` WHERE `ID_User` ="+dataTraining.ID_User;
 	db_all_user.query(queryServer,function (error,rowsQueryServer) {
+
+		if (!!error){DetailError = ('Training.js: setTimeUpdate user_info ' + dataTraining.ID_User);functions.WriteLogError(DetailError);}
+		
 		switch (rowsQueryServer[0].Server_ID) {
 			case 1:
 			dbBase 		= db_s1_base_info;
@@ -96,6 +99,7 @@ function setTimeUpdate (dataTraining) {
 		"`Training_Might`="+dataTraining.Training_Might;
 
 		dbBase.query(stringQuery,function (error,rows) {
+			if (!!error){DetailError = ('Training.js: setTimeUpdate ' + dataTraining.ID_User);functions.WriteLogError(DetailError);}
 			if (rows!=undefined) {
 				updateBaseDefend(dbDefend,dataTraining);
 				clearBaseInfo(dbBase,dataTraining);
@@ -110,7 +114,8 @@ function clearBaseInfo (dbBase,dataTraining) {
 	"`TrainingUnit_ID` = null, `TrainingTime`=null, `TrainingQuality`=null,`Training_Might`=null"
 	+" WHERE `BaseNumber` = "+dataTraining.BaseNumber;
 	dbBase.query(clearString,function (error,result) {
-		console.log(error);
+		if (!!error){DetailError = ('Training.js: clearBaseInfo' + dataTraining.ID_User);functions.WriteLogError(DetailError);}
+		LogChange='Training.js: clearBaseInfo '+dataTraining.ID_User;functions.LogChange(LogChange);
 	});
 }
 
@@ -120,6 +125,8 @@ function updateBaseDefend (dbDefend,dataTraining) {
 	"`UnitType` = "+dataTraining.ID_Unit;
 	var query_updateBaseDefend;
 	dbDefend.query(stringQuery,function (error,rows) {
+		if (!!error){DetailError = ('Training.js: query updateBaseDefend ' + dataTraining.ID_User);functions.WriteLogError(DetailError);}
+		
 		if (rows ==undefined) {
 			var query_updateBaseDefend = "INSERT INTO `"+dataTraining.ID_User+"` (`BaseNumber`,`UnitType`,`Quality`) VALUES ("+
 			dataTraining.BaseNumber+","+
@@ -132,7 +139,8 @@ function updateBaseDefend (dbDefend,dataTraining) {
 			"`UnitType` = "+dataTraining.TrainingUnit_ID;
 		}
 		dbDefend.query(query_updateBaseDefend, function (error,result) {
-			console.log(error);
+			if (!!error){DetailError = ('Training.js: query_updateBaseDefend ' + dataTraining.ID_User);functions.WriteLogError(DetailError);}
+			LogChange='Training.js: update_insert_BaseDefend '+dataTraining.ID_User;functions.LogChange(LogChange);
 		});
 	})
 }
@@ -158,12 +166,14 @@ function updateDatabaseTraining (materialCost,dataTraining) {
 	"WHERE `BaseNumber`= '"+dataTraining.BaseNumber+"'";
 
 	dbBase.query(stringQuery,function (error,result) {
-		console.log(error);
-	})
+		if (!!error){DetailError = ('Training.js: updateDatabaseTraining' + dataTraining.ID_User);functions.WriteLogError(DetailError);}
+		LogChange='Training.js: updateDatabaseTraining '+dataTraining.ID_User;functions.LogChange(LogChange);
+	});
 }
 
 function calcCost (stringQuery,data,resolve) {
 	db_training.query(stringQuery, function (error,rows) {	
+		if (!!error){DetailError = ('Training.js: calcCost' + data.ID_User);functions.WriteLogError(DetailError);}
 		materialCost={
 			Food: 	rows[0].Food * data.Quality,
 			Wood: 	rows[0].Wood * data.Quality,
@@ -176,10 +186,12 @@ function calcCost (stringQuery,data,resolve) {
 
 
 function getTrainingTime (stringQuery,data,resolve) {
-	db_training.query(stringQuery, function (error,rows) {		
+	db_training.query(stringQuery, function (error,rows) {	
+		if (!!error){DetailError = ('Training.js: getTrainingTime' + data.ID_User);functions.WriteLogError(DetailError);}
 		data.Level = (data.Level==0)?1:data.Level;
-		var trainingTable = "SELECT * FROM `"+rows[0].Unit+"` WHERE `Level`="+data.Level;
+		var trainingTable = "SELECT * FROM `"+rows[0].Unit+"` WHERE `Level`= "+data.Level;
 		db_training.query(trainingTable,function (error,rowsTrainingTable) {
+			if (!!error){DetailError = ('Training.js: getTrainingTime trainingTable ' + data.ID_User);functions.WriteLogError(DetailError);}
 			trainingTimeOut = rowsTrainingTable[0].TrainingTime*1000* data.Quality;
 			trainingTime = new Date(functions.GetTime()+trainingTimeOut).toISOString();
 			resolve();
@@ -190,6 +202,7 @@ function getTrainingTime (stringQuery,data,resolve) {
 
 function getMightBonus (stringQuery,data,resolve) {
 	db_training.query(stringQuery, function (error,rows) {	
+		if (!!error){DetailError = ('Training.js: getMightBonus ' + data.ID_User);functions.WriteLogError(DetailError);}
 		mightBonus=rows[0].MightBonus * data.Quality;
 		resolve();
 	});
@@ -213,6 +226,7 @@ exports.UpdateDatabase = function updateDatabase (serverInt) {
 	//console.log(tableQuery)
 	
 	dbBase.query(stringQuery,function (error,rows) {
+		if (!!error){DetailError = ('Training.js: queryTable UpdateDatabase ' + serverInt);functions.WriteLogError(DetailError);}
 		if (rows!=undefined) {
 			for (var i = 0; i < rows.length; i++) {
 				tableQuery = "SELECT * FROM `"+rows[i].TABLE_NAME+"` WHERE `TrainingTime`<>null";
@@ -224,21 +238,27 @@ exports.UpdateDatabase = function updateDatabase (serverInt) {
 
 function checkTimeDataBase (serverInt,dbBase,dbDefend,tableQuery) {
 	dbBase.query(tableQuery,function (error,rows) {
+		if (!!error){DetailError = ('Training.js: checkTimeDataBase ' + serverInt);functions.WriteLogError(DetailError);}
 		if (rows!=undefined) {
 			var currentTime = functions.getTime();
 			var databaseTime = functions.ExportTimeDatabase(rows[0].TrainingTime);
+			dataTraining={
+				Server_ID: 			serverInt,
+				ID_User: 			rows[0].ID_User,
+				BaseNumber: 		rows[0].BaseNumber,
+				TrainingUnit_ID: 	rows[0].TrainingUnit_ID,
+				TrainingTime: 		rows[0].TrainingTime,
+				TrainingQuality: 	rows[0].TrainingQuality,
+				TrainingMight: 		rows[0].Training_Might,
+			}
 			if (databaseTime<=currentTime) {
-				dataTraining={
-					Server_ID: 			serverInt,
-					ID_User: 			rows[0].ID_User,
-					BaseNumber: 		rows[0].BaseNumber,
-					TrainingUnit_ID: 	rows[0].TrainingUnit_ID,
-					TrainingTime: 		rows[0].TrainingTime,
-					TrainingQuality: 	rows[0].TrainingQuality,
-					TrainingMight: 		rows[0].Training_Might,
-				}
 				updateBaseDefend(dbDefend,dataTraining);
 				clearBaseInfo(dbBase,dataTraining);
+			}else{
+				trainingTimeOut =  new Date(databaseTime).getTime() -currentTime;
+				setTimeout(function (dataTraining) {
+					setTimeUpdate (dataTraining);
+				},trainingTimeOut , dataTraining);
 			}
 		}
 	});
