@@ -813,3 +813,29 @@
 
 // }
 
+// var tArray = [1,2,3,4,5]
+// console.log(tArray[0])
+
+// var Dic ={}
+
+// Dic['9_1_1']=setTimeout(function  () {
+// 	console.log('here');
+// },5000)
+
+// setTimeout(function  () {
+// 	console.log('clearTimeout');
+// 	clearTimeout(Dic['9_1_1'])
+
+// },3000)
+
+var functions = require('./Util/Functions.js')
+var test = new Date().toISOString()
+
+console.log(test)
+
+var db_s1_base_info			= require('./Util/Database/Db_s1_base_info.js');
+var stringQuery = "UPDATE `9` SET `TrainingTime`='"+functions.ImportTimeToDatabase(test)+"' WHERE `ID`=1";
+console.log(stringQuery)
+db_s1_base_info.query(stringQuery, function (error,result) {
+	console.log(error)
+})

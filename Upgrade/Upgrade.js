@@ -13,10 +13,10 @@ var db_upgrade				= require('./../Util/Database/Db_upgrade_database.js');
 var functions 				= require('./../Util/Functions.js');
 
 // var Promise 				= require('promise');
-
+var dbUpgrade;
 var DetailError, LogChange;
 
-var thisTimeOut,upgradeTimeout, researchTimeout;
+var DictTimeOut={};
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
@@ -30,8 +30,24 @@ exports.Start = function start (io) {
 	});
 }
 
-function S_UPGRADE_SPEEDUP(socket,data) {
-	//clearTimeout(thisTimeOut);
+
+
+// exports.R_UPGRADE = function r_upgrade (socket,dataUser) {
+// 	var currentTime = functions.GetTime();
+// 	switch (parseInt(dataUser.ID_Server)) {
+// 		case 1:
+// 			dbUpgrade = db_s1_base_info;
+// 			break;
+// 		case 2:
+// 			dbUpgrade = db_s2_base_info;
+// 			break;
+// 	}
+// 	var stringQuery = "SELECT * FROM `"+dataUser.ID_User+"`"
+// }
+
+function S_UPGRADE_SPEEDUP(socket,dataUser) {
+	var stringClearTimeout = dataUser.ID_User+"_"+dataUser.BaseNumber+"_"+dataUser.ID_Upgrade+"_"+upgradeType;
+	//clearTimeout(DictTimeOut[stringClearTimeout]);
 }
 
 function S_UPGRADE (socket,data) {
@@ -106,65 +122,10 @@ function updateUpgrade (dataUser,upgradeType,rowsUpgrade) {
 
 }
 
-
-function test (dataUser,upgradeType) {
-
-	var dbQuery_base_info,dbQuery_base_upgrade;
-	var stringQuery = "SELECT * FROM `user_info` WHERE `ID_User`="+dataUser.ID_User;
-	var stringQueryMightBounus,stringUpdateBaseInfo, stringUpdate_Game_info, stringUpdateBaseUpgrade;
-
-	db_all_user.query(stringQuery, function (error,rows) {
-		stringUpdate_Game_info = "UPDATE `game_info_s"+rows[0].Server_ID+"` SET `Might`=`Might`+";
-		stringUpdateBaseUpgrade = "UPDATE `"+dataUser.ID_User+"_"+dataUser.ID_Base+"` SET `Level`="+dataUser.Level+" WHERE `ID` = "+ dataUser.ID_Upgrade;
-
-		switch (rows[0].Server_ID) {
-			case 1:
-			dbQuery_base_info = db_s1_base_info;
-			dbQuery_base_upgrade = db_s1_upgrade;
-			break;
-
-			case 2:
-			dbQuery_base_info = db_s2_base_info;
-			dbQuery_base_upgrade = db_s2_upgrade;
-			break;
-		}
-
-		switch (upgradeType) {
-			case 1:
-			stringQueryMightBounus = "SELECT `UpgradeWait_Might` AS Might FROM `"+dataUser.ID_User+"`";
-			stringUpdateBaseInfo = "UPDATE `"+dataUser.ID_User+"` SET `UpgradeWait_ID`= NULL,"
-			+" `UpgradeWait_Might`= NULL,"
-			+" `UpgradeTime`= NULL;";
-			break;
-			case 2:
-			stringQueryMightBounus = "SELECT `ResearchWait_Might` AS Might FROM `"+dataUser.ID_User+"`";
-			stringUpdateBaseInfo = "UPDATE `"+dataUser.ID_User+"` SET `ResearchWait_ID`= NULL,"
-			+" `ResearchWait_Might`= NULL,"
-			+" `ResearchTime`= NULL;";
-			break;
-		}
-
-		dbQuery_base_info.query(stringQueryMightBounus,function(error,rows){
-			stringUpdate_Game_info +=rows[0].Might;
-			db_all_user.query(stringUpdate_Game_info,function (error,result_stringUpdate_Game_info) {
-				if (!!error){DetailError = ('Upgrade.js: updateMight' + data.ID_User);functions.WriteLogError(DetailError);}
-				LogChange='Upgrade.js: updateMight: '+data.ID_User;functions.LogChange(LogChange);
-			});
-		});
-		dbQuery_base_upgrade.query(stringUpdateBaseUpgrade,function (error,result) {
-			if (!!error){DetailError = ('Upgrade.js: updateLevel' + data.ID_User);functions.WriteLogError(DetailError);}
-			LogChange='Upgrade.js: updateLevel: '+data.ID_User;functions.LogChange(LogChange);
-		});
-		dbQuery_base_info.query(stringUpdateBaseInfo,function(error,result){
-			if (!!error){DetailError = ('Upgrade.js: resetBaseInfoUpdate' + data.ID_User);functions.WriteLogError(DetailError);}
-			LogChange='Upgrade.js: resetBaseInfoUpdate: '+data.ID_User;functions.LogChange(LogChange);
-		});
-	});
-}
-
-
 function setTimerUpdateDatabase (time,dataUser,upgradeType) {
-	thisTimeOut = setTimeout(function (dataUser,upgradeType) {
+	var stringTimeOut = dataUser.ID_User+"_"+dataUser.BaseNumber+"_"+dataUser.ID_Upgrade+"_"+upgradeType;
+
+	DictTimeOut[stringTimeOut] = setTimeout(function (dataUser,upgradeType) {
 		
 		var dbQuery_base_info,dbQuery_base_upgrade;
 		var stringQuery = "SELECT * FROM `user_info` WHERE `ID_User`="+dataUser.ID_User;
@@ -218,6 +179,8 @@ function setTimerUpdateDatabase (time,dataUser,upgradeType) {
 						if (!!error){DetailError = ('Upgrade.js: resetBaseInfoUpdate' + data.ID_User);functions.WriteLogError(DetailError);}
 						LogChange='Upgrade.js: resetBaseInfoUpdate: '+data.ID_User;functions.LogChange(LogChange);
 					});
+
+					delete DictTimeOut[stringTimeOut];
 				}
 			});
 
@@ -225,14 +188,7 @@ function setTimerUpdateDatabase (time,dataUser,upgradeType) {
 		
 	},time, dataUser,upgradeType);
 
-	switch (upgradeType) {
-		case 1:
-		upgradeTime = thisTimeOut;
-		break;
-		case 2:
-		researchTimeout = thisTimeOut;
-		break;
-	}
+	
 }
 
 function checkBoolUpgrade (dataUser,serverInt,upgradeType,checkBool) {

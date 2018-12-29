@@ -16,43 +16,53 @@ var Promise 				= require('promise');
 
 var DetailError, LogChange;
 
+var dataTraining={};
+var materialCost={};
+var trainingTime,mightBonus,trainingTimeOut;
+var dbUpgrade,dbBase,dbDefend;
+var DictTimeOut={};
+// var data={
+// 	ID_User: 	9,
+// 	Server_ID: 	1,
+// 	BaseNumber: 1,
+// 	ID_Unit: 	1,
+// 	Level: 		1,
+// 	Quality: 	500,
+// }
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_TRAINING', function (data){
 			//console.log('socketID: '+socket.id);
 			S_TRAINING (socket,data);
 		});
+		socket.on('S_TRAINING_SPEEDUP', function (data){
+			//console.log('socketID: '+socket.id);
+			S_TRAINING_SPEEDUP (socket,data);
+		});
 	});
 }
 
-var data={
-	ID_User: 	9,
-	Server_ID: 	1,
-	BaseNumber: 1,
-	ID_Unit: 	1,
-	Level: 		1,
-	Quality: 	500,
+
+function S_TRAINING_SPEEDUP (socket,data) {
+	var stringTimeOut = dataTraining.ID_User+"_"+dataTraining.BaseNumber;
+	clearTimeout(DictTimeOut[stringTimeOut]);
+
 }
 
-var dataTraining={};
-var materialCost={};
-var trainingTime,mightBonus,trainingTimeOut;
-var dbUpgrade,dbBase,dbDefend;
 
-//S_TRAINING(data);
 
 
 function S_TRAINING (data) {
 	var stringQuery = "SELECT * FROM `unit` WHERE `ID`="+data.ID_Unit;
 	return new Promise((resolve,reject)=>{
-		getTrainingTime (stringQuery,data,resolve)
+		getTrainingTime (stringQuery,data,resolve);
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
-			getMightBonus (stringQuery,data,resolve)	
+			getMightBonus (stringQuery,data,resolve);	
 		});
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
-			calcCost (stringQuery,data,resolve)	
+			calcCost (stringQuery,data,resolve);
 		});
 	}).then(()=>{
 		dataTraining={
@@ -67,8 +77,10 @@ function S_TRAINING (data) {
 		updateDatabaseTraining(materialCost,dataTraining);
 		
 	}).then(()=>{
-		setTimeout(function (dataTraining) {
+		var stringTimeOut = dataTraining.ID_User+"_"+dataTraining.BaseNumber;
+		DictTimeOut[stringTimeOut] = setTimeout(function (dataTraining) {
 			setTimeUpdate (dataTraining);
+			delete DictTimeOut[stringTimeOut];
 		},trainingTimeOut , dataTraining);
 		
 	});
@@ -256,8 +268,10 @@ function checkTimeDataBase (serverInt,dbBase,dbDefend,tableQuery) {
 				clearBaseInfo(dbBase,dataTraining);
 			}else{
 				trainingTimeOut =  new Date(databaseTime).getTime() -currentTime;
-				setTimeout(function (dataTraining) {
+				var stringTimeOut = dataTraining.ID_User+"_"+dataTraining.BaseNumber;
+				DictTimeOut[stringTimeOut]=setTimeout(function (dataTraining) {
 					setTimeUpdate (dataTraining);
+					delete DictTimeOut[stringTimeOut];
 				},trainingTimeOut , dataTraining);
 			}
 		}
