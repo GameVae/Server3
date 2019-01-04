@@ -5,6 +5,7 @@ var db_all_user			= require('./../../Util/Database/Db_all_user.js');
 var getUserBase			= require('./GetUserBase.js')
 var getRss 				= require('./../../Map/GetRss.js');
 var getPosition			= require('./../../Map/GetPosition.js');
+var getFriend 			= require('./../../Friend/GetFriend.js');
 
 var functions 			= require('./../../Util/Functions.js');
 
@@ -21,20 +22,30 @@ exports.Start = function start (io) {
 }
 
 function S_LOGIN (socket,data) {
-	currentUser = getCurrentUser(data);
-	var queryUserNamePass = "SELECT * FROM `user_info` WHERE `UserName`="+currentUser.UserName+"'";
+
+	console.log('S_LOGIN')
+	console.log(data);
+	// currentUser = getCurrentUser(data);
+	//console.log(currentUser);
+	var queryUserNamePass = "SELECT * FROM `user_info` WHERE `UserName`='"+data.UserName+"'";
+
 	db_all_user.query(queryUserNamePass, function (error,rows) {
-		if (!!error){DetailError = ('Login.js: Error queryUserNamePass');functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('Login.js: Error queryUserNamePass ');functions.WriteLogError(DetailError);}
 		if (rows[0].BlockedForever==1) {
 			socket.emit('R_BLOCKED',{BlockedForever:1,Time:0});
 		}else{
-			if (rows[0].BlockedTime.getTime()>=functions.GetTime()) {
-				// check time => lấy time chenh lech => chay settimeout  doi voi time lon hon hien tai, con nho hon thi reset ve null, va doi bien blockForever 	
-				socket.emit('R_BLOCKED',{BlockedForever:0,Time:rows[0].BlockedTime});
-				updateSetBlockTime (blockTime,socket,data);
+
+			if (rows[0].BlockedTime!=null) {
+				if (functions.ExportTimeDatabase(rows[0].BlockedTime)>=functions.GetTime()) {
+					// check time => lấy time chenh lech => chay settimeout  doi voi time lon hon hien tai, con nho hon thi reset ve null, va doi bien blockForever 	
+					var databaseTime = functions.ExportTimeDatabase(rows[0].BlockedTime) - functions.GetTime()
+					socket.emit('R_BLOCKED',{BlockedForever:0,Time: databaseTime});
+					updateSetBlockTime (blockTime,socket,data);
+				}
+				
 			}else{
-				if (rows[0].Password==currentUser.Password) {
-					R_USER_INFO (socket,rows[0].Server_ID);
+				if (rows[0].Password==data.Password) {
+					R_USER_INFO (socket,rows[0].ID_User,rows[0].Server_ID);
 					socket.emit('R_LOGIN',{LoginBool:1});
 				}
 				else{
@@ -53,10 +64,23 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 		if (!!error){DetailError = ('Login.js: S_USER_INFO queryUser :'+ ID_User); functions.WriteLogError(DetailError);}
 		dataUser= rows[0];
 		delete dataUser.ID;
-		getUserBase.R_BASE_INFO(socket,ID_User,Server_ID)
-		socket.emit('R_USER_INFO',{Data:dataUser,Server:rows[0].Server_ID});
-		getRss.R_GET_RSS(socket,rows[0].Server_ID);
-		getPosition.R_GET_POSITION(socket,rows[0].Server_ID);
+		getFriend.GetFriendInfo(socket,dataUser.ID_User);
+
+		
+		
+		var queryServer = "SELECT * FROM `user_info` WHERE `ID_User`='"+ID_User+"'";
+
+		db_all_user.query(queryServer,function (error,rowsServer) {
+			
+			dataUser.Server_ID = rowsServer[0].Server_ID;
+			dataUser.Diamond = rowsServer[0].Diamond;
+			dataUser.ResetVipTime = rowsServer[0].ResetVipTime;
+
+			getUserBase.R_BASE_INFO(socket,dataUser.ID_User,dataUser.Server_ID)
+			socket.emit('R_USER_INFO',{R_USER_INFO:dataUser});
+			getRss.R_GET_RSS(socket,dataUser.Server_ID);
+			getPosition.R_GET_POSITION(socket,dataUser.Server_ID);
+		});
 	});
 }
 
@@ -68,10 +92,10 @@ function updateSetBlockTime (blockTime,socket,data) {
 			LogChange='Login.js: updateSetBlockTime: '+data.UserName;functions.LogChange(LogChange);
 		});
 	}, blockTime, data);
-
 }
+
 function R_CHECK_DUPLICATE_LOGIN (socket,data) {
-	var queryCheckDuplicate = "SELECT `Socket` FROM `user_info` WHERE `UserName`='"+currentUser.UserName+"'";
+	var queryCheckDuplicate = "SELECT `Socket` FROM `user_info` WHERE `UserName`='"+data.UserName+"'";
 	db_all_user.query(queryCheckDuplicate,function (error,rows) {
 		if (!!error){DetailError = ('Login.js: R_CHECK_DUPLICATE_LOGIN queryUser :'+ data.UserName); functions.WriteLogError(DetailError);}
 		if (rows[0].Socket!=null||rows[0].Socket!=socket.id) {
@@ -80,14 +104,14 @@ function R_CHECK_DUPLICATE_LOGIN (socket,data) {
 	});
 }
 
-function getCurrentUser (data) {
-	return currentUser ={
-		UserName: data.UserName,
-		Password: data.Password,
-		Model_Device: data.ModelDevice,
-		Ram_Device: data.RamDevice
-	}
-}
+// function getCurrentUser (data) {
+// 	return currentUser ={
+// 		UserName: data.UserName,
+// 		Password: data.Password,
+// 		Model_Device: data.Model_Device,
+// 		Ram_Device: data.Ram_Device
+// 	}
+// }
 
 
 // var async 			= require('async');

@@ -7,8 +7,8 @@ exports.Register = function reigister (UserName,Email) {
 	  let transporter = nodemailer.createTransport({
 	  	service: 'gmail',
 	  	auth: {
-	  		user: 'aloevera.hoang@gmail.com',
-	  		pass: '123456@A'
+	  		user: 'testdemanvi@gmail.com',
+	  		pass: 'canthan112'
 	  	}
 	  });
 

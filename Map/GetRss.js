@@ -9,7 +9,7 @@ var arrayTimeRSS_s2 =[];
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_GET_RSS', function (data){
-			R_GET_RSS (socket,data.["Server"]);
+			R_GET_RSS (socket,parseInt(data.Server));
 		});
 		socket.on('S_GATHER_RSS', function (data){
 			S_GATHER_RSS (socket,data);
@@ -26,16 +26,17 @@ function S_GATHER_RSS (socket,data) {
 
 exports.R_GET_RSS = function R_GET_RSS (socket,serverInt) {
 	var table = "s"+serverInt+"_rss";
-	var queryString = "SELECT * FROM "+table;
+	var queryString = "SELECT * FROM `"+table+"`";
+	console.log(queryString);
 	db_rss.query(queryString,function (error,rows) {
 		if (!!error){DetailError = ('GetRss.js: Error query getDataRss');functions.WriteLogError(DetailError);}
-		socket.emit('R_GET_RSS',{Data:rows});
+		socket.emit('R_GET_RSS',{R_GET_RSS:rows});
 	});
 }
 
-exports.UpdateTimeHarvest = function updateTimeHarvest () {
+exports.UpdateTimeHarvest = function updateTimeHarvest (serverInt) {
 	console.log('UpdateTimeHarvest');
-	var queryStringTimePrepare = "SELECT * FROM `s1_rss` WHERE `TimePrepare`<> 'NULL'";
+	var queryStringTimePrepare = "SELECT * FROM `s"+serverInt+"_rss` WHERE `TimePrepare`<> 'NULL'";
 	var currentTime = new Date().getTime();
 	var rowTime = 0;
 	db_rss.querry(queryStringTimePrepare,function (error,rows) {

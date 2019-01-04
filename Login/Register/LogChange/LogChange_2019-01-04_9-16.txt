@@ -1,0 +1,71 @@
+
+ logChangeDetail: 2019-01-04T04:21:00.150Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:21:00.132Z')
+ logChangeDetail: 2019-01-04T04:21:00.160Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('24','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:21:00.161Z: updateString: UPDATE `user_info` SET `ID_User` = '24',`Server_ID` ='1'  WHERE `user_info`.`ID` = '24'
+ logChangeDetail: 2019-01-04T04:21:00.194Z: updateDataPosition: 24_server: 1
+ logChangeDetail: 2019-01-04T04:22:30.651Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:22:30.634Z')
+ logChangeDetail: 2019-01-04T04:22:30.659Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('25','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:22:30.685Z: updateString: UPDATE `user_info` SET `ID_User` = '25',`Server_ID` ='1'  WHERE `user_info`.`ID` = '25'
+ logChangeDetail: 2019-01-04T04:22:30.688Z: updateDataPosition: 25_server: 1
+ logChangeDetail: 2019-01-04T04:26:41.121Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:26:41.104Z')
+ logChangeDetail: 2019-01-04T04:26:41.153Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('26','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:26:41.153Z: updateString: UPDATE `user_info` SET `ID_User` = '26',`Server_ID` ='1'  WHERE `user_info`.`ID` = '26'
+ logChangeDetail: 2019-01-04T04:26:41.156Z: updateDataPosition: 26_server: 1
+ logChangeDetail: 2019-01-04T04:30:31.691Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:30:31.675Z')
+ logChangeDetail: 2019-01-04T04:30:31.699Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('27','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:30:31.729Z: updateString: UPDATE `user_info` SET `ID_User` = '27',`Server_ID` ='1'  WHERE `user_info`.`ID` = '27'
+ logChangeDetail: 2019-01-04T04:30:31.731Z: updateDataPosition: 27_server: 1
+ logChangeDetail: 2019-01-04T04:32:53.758Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:32:53.741Z')
+ logChangeDetail: 2019-01-04T04:32:53.765Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('28','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:32:53.789Z: updateString: UPDATE `user_info` SET `ID_User` = '28',`Server_ID` ='1'  WHERE `user_info`.`ID` = '28'
+ logChangeDetail: 2019-01-04T04:32:53.793Z: updateDataPosition: 28_server: 1
+ logChangeDetail: 2019-01-04T04:34:59.069Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:34:59.051Z')
+ logChangeDetail: 2019-01-04T04:34:59.083Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('29','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:34:59.100Z: updateString: UPDATE `user_info` SET `ID_User` = '29',`Server_ID` ='1'  WHERE `user_info`.`ID` = '29'
+ logChangeDetail: 2019-01-04T04:34:59.115Z: updateDataPosition: 29_server: 1
+ logChangeDetail: 2019-01-04T04:36:52.098Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:36:52.080Z')
+ logChangeDetail: 2019-01-04T04:36:52.106Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('30','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:36:52.130Z: updateString: UPDATE `user_info` SET `ID_User` = '30',`Server_ID` ='1'  WHERE `user_info`.`ID` = '30'
+ logChangeDetail: 2019-01-04T04:36:52.134Z: updateDataPosition: 30_server: 1
+ logChangeDetail: 2019-01-04T04:37:36.729Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:37:36.713Z')
+ logChangeDetail: 2019-01-04T04:37:36.737Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('31','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:37:36.763Z: updateString: UPDATE `user_info` SET `ID_User` = '31',`Server_ID` ='1'  WHERE `user_info`.`ID` = '31'
+ logChangeDetail: 2019-01-04T04:37:36.767Z: updateDataPosition: 31_server: 1
+ logChangeDetail: 2019-01-04T04:42:02.594Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:42:02.576Z')
+ logChangeDetail: 2019-01-04T04:43:02.831Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:43:02.814Z')
+ logChangeDetail: 2019-01-04T04:43:57.282Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:43:57.264Z')
+ logChangeDetail: 2019-01-04T04:45:22.113Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:45:22.097Z')
+ logChangeDetail: 2019-01-04T04:45:37.494Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:45:37.476Z')
+ logChangeDetail: 2019-01-04T04:45:37.503Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('36','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:45:37.524Z: updateString: UPDATE `user_info` SET `ID_User` = '36',`Server_ID` ='1'  WHERE `user_info`.`ID` = '36'
+ logChangeDetail: 2019-01-04T04:45:37.534Z: updateDatabase: 36
+ logChangeDetail: 2019-01-04T04:45:37.538Z: updateDataPosition: 36_server: 1
+ logChangeDetail: 2019-01-04T04:46:36.590Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:46:36.574Z')
+ logChangeDetail: 2019-01-04T04:46:36.621Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('37','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:46:36.625Z: updateString: UPDATE `user_info` SET `ID_User` = '37',`Server_ID` ='1'  WHERE `user_info`.`ID` = '37'
+ logChangeDetail: 2019-01-04T04:46:36.629Z: updateDatabase: 37
+ logChangeDetail: 2019-01-04T04:46:36.631Z: updateDataPosition: 37_server: 1
+ logChangeDetail: 2019-01-04T04:47:56.223Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:47:56.206Z')
+ logChangeDetail: 2019-01-04T04:47:56.231Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('38','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:47:56.260Z: updateString: UPDATE `user_info` SET `ID_User` = '38',`Server_ID` ='1'  WHERE `user_info`.`ID` = '38'
+ logChangeDetail: 2019-01-04T04:47:56.263Z: updateDatabase: 38
+ logChangeDetail: 2019-01-04T04:47:56.266Z: updateDataPosition: 38_server: 1
+ logChangeDetail: 2019-01-04T04:47:56.319Z: createNewTable_base_info: 38
+ logChangeDetail: 2019-01-04T04:48:04.383Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','4','2019-01-04T04:48:04.366Z')
+ logChangeDetail: 2019-01-04T04:48:04.393Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('39','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T04:48:04.421Z: updateString: UPDATE `user_info` SET `ID_User` = '39',`Server_ID` ='1'  WHERE `user_info`.`ID` = '39'
+ logChangeDetail: 2019-01-04T04:48:04.425Z: updateDatabase: 39
+ logChangeDetail: 2019-01-04T04:48:04.425Z: updateDataPosition: 39_server: 1
+ logChangeDetail: 2019-01-04T04:48:04.521Z: createNewTable_base_defend: 39
+ logChangeDetail: 2019-01-04T04:48:04.543Z: createNewTable_base_upgrade: 39
+ logChangeDetail: 2019-01-04T04:48:04.553Z: createNewTable_base_info: 39
+ logChangeDetail: 2019-01-04T06:23:08.718Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('12345672','e10adc3949ba59abbe56e057f20f883e','homanhquan87@gmail.com','12345672','1000','6','2019-01-04T06:23:08.700Z')
+ logChangeDetail: 2019-01-04T06:23:08.728Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('40','12345672','FFFFFF')
+ logChangeDetail: 2019-01-04T06:23:08.750Z: updateString: UPDATE `user_info` SET `ID_User` = '40',`Server_ID` ='1'  WHERE `user_info`.`ID` = '40'
+ logChangeDetail: 2019-01-04T06:23:08.763Z: updateDataPosition: 40_server: 1
+ logChangeDetail: 2019-01-04T06:23:08.769Z: updateDatabase: 40
+ logChangeDetail: 2019-01-04T06:23:08.885Z: createNewTable_base_info: 40
+ logChangeDetail: 2019-01-04T06:23:08.896Z: createNewTable_base_defend: 40
+ logChangeDetail: 2019-01-04T06:23:08.909Z: createNewTable_base_upgrade: 40
+ logChangeDetail: 2019-01-04T07:29:09.316Z: updateDataPosition: 9_server: 1
+ logChangeDetail: 2019-01-04T07:29:09.317Z: updateDatabase: 9

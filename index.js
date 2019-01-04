@@ -16,8 +16,10 @@ console.log(functions.GetTimeNow()+": "+app.get('port'));
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
+var serverPosition = require('./Login/Register/UpdateDatabaseUser.js');
+serverPosition.UpdateDatabase(1);
+
 var register 		= require('./Login/Register/Register.js');
-register.Start(io);
 
 var login 			= require('./Login/Login/Login.js');
 // login.Start(io);
@@ -33,18 +35,26 @@ var getRss 			= require('./Map/GetRss.js');
 var upgrade 		= require('./Upgrade/Upgrade.js');
 upgrade.UpdateDatabase(1);
 //upgrade.UpdateDatabase(2);
-var training	= require('./TrainingUnit/Training.js')
+var training		= require('./TrainingUnit/Training.js')
 // training.UpdateDatabase(1);
 // training.UpdateDatabase(2);
+var info 			= require('./Info/GetInfo.js');
+
+var friend 			= require('./Friend/GetFriend.js');
+friend.UpdateDatabase();
 
 if (app.get('port') === process.env.PORT)
 {	
 	var connectCounter=0;
 	checkConnect (connectCounter,io);
+
+	register.Start(io);
 	login.Start(io);
 	checkVersion.Start(io);
 	getRss.Start(io);
 	upgrade.Start(io);
+	friend.Start(io);
+	info.Start(io);
 }
 
 function checkConnect (connectCounter,io) {
@@ -54,14 +64,14 @@ function checkConnect (connectCounter,io) {
 		db_server_task.query(selectConnectServer, function (error,rows) {
 			if (rows[0].Content==1) {		
 				connectCounter++;
-				taskServer.ConnectSocket(socket.id);
+				//taskServer.ConnectSocket(socket.id);
 				socket.emit('connection',{});
 				console.log('connectCounter: '+connectCounter);		
 			}	
 		});
 		socket.on('disconnect', function () {
 			connectCounter--;
-			taskServer.RemoveConnectSocket(socket.id);
+			//taskServer.RemoveConnectSocket(socket.id);
 			console.log('connectCounter: '+connectCounter);		
 		});
 	});

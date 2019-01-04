@@ -7,16 +7,18 @@ var index 			= require('./../index.js');
 var DetailError,logChangeDetail ;
 
 exports.ConnectSocket = function connectSocket (id) {
-	var insertUser = "INSERT INTO `socket_user`(`SocketID`, `Time`) VALUES ("+id+",'"+functions.GetTimeNow()+"')";
-	db_server_task.query(insertUser,function (error,result) {
+	var currentTime =functions.ImportTimeToDatabase(functions.GetTimeNow());
+	var insertUser = "INSERT INTO `user_info`(`Socket`, `TimeLogIn`) VALUES ("+id+",'"+currentTime+"')";
+	db_all_user.query(insertUser,function (error,result) {
 		if (!!error){DetailError = ('TaskServer.js: insertUser ConnectUser'); functions.WriteLogError(DetailError);}
 		logChangeDetail =("TaskServer.js: insertUser ConnectUser"); functions.LogChange(logChangeDetail);
 	});
 }
 
-exports.RemoveConnectSocket = function removeConnectSocket (id) {	
-	var removeUser = "DELETE FROM `socket_user` WHERE `SocketID`="+id;
-	db_server_task.query(removeUser,function (error,result) {
+exports.RemoveConnectSocket = function removeConnectSocket (id) {
+	var currentTime =functions.ImportTimeToDatabase(functions.GetTimeNow());	
+	var removeUser = "UPDATE `user_info` SET `TimeLogOut`="+currentTime+",`TimeLogOut`=null, `Socket`=null WHERE `Socket`="+id;
+	db_all_user.query(removeUser,function (error,result) {
 		if (!!error){DetailError = ('TaskServer.js: removeUser ConnectUser '+id); functions.WriteLogError(DetailError);}
 		logChangeDetail =("TaskServer.js: removeUser ConnectUser "+id); functions.LogChange(logChangeDetail);
 	});

@@ -96,7 +96,7 @@ function updateUpgrade (dataUser,upgradeType,rowsUpgrade) {
 		stringUpdate = "UPDATE `"+dataUser.ID_User+"` SET `UpgradeWait_ID`="+dataUser.ID_Upgrade+","
 		+" `UpgradeWait_Might`="+rowsUpgrade[0].MightBonus+","
 		+" `UpgradeTime`='"+upgradeTime+"';";
-		console.log(stringUpdate);
+		//console.log(stringUpdate);
 		break;
 		case 2:
 		stringUpdate = "UPDATE `"+dataUser.ID_User+"` SET `ResearchWait_ID`="+dataUser.ID_Upgrade+","
@@ -242,7 +242,7 @@ exports.UpdateDatabase = function updateDatabase (serverInt) {
 
 function updateTime (serverInt,serverBase,serverUpdate, tableQuery) {
 	var stringQueryBaseUpgrade = "SELECT `ID_User`,`BaseNumber`,`UpgradeWait_ID` AS LevelUp_ID ,`UpgradeWait_Might` AS Might,`UpgradeTime` AS Time FROM `"+tableQuery+"`";
-	var stringQueryBaseResearch="SELECT `ID_User`,`BaseNumber`,`ResearchWait_ID` AS LevelUp_ID ,`ResearchWait_Might` AS Might,`ResearchTime` AS Time FROM `"+tableQuery+"`";
+	var stringQueryBaseResearch= "SELECT `ID_User`,`BaseNumber`,`ResearchWait_ID` AS LevelUp_ID ,`ResearchWait_Might` AS Might,`ResearchTime` AS Time FROM `"+tableQuery+"`";
 
 	var currentTime = functions.GetTime();
 	var dataTime;

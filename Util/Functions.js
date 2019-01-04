@@ -98,10 +98,10 @@ exports.ExportTimeDatabase = function exportTimeDatabase (stringDaTaTime) {
 	var stringTime = stringDaTaTime.toString();
 	var timeReturn;
 	if (stringTime.includes('Z')) {
-		timeReturn = new Date(stringTime).getTime()
+		timeReturn = new Date(stringTime).getTime();
 	}else{
 		stringTime = stringDaTaTime+"Z";
-		timeReturn = new Date(stringTime).getTime()
+		timeReturn = new Date(stringTime).getTime();
 	}
 	return timeReturn;
 }
@@ -109,6 +109,8 @@ exports.ImportTimeToDatabase = function importTimeToDatabase (stringTime) {
 	var stringReturn = stringTime.substring(0,stringTime.length - 1);
 	return stringReturn;
 }
+
+
 // 'use strict';
 // const   fs          = require('fs');
 // var crypto          = require('crypto');

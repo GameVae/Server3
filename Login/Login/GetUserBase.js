@@ -10,16 +10,11 @@ var functions 			= require('./../../Util/Functions.js');
 
 var dbInfo;
 
-var dataUser={
-	ID_User: 9,
-	ID_Server: 1,
-
-}
 var dataInfo={}
 
 exports.R_BASE_INFO = function r_base_info (socket,ID_User,Server_ID) {
 	
-	switch (parseInt(ID_Server)) {
+	switch (parseInt(Server_ID)) {
 		case 1:
 		dbInfo = db_s1_base_info;
 		break;
@@ -46,7 +41,7 @@ exports.R_BASE_INFO = function r_base_info (socket,ID_User,Server_ID) {
 				dataInfo["TrainingTime"]= (new Date(functions.ExportTimeDatabase(rows[i].TrainingTime))-currentTime)/1000;
 			}
 			delete dataInfo["ID"];
-			socket.Emit('R_BASE_INFO',dataInfo);
+			socket.emit('R_BASE_INFO',{R_BASE_INFO:dataInfo});
 		}
 	});
 }

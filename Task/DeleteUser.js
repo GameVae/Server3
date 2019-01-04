@@ -40,7 +40,12 @@ else{
 		break;
 	}
 }
-
+function deleteInfo (userID) {
+	delete_base_info (parseInt(process.argv[3]));
+			delete_base_defend(parseInt(process.argv[3]));
+			delete_game_info (parseInt(process.argv[3]));
+			delete_user_info (parseInt(process.argv[3]));	
+}
 function delete_user_info (id) {
 	var deleteString_user_info = "DELETE FROM `user_info` WHERE `ID_User`= '"+id+"'";
 	db_all_user.query(deleteString_user_info,function (error) {
