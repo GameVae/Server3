@@ -18,6 +18,14 @@ var DetailError, LogChange;
 
 var DictTimeOut={};
 
+// var data = {
+//     ID_Server:'1',
+//     ID_User: '9',
+//     BaseNumber: '1',
+//     ID_Upgrade: '1',
+//     Level:'2'
+// }
+
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_UPGRADE', function (data){
@@ -63,7 +71,7 @@ function S_UPGRADE (socket,data) {
 }
 
 function checkUpgrade (dataUser,upgradeType,rowsUpgrade) {
-	var tableQuery 	= dataUser.ID_User+"_"+dataUser.ID_Base;
+	var tableQuery 	= dataUser.ID_User+"_"+dataUser.BaseNumber;
 	var stringQuery = "SELECT * FROM `"+tableQuery+"` WHERE `ID`="+dataUser.ID_Upgrade;
 	var dbQuery;
 	switch (parseInt(dataUser.ID_Server)) {
@@ -133,7 +141,7 @@ function setTimerUpdateDatabase (time,dataUser,upgradeType) {
 
 		db_all_user.query(stringQuery, function (error,rows) {
 			stringUpdate_Game_info 	= "UPDATE `game_info_s"+rows[0].Server_ID+"` SET `Might`=`Might`+";
-			stringUpdateBaseUpgrade = "UPDATE `"+dataUser.ID_User+"_"+dataUser.ID_Base+"` SET `Level`="+dataUser.Level+" WHERE `ID` = "+ dataUser.ID_Upgrade;
+			stringUpdateBaseUpgrade = "UPDATE `"+dataUser.ID_User+"_"+dataUser.BaseNumber+"` SET `Level`="+dataUser.Level+" WHERE `ID` = "+ dataUser.ID_Upgrade;
 
 			checkBoolUpgrade (dataUser,rows[0].Server_ID,upgradeType,function (checkBool) {
 				if (checkBool==true) {
@@ -193,7 +201,7 @@ function setTimerUpdateDatabase (time,dataUser,upgradeType) {
 
 function checkBoolUpgrade (dataUser,serverInt,upgradeType,checkBool) {
 	var returnBool = false;
-	var tableQuery = dataUser.ID_User+"_"+dataUser.ID_Base;
+	var tableQuery = dataUser.ID_User+"_"+dataUser.BaseNumber;
 
 	var serverQuery,stringQuery;
 	switch (serverInt) {

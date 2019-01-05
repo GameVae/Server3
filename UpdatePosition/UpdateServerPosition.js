@@ -13,6 +13,8 @@ var arrayTimeRSS_s1 =[];
 var arrayTimeRSS_s2 =[];
 var queryUpdatePos;
 
+var Promise 				= require('promise');
+
 exports.UpdateDatabase = function updateDatabase (serverInt) {
 	updateFromRSS (serverInt);
 	updateFromPlayer(serverInt);
@@ -20,7 +22,7 @@ exports.UpdateDatabase = function updateDatabase (serverInt) {
 }
 
 exports.UpdatePosition = function updatePosition (serverInt,ID_Type) {
-	var updateString = "UPDATE `s"+serverInt+"_position` SET `Position_Cell`='"+rows[i].Position+"'' WHERE `ID_Type`='"+ID_Type+"';"
+	var updateString = "UPDATE `s"+serverInt+"_position` SET `Position_Cell`='"+rows[i].Position+"' WHERE `ID_Type`='"+ID_Type+"';"
 	db_position.query(updateString,function (error,result) {
 		if (!!error){DetailError = ('UpdateServerPosition.js: UpdatePosition '+ID_Type);functions.WriteLogError(DetailError);}
 		LogChange='UpdateServerPosition.js: UpdatePosition '+updateString;functions.LogChange(LogChange);
@@ -56,7 +58,7 @@ function queryBaseTable (dbBase_info,data,serverInt) {
 		if (!!error){DetailError = ('UpdateServerPosition.js: query stringTableQuery ');functions.WriteLogError(DetailError);}
 		if (rows!=undefined) {
 			for (var i = 0; i < rows.length; i++) {
-				var updateString = "UPDATE `s"+serverInt+"_position` SET `Position_Cell`="+rows[i].Position+" WHERE `ID_Type`="+rows[i].ID_User+"_0_"+rows[i].BaseNumber;
+				var updateString = "UPDATE `s"+serverInt+"_position` SET `Position_Cell`='"+rows[i].Position+"' WHERE `ID_Type`='"+rows[i].ID_User+"_0_"+rows[i].BaseNumber+"';";
 				db_position.query(updateString,function (error,updateResult) {
 					if (!!error){DetailError = ('UpdateServerPosition.js: query updateString ');functions.WriteLogError(DetailError);}
 					LogChange='UpdateServerPosition.js: updateString '+updateString;functions.LogChange(LogChange);
@@ -83,8 +85,9 @@ function updateFromRSS (serverInt) {
 				// "RSS')";
 				queryUpdatePos = "UPDATE `s"+serverInt+"_position` SET "+
 				"`Position_Cell`='"+rowsQueryString[i].Position+
-				"',`ID_Type`'"+rowsQueryString[i].ID_Type+
+				"',`ID_Type`='"+rowsQueryString[i].RssType+
 				"' WHERE `ID`='"+rowsQueryString[i].ID+"';";
+			
 				db_position.query(queryUpdatePos,function (error,resultQueryUpdatePos) {
 					if (!!error){DetailError = ('UpdateServerPosition.js: Error queryUpdatePos ');functions.WriteLogError(DetailError);}
 				});

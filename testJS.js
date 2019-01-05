@@ -1,4 +1,4 @@
-// // // var db_all_user			= require('./Util/Database/Db_all_user.js');
+// // // 
 
 // // // var functions 			= require('./Util/Functions.js');
 // // // var DetailError;
@@ -771,7 +771,7 @@
 // 	})
 // }
 
-// var db_s1_base_info			= require('./Util/Database/Db_s1_base_info.js');
+
 // var Promise 				= require('promise');
 // var timeOut;
 // Test1();
@@ -828,14 +828,32 @@
 
 // },3000)
 
-var functions = require('./Util/Functions.js')
-var test = new Date().toISOString()
+// var functions = require('./Util/Functions.js')
+// var test = new Date().toISOString()
 
-console.log(test)
+// console.log(test)
 
-var db_s1_base_info			= require('./Util/Database/Db_s1_base_info.js');
-var stringQuery = "UPDATE `9` SET `TrainingTime`='"+functions.ImportTimeToDatabase(test)+"' WHERE `ID`=1";
-console.log(stringQuery)
-db_s1_base_info.query(stringQuery, function (error,result) {
-	console.log(error)
-})
+// var db_s1_base_info			= require('./Util/Database/Db_s1_base_info.js');
+// var stringQuery = "UPDATE `9` SET `TrainingTime`='"+functions.ImportTimeToDatabase(test)+"' WHERE `ID`=1";
+// console.log(stringQuery)
+// db_s1_base_info.query(stringQuery, function (error,result) {
+// 	console.log(error)
+// })
+
+var db_all_user			= require('./Util/Database/Db_all_user.js');
+
+var dataInfo={};
+r_base_info()
+
+function r_base_info () {
+	var stringQuery = "SELECT * FROM `game_info_s1`";
+	db_all_user.query(stringQuery, function (error,rows) {
+	
+		
+		for (var i = 0; i < rows.length; i++) {
+			dataInfo[rows[i].ID]=rows[i];
+			delete dataInfo[rows[i].ID].ID;	
+		}
+		console.log(dataInfo);
+	});
+}

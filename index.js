@@ -16,7 +16,7 @@ console.log(functions.GetTimeNow()+": "+app.get('port'));
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-var serverPosition = require('./Login/Register/UpdateDatabaseUser.js');
+var serverPosition = require('./UpdatePosition/UpdateServerPosition.js');
 serverPosition.UpdateDatabase(1);
 
 var register 		= require('./Login/Register/Register.js');

@@ -1,6 +1,5 @@
 'use strict';
 var createPosition 		= require('./CreatePosition.js');
-var updateDatabaseUser	= require('./UpdateDatabaseUser.js');
 
 var functions 			= require('./../../Util/Functions.js');
 var sendMail 			= require('./../../Util/SendMail/SendMail.js');
