@@ -857,3 +857,28 @@ function r_base_info () {
 		console.log(dataInfo);
 	});
 }
+
+
+
+// 		dbInfo.query(stringBase,function (error,rowsTableName) {
+// 			if (rowsTableName!=undefined) {
+// 				for (var i = 0; i < rowsTableName.length; i++) {
+// 					var stringQuery = "SELECT `ID_User`,`BaseNumber`,`Position` FROM `"+rowsTableName[i].TABLE_NAME+"`";
+// 					dbInfo.query(stringQuery,function (error,rows) {
+// 						for (var i = 0; i < rows.length; i++) {
+// 							playerData[rows[i].ID_User] = rows[i];
+// 							//resolve()
+// 						}
+// console.log(playerData);
+// 					//console.log(rows);
+
+// 				});
+
+// 					//
+// 				}
+
+// 			}
+// 		});
+// 	}).then(()=>{
+// 		console.log(playerData);
+// 	});

@@ -1,0 +1,7 @@
+
+ logChangeDetail: 2019-01-09T01:49:46.158Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='500,80,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-01-09T01:49:46.161Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-09T01:49:46.163Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-09T01:49:51.271Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-09T01:58:54.267Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-09T01:59:03.234Z: Login.js: queryUserNamePass: ndinhtoan45

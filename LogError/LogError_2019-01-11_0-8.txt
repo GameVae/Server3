@@ -1,0 +1,18 @@
+
+ 2019-01-11T01:09:20.677Z: TaskServer.js: ClearAllSocket 
+ 2019-01-11T01:11:09.670Z: TaskServer.js: ClearAllSocket 
+ 2019-01-11T01:11:25.568Z: TaskServer.js: ClearAllSocket 
+ 2019-01-11T01:12:30.674Z: TaskServer.js: ClearAllSocket 
+ 2019-01-11T01:12:35.114Z: TaskServer.js: updateString ConnectUser 42
+ 2019-01-11T01:12:49.643Z: TaskServer.js: removeUser ConnectUser Ik9jOGNcyQrBg6RMAAAA
+ 2019-01-11T01:19:50.722Z: TaskServer.js: ClearAllSocket 
+ 2019-01-11T01:20:04.387Z: TaskServer.js: removeUser ConnectUser M9SbcLyE-VNbJ0WYAAAA
+ 2019-01-11T01:21:55.077Z: TaskServer.js: ClearAllSocket 
+ 2019-01-11T01:22:09.185Z: TaskServer.js: removeUser ConnectUser sgZC_UXefnDQtCnFAAAA
+ 2019-01-11T01:26:55.939Z: TaskServer.js: ClearAllSocket 
+ 2019-01-11T01:27:10.597Z: TaskServer.js: updateString ConnectUser 42
+ 2019-01-11T01:28:21.875Z: TaskServer.js: ClearAllSocket 
+ 2019-01-11T01:28:35.533Z: TaskServer.js: queryId querySocketId ShdtbliRG2t-ceucAAAA
+ 2019-01-11T01:29:08.239Z: TaskServer.js: ClearAllSocket 
+ 2019-01-11T01:29:51.889Z: TaskServer.js: ClearAllSocket 
+ 2019-01-11T01:32:53.463Z: TaskServer.js: queryId querySocketId dISy5TXIxQY4E7ZuAAAA

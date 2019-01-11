@@ -6,11 +6,11 @@ var getUserBase			= require('./GetUserBase.js')
 var getRss 				= require('./../../Map/GetRss.js');
 var getPosition			= require('./../../Map/GetPosition.js');
 var getFriend 			= require('./../../Friend/GetFriend.js');
-
+var taskServer 			= require('./../../Task/TaskServer.js');
 var functions 			= require('./../../Util/Functions.js');
 
-var currentUser;
-var dataUser={}
+var dataUser={};
+var data =[];
 var DetailError, LogChange;
 
 exports.Start = function start (io) {
@@ -44,16 +44,17 @@ function S_LOGIN (socket,data) {
 				}
 				
 			}else{
-				if (rows[0].Password==data.Password) {
+				if (rows[0].Password==data.Password&&rows[0].UserName==data.UserName) {
 					R_USER_INFO (socket,rows[0].ID_User,rows[0].Server_ID);
 					socket.emit('R_LOGIN',{LoginBool:1});
+					
 				}
-				else{
-
+				else{					
 					socket.emit('R_LOGIN',{LoginBool:0});
 				}
 			}
 		}
+		//db_all_user.end();
 		LogChange='Login.js: queryUserNamePass: '+data.UserName;functions.LogChange(LogChange);	
 	});
 }
@@ -66,8 +67,8 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 		delete dataUser.ID;
 		getFriend.GetFriendInfo(socket,dataUser.ID_User);
 
-		
-		
+		taskServer.ConnectSocket(socket.id,ID_User);
+
 		var queryServer = "SELECT * FROM `user_info` WHERE `ID_User`='"+ID_User+"'";
 
 		db_all_user.query(queryServer,function (error,rowsServer) {
@@ -76,10 +77,16 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 			dataUser.Diamond = rowsServer[0].Diamond;
 			dataUser.ResetVipTime = rowsServer[0].ResetVipTime;
 
-			getUserBase.R_BASE_INFO(socket,dataUser.ID_User,dataUser.Server_ID)
-			socket.emit('R_USER_INFO',{R_USER_INFO:dataUser});
+			getUserBase.R_BASE_INFO(socket,dataUser.ID_User,dataUser.Server_ID);
+			getUserBase.R_BASE_UPGRADE(socket,dataUser.ID_User,dataUser.Server_ID);
+			
+			getUserBase.R_BASE_PLAYER (socket,rows[0].ID_User,rows[0].Server_ID);
+			getUserBase.R_PLAYER_INFO(socket,rows[0].ID_User,rows[0].Server_ID);
+
 			getRss.R_GET_RSS(socket,dataUser.Server_ID);
 			getPosition.R_GET_POSITION(socket,dataUser.Server_ID);
+			data.push(dataUser);
+			socket.emit('R_USER_INFO',{R_USER_INFO:data});
 		});
 	});
 }

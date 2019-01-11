@@ -2,7 +2,6 @@
 var db_s1_base_info			= require('./../Util/Database/Db_s1_base_info.js');
 var db_s1_base_defend		= require('./../Util/Database/Db_s1_base_defend.js');
 
-
 var db_s2_base_info			= require('./../Util/Database/Db_s2_base_info.js');
 var db_s2_base_defend		= require('./../Util/Database/Db_s2_base_defend.js');
 

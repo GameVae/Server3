@@ -25,6 +25,7 @@ var login 			= require('./Login/Login/Login.js');
 // login.Start(io);
 
 var taskServer 		= require('./Task/TaskServer.js');
+taskServer.ClearAllSocket();
 // taskServer.Start(io);
 
 var checkVersion 	= require('./CheckVersion/CheckVersion.js');
@@ -33,7 +34,7 @@ var checkVersion 	= require('./CheckVersion/CheckVersion.js');
 var getRss 			= require('./Map/GetRss.js');
 // getRss.UpdateTimeHarvest();
 var upgrade 		= require('./Upgrade/Upgrade.js');
-upgrade.UpdateDatabase(1);
+//upgrade.UpdateDatabase(1);
 //upgrade.UpdateDatabase(2);
 var training		= require('./TrainingUnit/Training.js')
 // training.UpdateDatabase(1);
@@ -59,19 +60,21 @@ if (app.get('port') === process.env.PORT)
 
 function checkConnect (connectCounter,io) {
 	io.on('connection', function (socket) {
-		
+		//console.log('socket');
+		//console.log(socket);
+		//console.log(socket.id);
 		var selectConnectServer ="SELECT `Content` FROM `task` WHERE `ID`='2'";
 		db_server_task.query(selectConnectServer, function (error,rows) {
 			if (rows[0].Content==1) {		
 				connectCounter++;
-				//taskServer.ConnectSocket(socket.id);
+			
 				socket.emit('connection',{});
 				console.log('connectCounter: '+connectCounter);		
 			}	
 		});
 		socket.on('disconnect', function () {
 			connectCounter--;
-			//taskServer.RemoveConnectSocket(socket.id);
+			taskServer.RemoveConnectSocket(socket.id);
 			console.log('connectCounter: '+connectCounter);		
 		});
 	});

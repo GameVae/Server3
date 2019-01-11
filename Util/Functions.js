@@ -105,6 +105,7 @@ exports.ExportTimeDatabase = function exportTimeDatabase (stringDaTaTime) {
 	}
 	return timeReturn;
 }
+
 exports.ImportTimeToDatabase = function importTimeToDatabase (stringTime) {
 	var stringReturn = stringTime.substring(0,stringTime.length - 1);
 	return stringReturn;

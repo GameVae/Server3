@@ -1,0 +1,23 @@
+
+ logChangeDetail: 2019-01-08T07:23:31.937Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T07:26:52.404Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T07:30:53.961Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T07:31:21.560Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T07:44:06.044Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T07:45:53.339Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T07:48:46.554Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T07:51:34.205Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T08:28:25.999Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T08:33:55.191Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-08T08:33:55.193Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='500,80,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-01-08T08:33:55.195Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-08T08:34:13.604Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T08:35:12.259Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T09:18:59.977Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T09:19:41.938Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T09:26:55.596Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T09:30:40.155Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T09:31:35.011Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T09:32:05.224Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T09:42:55.005Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-08T09:44:02.965Z: Login.js: queryUserNamePass: ndinhtoan45

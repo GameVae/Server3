@@ -1,0 +1,17 @@
+
+ logChangeDetail: 2019-01-11T10:00:34.863Z: TaskServer.js: ClearAllSocket ConnectUser 
+ logChangeDetail: 2019-01-11T10:00:35.625Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='500,80,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-01-11T10:00:35.627Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-11T10:00:35.629Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-11T10:00:46.670Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-11T10:00:46.679Z: TaskServer.js: updateString ConnectUser 42
+ logChangeDetail: 2019-01-11T10:00:57.837Z: Upgrade.js: updateUserMaterial: UPDATE `42` SET `Farm`=`Farm` - '560', `Wood`=`Wood` - '700', `Stone`=`Stone` - '1120', `Metal`=`Metal` - '420' WHERE `ID` = 1
+ logChangeDetail: 2019-01-11T10:00:57.838Z: Upgrade.js: updateBaseUser: UPDATE `42` SET `UpgradeWait_ID`=1, `UpgradeWait_Might`=40, `UpgradeTime`='2019-01-11T10:01:17.833' WHERE `BaseNumber`=1;
+ logChangeDetail: 2019-01-11T10:01:00.592Z: TaskServer.js: removeUser ConnectUser rmF1vT1Ae904BJ4DAAAA
+ logChangeDetail: 2019-01-11T10:01:17.843Z: Upgrade.js: updateMight: SELECT `UpgradeWait_Might` AS Might FROM `42` WHERE `BaseNumber` = 1
+ logChangeDetail: 2019-01-11T10:01:17.845Z: Upgrade.js: updateLevel: UPDATE `42_1` SET `Level`=`Level`+1 WHERE `ID` = 1
+ logChangeDetail: 2019-01-11T10:01:17.846Z: Upgrade.js: resetBaseInfoUpdate: UPDATE `42` SET `UpgradeWait_ID`= NULL, `UpgradeWait_Might`= NULL, `UpgradeTime`= NULL WHERE `BaseNumber` = 1
+ logChangeDetail: 2019-01-11T10:01:17.850Z: Upgrade.js: checkUnlock upgrade: UPDATE `42_1` SET `Level`= 1 WHERE `ID`= 15
+ logChangeDetail: 2019-01-11T10:01:22.162Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-11T10:01:22.167Z: TaskServer.js: updateString ConnectUser 42
+ logChangeDetail: 2019-01-11T10:02:11.373Z: TaskServer.js: removeUser ConnectUser 90rhvZ2J0XP7-8jKAAAB
