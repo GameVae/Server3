@@ -1,0 +1,9 @@
+
+ logChangeDetail: 2019-01-12T07:16:58.978Z: TaskServer.js: ClearAllSocket ConnectUser 
+ logChangeDetail: 2019-01-12T07:16:59.914Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-12T07:16:59.917Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-12T07:16:59.919Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='500,80,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-01-12T07:19:30.033Z: TaskServer.js: ClearAllSocket ConnectUser 
+ logChangeDetail: 2019-01-12T07:19:31.227Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='500,80,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-01-12T07:19:31.228Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-12T07:19:31.231Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';

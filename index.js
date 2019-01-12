@@ -16,34 +16,34 @@ console.log(functions.GetTimeNow()+": "+app.get('port'));
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-var serverPosition = require('./UpdatePosition/UpdateServerPosition.js');
+var serverPosition 			= require('./UpdatePosition/UpdateServerPosition.js');
 serverPosition.UpdateDatabase(1);
 
-var register 		= require('./Login/Register/Register.js');
+var register 				= require('./Login/Register/Register.js');
 
-var login 			= require('./Login/Login/Login.js');
+var login 					= require('./Login/Login/Login.js');
 // login.Start(io);
 
-var taskServer 		= require('./Task/TaskServer.js');
+var taskServer 				= require('./Task/TaskServer.js');
 taskServer.ClearAllSocket();
 // taskServer.Start(io);
 
-var checkVersion 	= require('./CheckVersion/CheckVersion.js');
+var checkVersion 			= require('./CheckVersion/CheckVersion.js');
 // checkVersion.Start(io);
 
-var getRss 			= require('./Map/GetRss.js');
+var getRss 					= require('./Map/GetRss.js');
 // getRss.UpdateTimeHarvest();
-var upgrade 		= require('./Upgrade/Upgrade.js');
+var upgrade 				= require('./Upgrade/Upgrade.js');
 
 var Upgrade_UpdateDatabase	= require('./Upgrade/Upgrade_UpdateDatabase.js');
-Update_UpgradeDatabase.UpdateDatabase(1);
+Upgrade_UpdateDatabase.UpdateDatabase(1);
 //upgrade.UpdateDatabase(2);
-var training		= require('./TrainingUnit/Training.js')
+var training				= require('./TrainingUnit/Training.js')
 // training.UpdateDatabase(1);
 // training.UpdateDatabase(2);
-var info 			= require('./Info/GetInfo.js');
+var info 					= require('./Info/GetInfo.js');
 
-var friend 			= require('./Friend/GetFriend.js');
+var friend 					= require('./Friend/GetFriend.js');
 friend.UpdateDatabase();
 
 if (app.get('port') === process.env.PORT)
@@ -69,7 +69,6 @@ function checkConnect (connectCounter,io) {
 		db_server_task.query(selectConnectServer, function (error,rows) {
 			if (rows[0].Content==1) {		
 				connectCounter++;
-			
 				socket.emit('connection',{});
 				console.log('connectCounter: '+connectCounter);		
 			}	
@@ -418,4 +417,3 @@ function checkConnect (connectCounter,io) {
 // function disconnectedFunc () {
 // 	console.log("thời gian disconnected: "+datetime.create().format('H:M:S d-m-Y')+" "+ new Date().toString().slice(25, 33));
 // }
-

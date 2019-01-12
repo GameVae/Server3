@@ -23,7 +23,7 @@ var database_s1_user    =    mysql.createPool({
 
 
 database_s1_user.on('connection', function(connection) {
- console.log('Connection established');
+
  connection.on('error', function(err) {
   console.error(new Date(), 'MySQL error', err.code);
 });

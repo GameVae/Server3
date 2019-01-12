@@ -1,7 +1,7 @@
 'use strict';
 var mysql = require('mysql');
 
-var max                  =  10000;
+var max                  =  0;
 var db_host              =  'localhost';
 var db_user              =  'gamevae';
 var db_password          =  'GWgUi2]&]aa';
@@ -23,7 +23,7 @@ var database_rss    =    mysql.createPool({
 
 
 database_rss.on('connection', function(connection) {
- console.log('Connection established');
+
  connection.on('error', function(err) {
   console.error(new Date(), 'MySQL error', err.code);
 });

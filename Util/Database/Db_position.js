@@ -23,7 +23,7 @@ var database_position    =    mysql.createPool({
 
 
 database_position.on('connection', function(connection) {
- console.log('Connection established');
+
  connection.on('error', function(err) {
   console.error(new Date(), 'MySQL error', err.code);
 });

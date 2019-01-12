@@ -23,7 +23,7 @@ var database_server_task    =    mysql.createPool({
 
 
 database_server_task.on('connection', function(connection) {
- console.log('Connection established');
+
  connection.on('error', function(err) {
   console.error(new Date(), 'MySQL error', err.code);
 });
