@@ -38,7 +38,7 @@ exports.Start = function start (io) {
 		// });
 	});
 }
-S_UPGRADE (dataIns);
+//sssS_UPGRADE (dataIns);
 function S_UPGRADE (data) {
 	//console.log(data);
 	switch (parseInt(data.ID_Server)) {
@@ -177,18 +177,18 @@ function setTimerUpdateDatabase (timeOut,data) {
 					stringUpdateBaseInfo = "UPDATE `"+data.ID_User+"` SET `UpgradeWait_ID`= NULL,"
 					+" `UpgradeWait_Might`= NULL,"
 					+" `UpgradeTime`= NULL WHERE `BaseNumber` = "+ data.BaseNumber;
-					console.log('stringQueryMightBonus2: '+stringQueryMightBonus)
+					//console.log('stringQueryMightBonus2: '+stringQueryMightBonus)
 					break;
 					case 2:
 					stringQueryMightBonus = "SELECT `ResearchWait_Might` AS Might FROM `"+data.ID_User+"` WHERE `BaseNumber` = "+ data.BaseNumber;
 					stringUpdateBaseInfo = "UPDATE `"+data.ID_User+"` SET `ResearchWait_ID`= NULL,"
 					+" `ResearchWait_Might`= NULL,"
 					+" `ResearchTime`= NULL WHERE `BaseNumber` = "+ data.BaseNumber;
-					console.log('stringQueryMightBonus3: '+stringQueryMightBonus)
+					//console.log('stringQueryMightBonus3: '+stringQueryMightBonus)
 					break;
 				}
 
-				checkUnlock (data);
+				checkUnlock (dbUpgrade,data);
 
 				stringUpdateBaseUpgrade ="UPDATE `"+data.ID_User+"_"+data.BaseNumber+"` SET `Level`=`Level`+1 WHERE `ID` = "+ data.ID_Upgrade;
 				//console.log('stringUpdateBaseUpgrade '+stringUpdateBaseUpgrade);
@@ -212,7 +212,8 @@ function setTimerUpdateDatabase (timeOut,data) {
 					if (!!error){DetailError = ('Upgrade.js: resetBaseInfoUpdate' + data.ID_User);functions.WriteLogError(DetailError);}
 					LogChange='Upgrade.js: resetBaseInfoUpdate: '+stringUpdateBaseInfo;functions.LogChange(LogChange);
 				});
-
+				
+				//clearTimeout(stringTimeOut);
 				delete DictTimeOut[stringTimeOut];
 
 			}
@@ -221,7 +222,7 @@ function setTimerUpdateDatabase (timeOut,data) {
 
 }
 
-function checkUnlock (data) {
+function checkUnlock (dbUpgrade,data) {
 	var returnUnlockID = 0;
 	var levelUpgrade = parseInt(data.Level)+1;
 	//console.log(levelUpgrade)

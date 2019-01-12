@@ -1,0 +1,20 @@
+
+ logChangeDetail: 2019-01-12T03:07:56.880Z: Upgrade.js: checkUnlock upgrade: UPDATE `9_1` SET `Level`= 1 WHERE `ID`= 15
+ logChangeDetail: 2019-01-12T03:08:58.929Z: Upgrade.js: updateUserMaterial: UPDATE `9` SET `Farm`=`Farm` - '560', `Wood`=`Wood` - '700', `Stone`=`Stone` - '1120', `Metal`=`Metal` - '420' WHERE `ID` = 1
+ logChangeDetail: 2019-01-12T03:08:58.929Z: Upgrade.js: updateBaseUser: UPDATE `9` SET `UpgradeWait_ID`=1, `UpgradeWait_Might`=40, `UpgradeTime`='2019-01-12T03:09:18.926' WHERE `BaseNumber`=1;
+ logChangeDetail: 2019-01-12T03:09:18.937Z: Upgrade.js: resetBaseInfoUpdate: UPDATE `9` SET `UpgradeWait_ID`= NULL, `UpgradeWait_Might`= NULL, `UpgradeTime`= NULL WHERE `BaseNumber` = 1
+ logChangeDetail: 2019-01-12T03:09:18.938Z: Upgrade.js: updateLevel: UPDATE `9_1` SET `Level`=`Level`+1 WHERE `ID` = 1
+ logChangeDetail: 2019-01-12T03:09:18.939Z: Upgrade.js: updateMight: SELECT `UpgradeWait_Might` AS Might FROM `9` WHERE `BaseNumber` = 1
+ logChangeDetail: 2019-01-12T03:09:18.943Z: Upgrade.js: checkUnlock upgrade: UPDATE `9_1` SET `Level`= 1 WHERE `ID`= 15
+ logChangeDetail: 2019-01-12T03:10:19.551Z: Upgrade.js: updateUserMaterial: UPDATE `9` SET `Farm`=`Farm` - '560', `Wood`=`Wood` - '700', `Stone`=`Stone` - '1120', `Metal`=`Metal` - '420' WHERE `ID` = 1
+ logChangeDetail: 2019-01-12T03:10:19.552Z: Upgrade.js: updateBaseUser: UPDATE `9` SET `UpgradeWait_ID`=1, `UpgradeWait_Might`=40, `UpgradeTime`='2019-01-12T03:10:39.547' WHERE `BaseNumber`=1;
+ logChangeDetail: 2019-01-12T03:10:39.558Z: Upgrade.js: resetBaseInfoUpdate: UPDATE `9` SET `UpgradeWait_ID`= NULL, `UpgradeWait_Might`= NULL, `UpgradeTime`= NULL WHERE `BaseNumber` = 1
+ logChangeDetail: 2019-01-12T03:10:39.560Z: Upgrade.js: updateMight: SELECT `UpgradeWait_Might` AS Might FROM `9` WHERE `BaseNumber` = 1
+ logChangeDetail: 2019-01-12T03:10:39.561Z: Upgrade.js: updateLevel: UPDATE `9_1` SET `Level`=`Level`+1 WHERE `ID` = 1
+ logChangeDetail: 2019-01-12T03:10:39.563Z: Upgrade.js: checkUnlock upgrade: UPDATE `9_1` SET `Level`= 1 WHERE `ID`= 15
+ logChangeDetail: 2019-01-12T03:13:00.777Z: Upgrade.js: updateBaseUser: UPDATE `9` SET `UpgradeWait_ID`=1, `UpgradeWait_Might`=40, `UpgradeTime`='2019-01-12T03:13:20.770' WHERE `BaseNumber`=1;
+ logChangeDetail: 2019-01-12T03:13:00.778Z: Upgrade.js: updateUserMaterial: UPDATE `9` SET `Farm`=`Farm` - '560', `Wood`=`Wood` - '700', `Stone`=`Stone` - '1120', `Metal`=`Metal` - '420' WHERE `ID` = 1
+ logChangeDetail: 2019-01-12T03:13:20.784Z: Upgrade.js: resetBaseInfoUpdate: UPDATE `9` SET `UpgradeWait_ID`= NULL, `UpgradeWait_Might`= NULL, `UpgradeTime`= NULL WHERE `BaseNumber` = 1
+ logChangeDetail: 2019-01-12T03:13:20.786Z: Upgrade.js: updateMight: SELECT `UpgradeWait_Might` AS Might FROM `9` WHERE `BaseNumber` = 1
+ logChangeDetail: 2019-01-12T03:13:20.786Z: Upgrade.js: updateLevel: UPDATE `9_1` SET `Level`=`Level`+1 WHERE `ID` = 1
+ logChangeDetail: 2019-01-12T03:13:20.789Z: Upgrade.js: checkUnlock upgrade: UPDATE `9_1` SET `Level`= 1 WHERE `ID`= 15

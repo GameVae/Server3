@@ -15,3 +15,12 @@
  logChangeDetail: 2019-01-11T10:01:22.162Z: Login.js: queryUserNamePass: ndinhtoan45
  logChangeDetail: 2019-01-11T10:01:22.167Z: TaskServer.js: updateString ConnectUser 42
  logChangeDetail: 2019-01-11T10:02:11.373Z: TaskServer.js: removeUser ConnectUser 90rhvZ2J0XP7-8jKAAAB
+ logChangeDetail: 2019-01-11T10:23:59.925Z: TaskServer.js: removeUser ConnectUser -_p0h8sqNDr5UA4GAAAC
+ logChangeDetail: 2019-01-11T10:24:52.240Z: TaskServer.js: removeUser ConnectUser qRtX7SsX_BKrhBxVAAAD
+ logChangeDetail: 2019-01-11T10:25:09.723Z: TaskServer.js: removeUser ConnectUser pdup4H5KtMRCXn_tAAAE
+ logChangeDetail: 2019-01-11T10:25:59.794Z: TaskServer.js: removeUser ConnectUser 1oSGZ83BNSEu5FXCAAAF
+ logChangeDetail: 2019-01-11T10:27:06.299Z: TaskServer.js: removeUser ConnectUser lheZaEp7mC9UnFbRAAAG
+ logChangeDetail: 2019-01-11T10:28:13.780Z: TaskServer.js: removeUser ConnectUser ZW0V-Ex_SSqKTInaAAAH
+ logChangeDetail: 2019-01-11T10:28:36.510Z: TaskServer.js: removeUser ConnectUser nyUJGT7ZqZvFsfWvAAAI
+ logChangeDetail: 2019-01-11T10:29:36.476Z: TaskServer.js: removeUser ConnectUser SZtn8TGroL0kw_7vAAAJ
+ logChangeDetail: 2019-01-11T10:30:51.961Z: TaskServer.js: removeUser ConnectUser xzwD7vNdbfewKTo_AAAK

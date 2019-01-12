@@ -34,7 +34,9 @@ var checkVersion 	= require('./CheckVersion/CheckVersion.js');
 var getRss 			= require('./Map/GetRss.js');
 // getRss.UpdateTimeHarvest();
 var upgrade 		= require('./Upgrade/Upgrade.js');
-//upgrade.UpdateDatabase(1);
+
+var Upgrade_UpdateDatabase	= require('./Upgrade/Upgrade_UpdateDatabase.js');
+Update_UpgradeDatabase.UpdateDatabase(1);
 //upgrade.UpdateDatabase(2);
 var training		= require('./TrainingUnit/Training.js')
 // training.UpdateDatabase(1);
