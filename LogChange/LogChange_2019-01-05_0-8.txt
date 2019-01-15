@@ -1,9 +1,0 @@
-
- logChangeDetail: 2019-01-05T01:40:22.621Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`=500,80,0 WHERE `ID_Type`=42_0_1
- logChangeDetail: 2019-01-05T01:40:22.621Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`=489,80,0 WHERE `ID_Type`=9_0_1
- logChangeDetail: 2019-01-05T01:42:24.855Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`=500,80,0 WHERE `ID_Type`=42_0_1
- logChangeDetail: 2019-01-05T01:42:24.856Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`=489,80,0 WHERE `ID_Type`=9_0_1
- logChangeDetail: 2019-01-05T01:42:51.294Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`=489,80,0 WHERE `ID_Type`=9_0_1
- logChangeDetail: 2019-01-05T01:42:51.295Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`=500,80,0 WHERE `ID_Type`=42_0_1
- logChangeDetail: 2019-01-05T01:43:46.820Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`=489,80,0 WHERE `ID_Type`=9_0_1
- logChangeDetail: 2019-01-05T01:43:46.821Z: UpdateServerPosition.js: updateString UPDATE `s1_position` SET `Position_Cell`=500,80,0 WHERE `ID_Type`=42_0_1

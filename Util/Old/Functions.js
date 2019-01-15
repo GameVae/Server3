@@ -2,31 +2,22 @@
 const   fs          = require('fs');
 var path 			= require('path');
 
-exports.WriteLogError = function(detailError,intLocationFile){
+exports.WriteLogError = function(detailError){
 	console.log(getTimeNow()+": Error "+detailError);
-	fs.appendFile(getStringErrorFile (intLocationFile), "\r\n "+ getTimeNow() +": "+detailError, (err) => {
+	fs.appendFile(getStringErrorFile (), "\r\n "+ getTimeNow() +": "+detailError, (err) => {
 		if (err) throw err;
 	});
 }
 
-exports.LogChange = function(logChangeDetail,intLocationFile){
+exports.LogChange = function(logChangeDetail){
 	//console.log(getTimeNow()+": "+logChangeDetail);
-	fs.appendFile(getStringChangeFile (intLocationFile), "\r\n logChangeDetail: "+ getTimeNow() +": "+logChangeDetail, (err) => {
+	fs.appendFile(getStringChangeFile (), "\r\n logChangeDetail: "+ getTimeNow() +": "+logChangeDetail, (err) => {
 		if (err) throw err;
 	});
 }
 
-function getStringChangeFile (intLocationFile) {
-	var stringTime ;
-	switch (intLocationFile) {
-		case 1:
-		stringTime = "./../LogChange/LogChange_"+getTimeNow().slice(0, 10);
-		break;
-		case 2:
-		stringTime = "./../../LogChange/LogChange_"+getTimeNow().slice(0, 10);
-		break;
-	}
-	
+function getStringChangeFile () {
+	var stringTime = "./LogChange/LogChange_"+getTimeNow().slice(0, 10);
 	var caseHour = parseInt((new Date().getHours()-1)/8);
 	var stringHour;
 	switch (caseHour) {
@@ -43,19 +34,10 @@ function getStringChangeFile (intLocationFile) {
 	var stringFile = stringTime+stringHour+".txt";
 	return stringFile;
 }
-function getStringErrorFile (intLocationFile) {
-	//var stringTime = "./LogError/LogError_"+getTimeNow().slice(0, 10);
+function getStringErrorFile () {
+	var stringTime = "./LogError/LogError_"+getTimeNow().slice(0, 10);
 	//var stringTime = "./../LogError/LogError_"+getTimeNow().slice(0, 10);
-	var stringTime;
-	switch (intLocationFile) {
-		case 1:
-		stringTime = "./../LogError/LogError_"+getTimeNow().slice(0, 10);
-		break;
-		case 2:
-		stringTime = "./../../LogError/LogError_"+getTimeNow().slice(0, 10);
-		break;
-	}
-	
+
 
 	var caseHour = parseInt((new Date().getHours()-1)/8);
 	var stringHour;

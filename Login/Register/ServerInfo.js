@@ -18,21 +18,21 @@ var s2_pos={};
 var currentUser, DetailError, logChangeDetail;
 var stringTable_base_info, createNewTable_base_info,stringTable_base_defend, createNewTable_base_defend;
 
-function getS1Pos () {
-	console.log("here Register.js");
-	var queryString_s1Pos = "SELECT * FROM `s1_rss` WHERE `Level`=1 ";
-}
-var data ={
-	UserName : "Mquan",
-	Email :"homanhquan@gmail.com"
-}
-S_REGISTER (data);
+// function getS1Pos () {
+// 	console.log("here Register.js");
+// 	var queryString_s1Pos = "SELECT * FROM `s1_rss` WHERE `Level`=1 ";
+// }
+// var data ={
+// 	UserName : "Mquan",
+// 	Email :"homanhquan@gmail.com"
+// }
+//S_REGISTER (data);
 function S_REGISTER (data) {
 	console.log('S_REGISTER');
 	var queryString = "SELECT * FROM `user_info` WHERE `UserName`='"+data.UserName+"' OR `Email`='"+data.Email+"'";
 	// var queryString = "SELECT * FROM `users`"
 	db_all_user.query(queryString,function(error,rows){
-		if (!!error){DetailError = ('Register: S_REGISTER queryUser :'+ data.UserName); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('Register: S_REGISTER queryUser : '+ queryString); functions.WriteLogError(DetailError,2);}
 		console.log("rows: "+rows.length);
 		if (rows.length>0) {		
 			// R_REGISTER(socket,0);
@@ -40,7 +40,7 @@ function S_REGISTER (data) {
 		}else{
 			createUser(data);
 			//R_REGISTER(socket,1);
-			// logChangeDetail = ("R_REGISTER: "+ data.UserName); functions.LogChange(logChangeDetail);
+			// logChangeDetail = ("R_REGISTER: "+ data.UserName); functions.LogChange(logChangeDetail,2);
 			// sendMail.Register(data.UserName,data.Email);		
 		}		
 	});
@@ -60,18 +60,18 @@ function insert_User_Game_Info (data) {
 	+functions.GetTimeNow()+"')";
 	// console.log(stringInsert_user_info);
 	db_all_user.query(stringInsert_user_info,function (error,result) {
-		if (!!error){DetailError = ('Register.js: Error stringInsert_user_info '+ data.UserName);functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('Register.js: Error stringInsert_user_info '+ data.UserName);functions.WriteLogError(DetailError,2);}
 		else{
 			var updateString = "UPDATE `user_info` SET `ID_User` = '"+result.insertId+"' WHERE `user_info`.`ID` = '"+result.insertId+"'";
 			//console.log(updateString);
 			db_all_user.query(updateString,function (error){
-				if (!!error){DetailError = ('Register.js: Error updateID_user_info '+ data.UserName); functions.WriteLogError(DetailError);}
-				logChangeDetail = "updateString: "+ updateString; functions.LogChange(logChangeDetail);
+				if (!!error){DetailError = ('Register.js: Error updateID_user_info '+ data.UserName); functions.WriteLogError(DetailError,2);}
+				logChangeDetail = "updateString: "+ updateString; functions.LogChange(logChangeDetail,2);
 			});
 			
 			var getServerString = "SELECT `Content` FROM `task` WHERE `ID`=1";
 			db_server_task.query(getServerString,function (error,rows) {
-				if (!!error){DetailError = ('Register.js: Error getServerString'+ data.UserName);functions.WriteLogError(DetailError);}
+				if (!!error){DetailError = ('Register.js: Error getServerString'+ data.UserName);functions.WriteLogError(DetailError,2);}
 
 				var stringInsert_game_info = "INSERT INTO `all_users`.`game_info_s"+rows[0].Content+"` (`ID_User`, `NameInGame`,`Server_ID`) VALUES ('"
 				+result.insertId+"','"
@@ -79,13 +79,13 @@ function insert_User_Game_Info (data) {
 				+rows[0].Content+"')";
 				console.log(stringInsert_game_info);
 				db_all_user.query(stringInsert_game_info,function (error,result_StringInsert_game_info) {
-					if (!!error){DetailError = ('Register.js: Error stringInsert_game_info'+ data.UserName);functions.WriteLogError(DetailError);}
-					logChangeDetail = "stringInsert_game_info: "+ stringInsert_game_info; functions.LogChange(logChangeDetail);
+					if (!!error){DetailError = ('Register.js: Error stringInsert_game_info'+ data.UserName);functions.WriteLogError(DetailError,2);}
+					logChangeDetail = "stringInsert_game_info: "+ stringInsert_game_info; functions.LogChange(logChangeDetail,2);
 				});
 				insertNewUserDatabase(result.insertId,parseInt(rows[0].Content));
 			});
 		}
-		logChangeDetail = "insert_User_Game_Info: "+ stringInsert_user_info; functions.LogChange(logChangeDetail);
+		logChangeDetail = "insert_User_Game_Info: "+ stringInsert_user_info; functions.LogChange(logChangeDetail,2);
 	});
 }
 
@@ -120,13 +120,13 @@ function insertNewUserDatabase(ID_User,Server_ID) {
 	switch (Server_ID) {
 		case 1:
 		db_s1_base_defend.query(createNewTable_base_defend,function (error,result) {
-			if (!!error){DetailError = ("UpdateUser.js: createNewTable_base_defend s1_base_info: "+ID_User);functions.WriteLogError(DetailError);}
-			logChangeDetail = "createNewTable_base_defend: "+ ID_User; functions.LogChange(logChangeDetail);
+			if (!!error){DetailError = ("UpdateUser.js: createNewTable_base_defend s1_base_info: "+ID_User);functions.WriteLogError(DetailError,2);}
+			logChangeDetail = "createNewTable_base_defend: "+ ID_User; functions.LogChange(logChangeDetail,2);
 			console.log(error);
 		});
 		db_s1_base_info.query(createNewTable_base_info,function (error,result) {
-			if (!!error){DetailError = ('UpdateUser.js: createNewTable_base_info s1_base_defend: '+ID_User);functions.WriteLogError(DetailError);}
-			logChangeDetail = "createNewTable_base_info: "+ ID_User; functions.LogChange(logChangeDetail);
+			if (!!error){DetailError = ('UpdateUser.js: createNewTable_base_info s1_base_defend: '+ID_User);functions.WriteLogError(DetailError,2);}
+			logChangeDetail = "createNewTable_base_info: "+ ID_User; functions.LogChange(logChangeDetail,2);
 			updatePosition (ID_User,Server_ID);			
 			console.log(error);
 		});
@@ -134,13 +134,13 @@ function insertNewUserDatabase(ID_User,Server_ID) {
 
 		case 2:
 		db_s2_base_defend.query(createNewTable_base_defend,function (error,result) {
-			if (!!error){DetailError = ('UpdateUser.js: createNewTable_base_defend s2_base_info: '+ID_User);functions.WriteLogError(DetailError);}
-			logChangeDetail = "createNewTable_base_defend: "+ ID_User; functions.LogChange(logChangeDetail);
+			if (!!error){DetailError = ('UpdateUser.js: createNewTable_base_defend s2_base_info: '+ID_User);functions.WriteLogError(DetailError,2);}
+			logChangeDetail = "createNewTable_base_defend: "+ ID_User; functions.LogChange(logChangeDetail,2);
 			console.log(error);
 		});
 		db_s2_base_info.query(createNewTable_base_info,function (error,result) {
-			if (!!error){DetailError = ('UpdateUser.js: createNewTable_base_info s2_base_info: '+ID_User);functions.WriteLogError(DetailError);}
-			logChangeDetail = "createNewTable_base_defend: "+ ID_User; functions.LogChange(logChangeDetail);
+			if (!!error){DetailError = ('UpdateUser.js: createNewTable_base_info s2_base_info: '+ID_User);functions.WriteLogError(DetailError,2);}
+			logChangeDetail = "createNewTable_base_defend: "+ ID_User; functions.LogChange(logChangeDetail,2);
 			console.log(error);
 		});
 		break;

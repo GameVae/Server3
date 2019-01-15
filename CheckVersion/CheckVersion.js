@@ -16,7 +16,7 @@ function S_CHECK_VERSION(socket) {
 		console.log("S_CHECK_VERSION here");
 		var queryStringUpdate = "SELECT `Content` FROM `task` WHERE `ID`='3'"
 		db_server_task.query(queryStringUpdate,function (error,rows) {
-			if (!!error){DetailError = ('CheckVersion.js: Error query S_CHECK_VERSION');functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('CheckVersion.js: Error query S_CHECK_VERSION');functions.WriteLogError(DetailError,1);}
 			version = rows[0].Content;
 			if (data.Version!=version) {			
 				R_CHECK_VERSION(socket,version);

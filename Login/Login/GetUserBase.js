@@ -27,8 +27,8 @@ exports.R_BASE_INFO = function r_base_info (socket,ID_User,Server_ID) {
 	}
 	var stringQuery = "SELECT * FROM `"+ID_User+"`";
 	dbInfo.query(stringQuery, function (error,rows) {
+		if (!!error){DetailError = ('GetUserBase.js: query '+stringQuery); functions.WriteLogError(DetailError,2);}
 		var currentTime = functions.GetTime();
-		
 		for (var i = 0; i < rows.length; i++) {
 			if (rows[i].UpgradeTime!=null) {
 				rows[i]["UpgradeTime"]= (new Date(functions.ExportTimeDatabase(rows[i].UpgradeTime))-currentTime)*0.001;// /1000
@@ -62,8 +62,9 @@ exports.R_BASE_UPGRADE = function r_base_upgrade (socket,ID_User,Server_ID) {
 		break;
 	}
 	var stringQueryBaseNumber = "SELECT `BaseNumber` FROM `"+ID_User+"`";
-	console.log(stringQueryBaseNumber)
+	//console.log(stringQueryBaseNumber)
 	dbInfo.query(stringQueryBaseNumber,function (error,rows) {
+		if (!!error){DetailError = ('GetUserBase.js: stringQueryBaseNumber '+stringQueryBaseNumber); functions.WriteLogError(DetailError,2);}
 		if (rows!=undefined) {
 			for (var i = 0; i < rows.length; i++) {
 				getBaseUpgrade (socket,dbUpgrade,ID_User,rows[i].BaseNumber);	
@@ -74,8 +75,9 @@ exports.R_BASE_UPGRADE = function r_base_upgrade (socket,ID_User,Server_ID) {
 
 function getBaseUpgrade (socket,dbUpgrade,ID_User,BaseNumber) {
 	var queryBaseUpgrade = "SELECT * FROM `"+ID_User+"_"+BaseNumber+"`";
-	console.log(queryBaseUpgrade)
+	//console.log(queryBaseUpgrade)
 	dbUpgrade.query(queryBaseUpgrade,function(error,rows){
+		if (!!error){DetailError = ('GetUserBase.js: getBaseUpgrade '+queryBaseUpgrade); functions.WriteLogError(DetailError,2);}
 		delete rows.ID;
 		socket.emit('R_BASE_UPGRADE',{
 			ID_User: ID_User,
@@ -105,7 +107,7 @@ exports.R_BASE_PLAYER = function r_base_player (socket,ID_User,Server_ID) {
 	"`ID_User`<>"+ID_User;
 
 	db_all_user.query(stringID, function (error,rows) {
-		if (!!error){DetailError = ('GetUserBase.js: query stringID :'+ ID_User); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('GetUserBase.js: query stringID :'+ ID_User); functions.WriteLogError(DetailError,2);}
 		if (rows!=undefined) {	
 			for (var i = 0; i < rows.length; i++) {
 				getData (socket,dbInfo,dbUpgrade,rows[i]);
@@ -119,7 +121,7 @@ function getData (socket,dbInfo,dbUpgrade,rowsData) {
 	var stringQuery = "SELECT `ID_User`,`BaseNumber`,`Position` FROM `"+rowsData.ID_User+"`";
 	//console.log(stringQuery);	
 	dbInfo.query(stringQuery,function (error,rows) {
-		if (!!error){DetailError = ('GetUserBase.js: query getData :'+ rowsData.ID_User); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('GetUserBase.js: query getData :'+ stringQuery); functions.WriteLogError(DetailError,2);}
 		if (rows!=undefined) {
 			//console.log(rows.length);
 			for (var i = 0; i < rows.length; i++) {
@@ -150,7 +152,7 @@ function getUpgrade (dbUpgrade,rowsData,level) {
 	var stringQuery = "SELECT `Level` From `"+rowsData.ID_User+"_"+rowsData.BaseNumber+"` WHERE `ID`= 1"
 	// console.log(stringQuery);
 	dbUpgrade.query(stringQuery,function(error,rows){
-		if (!!error){DetailError = ('GetUserBase.js: query getUpgrade :'+ rowsData.ID_User); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('GetUserBase.js: query getUpgrade :'+ stringQuery); functions.WriteLogError(DetailError,2);}
 		level(rows[0].Level);
 	});
 }
@@ -161,55 +163,7 @@ exports.R_PLAYER_INFO = function r_player_info (socket,ID_User,Server_ID) {
 	//console.log(stringQuery);
 	db_all_user.query(stringQuery,function (error,rows) {
 		// console.log(rows);
-		if (!!error){DetailError = ('GetUserBase.js: query R_PLAYER_INFO :'+ ID_User); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('GetUserBase.js: query R_PLAYER_INFO: '+ stringQuery); functions.WriteLogError(DetailError,2);}
 		socket.emit('R_PLAYER_INFO',{R_PLAYER_INFO:rows});
 	});
 }
-// R_PLAYER_iNFO(9,1)
-// function R_PLAYER_iNFO(ID_User,Server_ID){
-// 	var stringQuery = "SELECT `ID_User`,`NameInGame`,`ChatWorldColor`,`Guild_ID`,`Might`,`Killed` FROM `game_info_s"+Server_ID+"` WHERE "+
-// 	"`ID_User`<>'"+ID_User+"'";
-// 	//console.log(stringQuery);
-// 	db_all_user.query(stringQuery,function (error,rows) {
-// 		// console.log(rows);
-// 		if (!!error){DetailError = ('GetUserBase.js: query R_PLAYER_INFO :'+ ID_User); functions.WriteLogError(DetailError);}
-// 		socket.emit('R_PLAYER_INFO',{R_PLAYER_INFO:rows});
-// 	});
-// }
-
-// r_base_info2 (42,1)
-// function r_base_info2 (ID_User,Server_ID) {
-	
-// 	switch (parseInt(Server_ID)) {
-// 		case 1:
-// 		dbInfo = db_s1_base_info;
-// 		break;
-// 		case 2:
-// 		dbInfo = db_s2_base_info;
-// 		break;
-// 	}
-// 	var stringQuery = "SELECT * FROM `"+ID_User+"`";
-// 	dbInfo.query(stringQuery, function (error,rows) {
-// 		var currentTime = functions.GetTime();
-		
-// 		for (var i = 0; i < rows.length; i++) {
-// 			if (rows[i].UpgradeTime!=null) {
-// 				rows[i]["UpgradeTime"]= (new Date(functions.ExportTimeDatabase(rows[i].UpgradeTime))-currentTime)*0.001;// /1000
-// 			}
-// 			if (rows[i].ResearchTime!=null) {
-// 				rows[i]["ResearchTime"]= (new Date(functions.ExportTimeDatabase(rows[i].ResearchTime))-currentTime)*0.001;
-// 			}
-// 			if (rows[i].ResearchTime!=null) {
-// 				rows[i]["UnitTransferTime "]= (new Date(functions.ExportTimeDatabase(rows[i].UnitTransferTime))-currentTime)*0.001;
-// 			}
-// 			if (rows[i].TrainingTime!=null) {
-// 				rows[i]["TrainingTime"]= (new Date(functions.ExportTimeDatabase(rows[i].TrainingTime))-currentTime)*0.001;
-// 			}
-// 			dataInfo = rows;
-// 			delete dataInfo["ID"];		
-// 		}
-		
-// 		socket.emit('R_BASE_INFO',{R_BASE_INFO:dataInfo});
-// 	});
-
-// }

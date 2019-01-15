@@ -39,7 +39,7 @@ var Upgrade_UpdateDatabase	= require('./Upgrade/Upgrade_UpdateDatabase.js');
 Upgrade_UpdateDatabase.UpdateDatabase(1);
 //upgrade.UpdateDatabase(2);
 var training				= require('./TrainingUnit/Training.js')
-// training.UpdateDatabase(1);
+training.UpdateDatabase(1);
 // training.UpdateDatabase(2);
 var info 					= require('./Info/GetInfo.js');
 
@@ -56,15 +56,14 @@ if (app.get('port') === process.env.PORT)
 	checkVersion.Start(io);
 	getRss.Start(io);
 	upgrade.Start(io);
+	training.Start(io);
 	friend.Start(io);
 	info.Start(io);
+
 }
 
 function checkConnect (connectCounter,io) {
 	io.on('connection', function (socket) {
-		//console.log('socket');
-		//console.log(socket);
-		//console.log(socket.id);
 		var selectConnectServer ="SELECT `Content` FROM `task` WHERE `ID`='2'";
 		db_server_task.query(selectConnectServer, function (error,rows) {
 			if (rows[0].Content==1) {		

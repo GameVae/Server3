@@ -19,7 +19,7 @@ function S_INFO (socket,data) {
 	var stringServer	= "game_info_s"+parseInt(data.serverInt);
 	var stringQuery 	= "SELECT * FROM `"+stringServer+"` WHERE `ID_User`="+data.ID_User;
 	db_all_user.query(stringQuery,function (error,rows) {
-		if (!!error){DetailError = ('GetInfo.js: S_INFO '+ data.ID_User); functions.WriteLogError(DetailError);}	
+		if (!!error){DetailError = ('GetInfo.js: S_INFO '+ data.ID_User); functions.WriteLogError(DetailError,1);}	
 		playerInfo=rows[0];
 		delete playerInfo.ID;
 		delete playerInfo.Diamond;

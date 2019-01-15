@@ -57,7 +57,7 @@ function S_UPGRADE (data) {
 	+" AND `s"+data.ID_Server+"_base_upgrade`.`"+data.ID_User+"_"+data.BaseNumber+"`.`ID`="+data.ID_Upgrade+";"
 	//console.log(stringQuery);
 	dbBase.query(stringQuery,function (error,rows) {
-		if (!!error){DetailError = ('Upgrade.js: query '+stringQuery); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('Upgrade.js: query S_UPGRADE'+stringQuery); functions.WriteLogError(DetailError,1);}
 
 		if (parseInt(data.UpgradeType)==1 && rows[0].UpgradeTime==null) {
 			if (data.Level==rows[0].Level||data.Level==0) {
@@ -78,7 +78,7 @@ function materialCalc (dbBase,data,rowUpgrade) {
 	var stringMaterial = "SELECT * FROM `"+rowUpgrade.Name_Upgrade+"` WHERE `Level`= "+data.Level;
 
 	db_upgrade_database.query(stringMaterial,function (error,rows) {
-		if (!!error){DetailError = ('Upgrade.js: materialCalc' + data.ID_User);functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('Upgrade.js: materialCalc ' + stringMaterial);functions.WriteLogError(DetailError,1);}
 		checkMaterial (dbBase,data,rows[0]);
 	});
 }
@@ -87,7 +87,7 @@ function checkMaterial (dbBase,data,rowsMaterial) {
 	var stringQuery = "SELECT `Farm`,`Wood`,`Stone`,`Metal` FROM `"+data.ID_User+"` WHERE `ID`="+data.BaseNumber;
 	
 	dbBase.query(stringQuery,function (error,rows) {
-		if (!!error){DetailError = ('Upgrade.js: query checkMaterial : '+ data.ID_User); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('Upgrade.js: query checkMaterial : '+ stringQuery); functions.WriteLogError(DetailError,1);}
 
 		if (rows[0].Farm<rowsMaterial.FoodCost||rows[0].Wood<rowsMaterial.WoodCost||rows[0].Stone<rowsMaterial.StoneCost||rows[0].Metal<rowsMaterial.MetalCost){
 			console.log('fail material-reset scene-not enough rss');
@@ -109,8 +109,8 @@ function updateUserMaterial (dbBase,data,rowsMaterial) {
 	"' WHERE `ID` = "+data.BaseNumber;
 	//console.log(stringUpdateUser);
 	dbBase.query(stringUpdateUser,function (error,result) {
-		if (!!error){DetailError = ('Upgrade.js: updateUserMaterial : '+ data.ID_User); functions.WriteLogError(DetailError);}
-		LogChange='Upgrade.js: updateUserMaterial: '+stringUpdateUser;functions.LogChange(LogChange);	
+		if (!!error){DetailError = ('Upgrade.js: updateUserMaterial : '+ stringUpdateUser); functions.WriteLogError(DetailError,1);}
+		LogChange='Upgrade.js: updateUserMaterial: '+stringUpdateUser;functions.LogChange(LogChange,1);	
 	});
 }
 
@@ -138,8 +138,8 @@ function updateBaseUser (dbBase,data,rowUpgrade) {
 	}
 	
 	dbBase.query(stringUpgrade,function (error,result) {
-		if (!!error){DetailError = ('Upgrade.js: updateBaseUser: '+ data.ID_User); functions.WriteLogError(DetailError);}
-		LogChange='Upgrade.js: updateBaseUser: '+stringUpgrade;functions.LogChange(LogChange);	
+		if (!!error){DetailError = ('Upgrade.js: updateBaseUser: '+ stringUpgrade); functions.WriteLogError(DetailError,1);}
+		LogChange='Upgrade.js: updateBaseUser: '+stringUpgrade;functions.LogChange(LogChange,1);	
 
 		setTimerUpdateDatabase (rowUpgrade.TimeInt*1000,data);
 	});
@@ -155,7 +155,7 @@ function setTimerUpdateDatabase (timeOut,data) {
 		var queryUser = "SELECT `Server_ID` FROM `user_info` WHERE `ID_User`="+data.ID_User;
 
 		db_all_user.query(queryUser,function (error,rows) {
-			if (!!error){DetailError = ('Upgrade.js: query getData : '+ rowsData.ID_User); functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('Upgrade.js: query getData : '+ queryUser); functions.WriteLogError(DetailError,1);}
 
 			if (rows!=undefined) {
 				//console.log("here: ")
@@ -193,8 +193,8 @@ function setTimerUpdateDatabase (timeOut,data) {
 				stringUpdateBaseUpgrade ="UPDATE `"+data.ID_User+"_"+data.BaseNumber+"` SET `Level`=`Level`+1 WHERE `ID` = "+ data.ID_Upgrade;
 				//console.log('stringUpdateBaseUpgrade '+stringUpdateBaseUpgrade);
 				dbUpgrade.query(stringUpdateBaseUpgrade,function (error,result) {
-					if (!!error){DetailError = ('Upgrade.js: updateLevel' + data.ID_User);functions.WriteLogError(DetailError);}
-					LogChange='Upgrade.js: updateLevel: '+stringUpdateBaseUpgrade;functions.LogChange(LogChange);
+					if (!!error){DetailError = ('Upgrade.js: updateLevel' + stringUpdateBaseUpgrade);functions.WriteLogError(DetailError,1);}
+					LogChange='Upgrade.js: updateLevel: '+stringUpdateBaseUpgrade;functions.LogChange(LogChange,1);
 				});
 
 				
@@ -203,14 +203,14 @@ function setTimerUpdateDatabase (timeOut,data) {
 					stringUpdate_Game_info = "UPDATE `game_info_s"+data.ID_Server+"` SET `Might`=`Might`+'"+rows[0].Might+"' WHERE `ID`='"+data.ID_User+"'";
 				//	console.log("stringUpdate_Game_info: "+stringUpdate_Game_info);
 				db_all_user.query(stringUpdate_Game_info,function (error,result_stringUpdate_Game_info) {
-					if (!!error){DetailError = ('Upgrade.js: updateMight ' + data.ID_User);functions.WriteLogError(DetailError);}
-					LogChange='Upgrade.js: updateMight: '+stringQueryMightBonus;functions.LogChange(LogChange);
+					if (!!error){DetailError = ('Upgrade.js: updateMight ' + stringUpdate_Game_info);functions.WriteLogError(DetailError,1);}
+					LogChange='Upgrade.js: updateMight: '+stringQueryMightBonus;functions.LogChange(LogChange,1);
 				});
 			});
 
 				dbBase.query(stringUpdateBaseInfo,function(error,result){
-					if (!!error){DetailError = ('Upgrade.js: resetBaseInfoUpdate' + data.ID_User);functions.WriteLogError(DetailError);}
-					LogChange='Upgrade.js: resetBaseInfoUpdate: '+stringUpdateBaseInfo;functions.LogChange(LogChange);
+					if (!!error){DetailError = ('Upgrade.js: resetBaseInfoUpdate' + stringUpdateBaseInfo);functions.WriteLogError(DetailError,1);}
+					LogChange='Upgrade.js: resetBaseInfoUpdate: '+stringUpdateBaseInfo;functions.LogChange(LogChange,1);
 				});
 				
 				//clearTimeout(stringTimeOut);
@@ -229,19 +229,18 @@ function checkUnlock (dbUpgrade,data) {
 	var stringQuery = "SELECT * FROM `upgrade` WHERE `ID`="+data.ID_Upgrade;
 
 	db_upgrade_database.query(stringQuery,function(error,rows){
-		if (!!error){DetailError = ('Upgrade.js: query checkUnlock : '+ data); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('Upgrade.js: query checkUnlock : '+ stringQuery); functions.WriteLogError(DetailError,1);}
 		var tableQuery = "SELECT * FROM `"+rows[0].Name_Upgrade +"` WHERE `Level`= "+levelUpgrade;
 		db_upgrade_database.query(tableQuery,function(error,rows_tableQuery){
-			if (!!error){DetailError = ('Upgrade.js: query tableQuery : '+ tableQuery); functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('Upgrade.js: query tableQuery : '+ tableQuery); functions.WriteLogError(DetailError,1);}
 			
 			if (rows_tableQuery[0].Unlock_ID!=0) { returnUnlockID=rows_tableQuery[0].Unlock_ID;
 				
-				if (!!error){DetailError = ('Upgrade.js: query tableQuery : '+ tableQuery); functions.WriteLogError(DetailError);}
 				var stringUpgrade = "UPDATE `"+data.ID_User+"_"+data.BaseNumber+"` SET `Level`= 1 WHERE `ID`= "+returnUnlockID;
 				dbUpgrade.query(stringUpgrade,function (error,result) {
 					
-					if (!!error){DetailError = ('Upgrade.js: query checkUnlock upgrade: '+ data); functions.WriteLogError(DetailError);}
-					LogChange='Upgrade.js: checkUnlock upgrade: '+stringUpgrade;functions.LogChange(LogChange);	
+					if (!!error){DetailError = ('Upgrade.js: query checkUnlock upgrade: '+ stringUpgrade); functions.WriteLogError(DetailError,1);}
+					LogChange='Upgrade.js: checkUnlock upgrade: '+stringUpgrade;functions.LogChange(LogChange,1);	
 				});
 			}
 		});

@@ -210,7 +210,7 @@ exports.CreatePos = function createPos (serverInt,returnValue) {
 	var queryPos = "SELECT * FROM `s"+serverInt+"_position`";
 	
 	db_position.query(queryPos,function (error,rows) {
-		if (!!error){DetailError = ('CreatePosition.js: queryPos');functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('CreatePosition.js: queryPos: '+queryPos);functions.WriteLogError(DetailError,2);}
 		for (var i = 0; i < rows.length; i++) {
 			functions.AddDict(dictPos,rows[i].Position_Cell,rows[i].Comment);
 		}

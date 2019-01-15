@@ -44,11 +44,11 @@ function S_ADD_FRIEND (socket,data) {
 	"'"+functions.ImportTimeToDatabase(new Date(timeOut).toISOString())+"');";
 	
 	db_friend.query(stringQuery, function (error,result) {
-		if (!!error){DetailError = ('GetFriend.js: stringQuery ' + stringQuery);functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('GetFriend.js: stringQuery ' + stringQuery);functions.WriteLogError(DetailError,1);}
 		setTimeoutAddFriend (data,timeOut);
 		var socketPlayer = "SELECT `Socket` FROM `user_info` WHERE `ID_User`="+data.ID_Player;
 		db_all_user.query(socketPlayer,function (error,rows) {
-			if (!!error){DetailError = ('GetFriend.js: socketPlayer ' + socketPlayer);functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('GetFriend.js: socketPlayer ' + socketPlayer);functions.WriteLogError(DetailError,1);}
 			if (rows!=undefined) {
 				if (rows[0].Socket!=null) {
 					socket.socket(rows[0].Socket).emit('R_ADD_FRIEND',{R_ADD_FRIEND: 	data.ID_User});
@@ -63,7 +63,7 @@ function setTimeoutAddFriend (data,timeOut) {
 	DictRemoveAddFriend[stringAddFriend]=setTimeout(function (data) {
 		var stringQuery = "SELECT * FROM `"+data.ID_User+"` WHERE `ID_Player`="+data.ID_Player;
 		db_friend.query(stringQuery, function (error,rows) {
-			if (!!error){DetailError = ('GetFriend.js: setTimeoutAddFriend');functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('GetFriend.js: setTimeoutAddFriend');functions.WriteLogError(DetailError,1);}
 			if (rows!=undefined) {
 				if (rows[0].AcceptTime!=null) {
 					var databaseTime = new Date(functions.ExportTimeDatabase(rows[0].AcceptTime)).getTime();
@@ -85,8 +85,8 @@ function removeAddFriend (ID_User,ID_Player) {
 	var stringQuery = "DELETE FROM `"+ID_User+"` WHERE `ID_Player`="+ID_Player+";"+
 	"DELETE FROM `"+ID_Player+"` WHERE `ID_Player`="+ID_User;
 	db_friend.query(stringQuery,function (error,result) {
-		if (!!error){DetailError = ('GetFriend.js: removeAddFriend '+ID_User);functions.WriteLogError(DetailError);}
-		LogChange='GetFriend.js: removeAddFriend: '+ID_User;functions.LogChange(LogChange);
+		if (!!error){DetailError = ('GetFriend.js: removeAddFriend '+ID_User);functions.WriteLogError(DetailError,1);}
+		LogChange='GetFriend.js: removeAddFriend: '+ID_User;functions.LogChange(LogChange,1);
 	});
 }
 
@@ -94,12 +94,12 @@ function S_ACCEPT_FRIEND(socket,data){
 	var stringQuery = "UPDATE `"+data.ID_User+"` SET `AcceptTime`=null,`RemoveTime`=null ;"+
 	"UPDATE `"+data.ID_Player+"` SET `AcceptTime`=null,`RemoveTime`=null;";
 	db_friend.query(stringQuery,function (error,result) {
-		if (!!error){DetailError = ('GetFriend.js: S_ACCEPT_FRIEND '+data.ID_User);functions.WriteLogError(DetailError);}
-		LogChange='GetFriend.js: removeAddFriend: '+data.ID_User;functions.LogChange(LogChange);
+		if (!!error){DetailError = ('GetFriend.js: S_ACCEPT_FRIEND '+data.ID_User);functions.WriteLogError(DetailError,1);}
+		LogChange='GetFriend.js: removeAddFriend: '+data.ID_User;functions.LogChange(LogChange,1);
 
 		var playerID = "SELECT `Socket` FROM `user_info` WHERE `ID_User` = "+data.ID_Player;
 		db_all_user.query(playerID,function (error,rows) {
-			if (!!error){DetailError = ('GetFriend.js: query Socket R_ACCEPT_FRIEND '+data.playerID);functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('GetFriend.js: query Socket R_ACCEPT_FRIEND '+data.playerID);functions.WriteLogError(DetailError,1);}
 			if (rows!=undefined) {
 				if (rows[0].Socket!=null) {
 					socket.socket(rows[0].Socket).emit('R_ACCEPT_FRIEND',{R_ACCEPT_FRIEND:data.ID_User});
@@ -115,8 +115,8 @@ function S_UNFRIEND (socket,data) {
 	var stringQuery ="UPDATE `"+data.ID_User+"` SET `RemoveTime`="+timeUnfriendData+";"+
 	"UPDATE `"+data.ID_Player+"` SET `RemoveTime`="+timeUnfriendData+";";
 	db_friend.query(stringQuery,function (error,result) {
-		if (!!error){DetailError = ('GetFriend.js: S_UNFRIEND '+data.ID_User+"_"+data.ID_Player);functions.WriteLogError(DetailError);}
-		LogChange='GetFriend.js: S_UNFRIEND: '+data.ID_User+"_"+data.ID_Player;functions.LogChange(LogChange);
+		if (!!error){DetailError = ('GetFriend.js: S_UNFRIEND '+data.ID_User+"_"+data.ID_Player);functions.WriteLogError(DetailError,1);}
+		LogChange='GetFriend.js: S_UNFRIEND: '+data.ID_User+"_"+data.ID_Player;functions.LogChange(LogChange,1);
 
 		var stringUnfriend1 = data.ID_User+"_"+data.ID_Player;
 		var stringUnfriend2 = data.ID_Player+"_"+data.ID_User;
@@ -125,7 +125,7 @@ function S_UNFRIEND (socket,data) {
 
 		var playerID = "SELECT `Socket` FROM `user_info` WHERE `ID_User` = "+data.ID_Player;
 		db_all_user.query(playerID,function (error,rows) {
-			if (!!error){DetailError = ('GetFriend.js: playerID '+playerID);functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('GetFriend.js: playerID '+playerID);functions.WriteLogError(DetailError,1);}
 			if (rows!=undefined) {
 				if (rows[0].Socket!=null) {
 					socket.socket(rows[0].Socket).emit('R_UNFRIEND',{R_UNFRIEND:data.ID_User});
@@ -146,8 +146,8 @@ function deleteUnfriendData (stringUnfriend,ID_User,ID_Player,timeOut) {
 					if (databaseTime<=currentTime) {
 						var deleteString = "DELETE FROM `"+ID_User+"` WHERE `ID_Player`= "+ID_Player;
 						db_friend.query(deleteString,function (error,result) {
-							if (!!error){DetailError = ('GetFriend.js: deleteUnfriendData '+ID_User+"_"+ID_Player);functions.WriteLogError(DetailError);}
-							LogChange='GetFriend.js: deleteUnfriendData: '+ID_User+"_"+ID_Player;functions.LogChange(LogChange);
+							if (!!error){DetailError = ('GetFriend.js: deleteUnfriendData '+ID_User+"_"+ID_Player);functions.WriteLogError(DetailError,1);}
+							LogChange='GetFriend.js: deleteUnfriendData: '+ID_User+"_"+ID_Player;functions.LogChange(LogChange,1);
 						});
 						delete DictTimeOut[stringUnfriend];
 					}else{
@@ -163,7 +163,7 @@ function deleteUnfriendData (stringUnfriend,ID_User,ID_Player,timeOut) {
 exports.GetFriendInfo = function getFriendInfo (socket,ID_User) {
 	var stringQuery = "SELECT * FROM `"+ID_User+"`";
 	db_friend.query(stringQuery,function (error,rows) {
-		if (!!error){DetailError = ('GetFriend.js: GetFriendInfo '+ID_User);functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('GetFriend.js: GetFriendInfo '+ID_User);functions.WriteLogError(DetailError,1);}
 		socket.emit('R_FRIEND_INFO',{R_FRIEND_INFO:rows});
 	});
 }

@@ -29,7 +29,7 @@ if (process.argv.length <=2) {
 		var queryString_user_info = "SELECT * FROM `user_info` WHERE 1";
 		// console.log("queryString_user_info: "+queryString_user_info);
 		db_all_user.query(queryString_user_info, function (error,rows) {
-			if (!!error){DetailError = ('UpdateUser.js: Error queryString_user_info ');functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('UpdateUser.js: Error queryString_user_info ');functions.WriteLogError(DetailError,1);}
 			for (var i = 0; i < rows.length; i++) {
 				//console.log('ID_User: '+rows[i].ID_User);
 				checkAndInsertToGameInfo (rows[i]);
@@ -41,7 +41,7 @@ if (process.argv.length <=2) {
 		console.log("update user to base_defend");
 		var queryString_user_info = "SELECT * FROM `game_info` WHERE 1";
 		db_all_user.query(queryString_user_info, function (error,rows) {
-			if (!!error){DetailError = ('UpdateUser.js: Error queryString_user_info ');functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('UpdateUser.js: Error queryString_user_info ');functions.WriteLogError(DetailError,1);}
 			for (var i = 0; i < rows.length; i++) {
 				checkAndInsertToBaseDefend (rows[i]);
 				// checkAndInsertToBaseInfo(rows[i]);	
@@ -53,7 +53,7 @@ if (process.argv.length <=2) {
 		console.log("update user to base_info");
 		var queryString_user_info = "SELECT * FROM `game_info` WHERE 1";
 		db_all_user.query(queryString_user_info, function (error,rows) {
-			if (!!error){DetailError = ('UpdateUser.js: Error queryString_user_info ');functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('UpdateUser.js: Error queryString_user_info ');functions.WriteLogError(DetailError,1);}
 			for (var i = 0; i < rows.length; i++) {
 				checkAndInsertToBaseInfo(rows[i]);	
 			}
@@ -66,17 +66,17 @@ function checkAndInsertToGameInfo (data) {
 	var queryString_check_game_info = "SELECT * FROM `game_info` WHERE `ID_User`= '"+data.ID_User+"'";
 	//console.log('queryString_check_game_info: '+queryString_check_game_info);
 	db_all_user.query(queryString_check_game_info,function (error,rows) {
-		if (!!error){DetailError = ('UpdateUser.js: Error queryString_check_game_info ');functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('UpdateUser.js: Error queryString_check_game_info ');functions.WriteLogError(DetailError,1);}
 		if (rows.length==0) {
 			db_server_task.query("SELECT `Content` FROM `task` WHERE `ID`=1",function (error,results) {
-				if (!!error){DetailError = ('UpdateUser.js: Error querydb_server_task');functions.WriteLogError(DetailError);}
+				if (!!error){DetailError = ('UpdateUser.js: Error querydb_server_task');functions.WriteLogError(DetailError,1);}
 				var queryInsert_game_info = "INSERT INTO `game_info`(`ID_User`,`NameInGame`,`Server_ID`) VALUES ('"
 				+data.ID_User+"','"
 				+data.NameInGame+"','"
 				+results[0].Content+"')";
 				// console.log('queryInsert_game_info: '+queryInsert_game_info);
 				db_all_user.query(queryInsert_game_info,function (error,results) {
-					if (!!error){DetailError = ('UpdateUser.js: Error queryInsert_game_info');functions.WriteLogError(DetailError);}
+					if (!!error){DetailError = ('UpdateUser.js: Error queryInsert_game_info');functions.WriteLogError(DetailError,1);}
 				})
 			})
 
@@ -90,7 +90,7 @@ function checkAndInsertToBaseDefend (data) {
 	switch (data.Server_ID) {
 		case 1:
 		db_s1_base_defend.query(findTableID,function (error,rows) {
-			if (!!error){DetailError = ('UpdateUser.js: findTableID');functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('UpdateUser.js: findTableID');functions.WriteLogError(DetailError,1);}
 			if (rows.length==0) {
 				var stringTable ="`s1_base_defend`.`"+data.ID_User+"`";
 				var createNewTable = "DROP TABLE IF EXISTS "+stringTable+" ; "+
@@ -98,14 +98,14 @@ function checkAndInsertToBaseDefend (data) {
 				"ALTER TABLE "+stringTable+" ADD PRIMARY KEY (`ID`);"+
 				"ALTER TABLE "+stringTable+" MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT";
 				db_s1_base_defend.query(createNewTable,function (error,result) {
-					if (!!error){DetailError = ('UpdateUser.js: createNewTable db_s1_base_defend');functions.WriteLogError(DetailError);}
+					if (!!error){DetailError = ('UpdateUser.js: createNewTable db_s1_base_defend');functions.WriteLogError(DetailError,1);}
 				});
 			}
 		});
 		break;
 		case 2:
 		db_s2_base_defend.query(findTableID,function (error,rows) {
-			if (!!error){DetailError = ('UpdateUser.js: findTableID');functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('UpdateUser.js: findTableID');functions.WriteLogError(DetailError,1);}
 			if (rows.length==0) {
 				var stringTable ="`s2_base_defend`.`"+data.ID_User+"`";
 				var createNewTable = "DROP TABLE IF EXISTS "+stringTable+" ; "+
@@ -113,7 +113,7 @@ function checkAndInsertToBaseDefend (data) {
 				"ALTER TABLE "+stringTable+" ADD PRIMARY KEY (`ID`);"+
 				"ALTER TABLE "+stringTable+" MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT";
 				db_s2_base_defend.query(createNewTable,function (error,result) {
-					if (!!error){DetailError = ('UpdateUser.js: createNewTable db_s2_base_defend');functions.WriteLogError(DetailError);}
+					if (!!error){DetailError = ('UpdateUser.js: createNewTable db_s2_base_defend');functions.WriteLogError(DetailError,1);}
 				});
 			}
 		});
@@ -127,7 +127,7 @@ function checkAndInsertToBaseInfo (data) {
 	switch (data.Server_ID) {
 		case 1:
 		db_s1_base_info.query(findTableID,function (error,rows) {
-			if (!!error){DetailError = ('UpdateUser.js: findTableID');functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('UpdateUser.js: findTableID');functions.WriteLogError(DetailError,1);}
 			if (rows.length==0) {
 				var stringTable ="`s1_base_info`.`"+data.ID_User+"`";
 				var createNewTable = "DROP TABLE IF EXISTS "+stringTable+";"+ 
@@ -136,14 +136,14 @@ function checkAndInsertToBaseInfo (data) {
 				"ALTER TABLE "+stringTable+" MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;"
 				
 				db_s1_base_info.query(createNewTable,function (error,result) {
-					if (!!error){DetailError = ('UpdateUser.js: createNewTable s1_base_info');functions.WriteLogError(DetailError);}
+					if (!!error){DetailError = ('UpdateUser.js: createNewTable s1_base_info');functions.WriteLogError(DetailError,1);}
 				});
 			}
 		});
 		break;
 		case 2:
 		db_s2_base_info.query(findTableID,function (error,rows) {
-			if (!!error){DetailError = ('UpdateUser.js: findTableID');functions.WriteLogError(DetailError);}
+			if (!!error){DetailError = ('UpdateUser.js: findTableID');functions.WriteLogError(DetailError,1);}
 			if (rows.length==0) {
 				var stringTable ="`s2_base_info`.`"+data.ID_User+"`";
 				var createNewTable = "DROP TABLE IF EXISTS "+stringTable+";"+ 
@@ -151,7 +151,7 @@ function checkAndInsertToBaseInfo (data) {
 				"ALTER TABLE "+stringTable+" ADD PRIMARY KEY (`ID`);"+ 
 				"ALTER TABLE "+stringTable+" MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;"
 				db_s2_base_info.query(createNewTable,function (error,result) {
-					if (!!error){DetailError = ('UpdateUser.js: createNewTable s2_base_info');functions.WriteLogError(DetailError);}
+					if (!!error){DetailError = ('UpdateUser.js: createNewTable s2_base_info');functions.WriteLogError(DetailError,1);}
 				});
 			}
 		});

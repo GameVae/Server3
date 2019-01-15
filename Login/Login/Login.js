@@ -30,11 +30,10 @@ function S_LOGIN (socket,data) {
 	var queryUserNamePass = "SELECT * FROM `user_info` WHERE `UserName`='"+data.UserName+"'";
 
 	db_all_user.query(queryUserNamePass, function (error,rows) {
-		if (!!error){DetailError = ('Login.js: Error queryUserNamePass ');functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('Login.js: Error queryUserNamePass '+queryUserNamePass);functions.WriteLogError(DetailError,2);}
 		if (rows[0].BlockedForever==1) {
 			socket.emit('R_BLOCKED',{BlockedForever:1,Time:0});
 		}else{
-
 			if (rows[0].BlockedTime!=null) {
 				if (functions.ExportTimeDatabase(rows[0].BlockedTime)>=functions.GetTime()) {
 					// check time => lấy time chenh lech => chay settimeout  doi voi time lon hon hien tai, con nho hon thi reset ve null, va doi bien blockForever 	
@@ -55,14 +54,14 @@ function S_LOGIN (socket,data) {
 			}
 		}
 		//db_all_user.end();
-		LogChange='Login.js: queryUserNamePass: '+data.UserName;functions.LogChange(LogChange);	
+		LogChange='Login.js: queryUserNamePass: '+data.UserName;functions.LogChange(LogChange,2);	
 	});
 }
 
 function R_USER_INFO (socket,ID_User,Server_ID) {
 	var queryString = "SELECT * FROM `game_info_s1` WHERE `ID_User`='"+ID_User+"'";
 	db_all_user.query(queryString,function (error,rows) {
-		if (!!error){DetailError = ('Login.js: S_USER_INFO queryUser :'+ ID_User); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('Login.js: S_USER_INFO queryUser :'+ queryString); functions.WriteLogError(DetailError,2);}
 		dataUser= rows[0];
 		delete dataUser.ID;
 		getFriend.GetFriendInfo(socket,dataUser.ID_User);
@@ -72,7 +71,7 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 		var queryServer = "SELECT * FROM `user_info` WHERE `ID_User`='"+ID_User+"'";
 
 		db_all_user.query(queryServer,function (error,rowsServer) {
-			
+			if (!!error){DetailError = ('Login.js: R_USER_INFO queryUser :'+ queryServer); functions.WriteLogError(DetailError,2);}
 			dataUser.Server_ID = rowsServer[0].Server_ID;
 			dataUser.Diamond = rowsServer[0].Diamond;
 			dataUser.ResetVipTime = rowsServer[0].ResetVipTime;
@@ -95,8 +94,9 @@ function updateSetBlockTime (blockTime,socket,data) {
 	setTimeout(function updateUser (data) {
 		var updateSetTimeout = "UPDATE `user_info` SET `BlockedTime`= null WHERE `UserName`="+data.UserName;
 		db_all_user.query(updateSetTimeout, function (error,result) {
+			if (!!error){DetailError = ('Login.js: updateSetBlockTime: '+ updateSetTimeout); functions.WriteLogError(DetailError,2);}
+			LogChange='Login.js: updateSetBlockTime: '+data.UserName;functions.LogChange(LogChange,2);
 			socket.emit('R_LOGIN',{LoginBool:1});
-			LogChange='Login.js: updateSetBlockTime: '+data.UserName;functions.LogChange(LogChange);
 		});
 	}, blockTime, data);
 }
@@ -104,9 +104,9 @@ function updateSetBlockTime (blockTime,socket,data) {
 function R_CHECK_DUPLICATE_LOGIN (socket,data) {
 	var queryCheckDuplicate = "SELECT `Socket` FROM `user_info` WHERE `UserName`='"+data.UserName+"'";
 	db_all_user.query(queryCheckDuplicate,function (error,rows) {
-		if (!!error){DetailError = ('Login.js: R_CHECK_DUPLICATE_LOGIN queryUser :'+ data.UserName); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('Login.js: R_CHECK_DUPLICATE_LOGIN queryCheckDuplicate: '+ queryCheckDuplicate); functions.WriteLogError(DetailError,2);}
 		if (rows[0].Socket!=null||rows[0].Socket!=socket.id) {
-			LogChange='Login.js: DUPLICATE_LOGIN: '+data.UserName;functions.LogChange(LogChange);
+			LogChange='Login.js: DUPLICATE_LOGIN: '+data.UserName;functions.LogChange(LogChange,2);
 		}
 	});
 }

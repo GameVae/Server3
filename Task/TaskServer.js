@@ -13,23 +13,23 @@ exports.ConnectSocket = function connectSocket (id,ID_User) {
 	"`Socket` ='"+id+
 	"', `TimeLogIn`='"+currentTime+
 	"', `TimeLogOut`= null WHERE `ID_User`='"+ID_User+"'";
-	console.log(updateString);
+	//console.log(updateString);
 	db_all_user.query(updateString,function (error,result) {
-		if (!!error){DetailError = ('TaskServer.js: updateString ConnectUser '+ID_User); functions.WriteLogError(DetailError);}
-		logChangeDetail =("TaskServer.js: updateString ConnectUser "+ID_User); functions.LogChange(logChangeDetail);
+		if (!!error){DetailError = ('TaskServer.js: updateString '+updateString); functions.WriteLogError(DetailError,1);;}
+		logChangeDetail =("TaskServer.js: updateString "+updateString); functions.LogChange(logChangeDetail,1);
 	});
 }
 
 exports.RemoveConnectSocket = function removeConnectSocket (id) {
 	var queryId = "SELECT * FROM `user_info` WHERE `Socket`= '"+id+"'";
 	db_all_user.query(queryId,function (error,rows) {
-		if (!!error){DetailError = ('TaskServer.js: queryId querySocketId '+id); functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('TaskServer.js: queryId querySocketId '+queryId); functions.WriteLogError(DetailError,1);;}
 		if (rows!=undefined) {
 			var currentTime =functions.ImportTimeToDatabase(functions.GetTimeNow());
 			var removeUser = "UPDATE `user_info` SET `TimeLogOut`='"+currentTime+"', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='"+id+"'";
 			db_all_user.query(removeUser,function (error,result) {
-				if (!!error){DetailError = ('TaskServer.js: removeUser ConnectUser '+id); functions.WriteLogError(DetailError);}
-				logChangeDetail =("TaskServer.js: removeUser ConnectUser "+id); functions.LogChange(logChangeDetail);
+				if (!!error){DetailError = ('TaskServer.js: removeUser ConnectUser '+removeUser); functions.WriteLogError(DetailError,1);;}
+				logChangeDetail =("TaskServer.js: removeUser ConnectUser "+removeUser); functions.LogChange(logChangeDetail,1);
 			});	
 		}
 	})
@@ -40,8 +40,8 @@ exports.ClearAllSocket = function ClearAllSocket () {
 	var updateString = "UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null";
 	//console.log(updateString);
 	db_all_user.query(updateString,function (error,result) {
-		if (!!error){DetailError = ('TaskServer.js: ClearAllSocket '); functions.WriteLogError(DetailError);}
-		logChangeDetail =("TaskServer.js: ClearAllSocket ConnectUser "); functions.LogChange(logChangeDetail);
+		if (!!error){DetailError = ('TaskServer.js: ClearAllSocket '+updateString); functions.WriteLogError(DetailError,1);;}
+		logChangeDetail =("TaskServer.js: ClearAllSocket ConnectUser "+updateString); functions.LogChange(logChangeDetail,1);
 	});
 }
 
@@ -63,7 +63,7 @@ exports.ClearAllSocket = function ClearAllSocket () {
 
 // 		//console.log(queryString);
 // 		db_server_task.query(queryString,function (error,rows) {
-// 			if (!!error){DetailError = ('TaskServer.js: query task'); functions.WriteLogError(DetailError);}
+// 			if (!!error){DetailError = ('TaskServer.js: query task'); functions.WriteLogError(DetailError,1);;}
 // 			console.log(rows);
 // 		});
 // 		break;
@@ -77,7 +77,7 @@ exports.ClearAllSocket = function ClearAllSocket () {
 // 			var updateString ="UPDATE `task` SET `Content` = '"+parseInt(process.argv[3])+"' WHERE `task`.`ID` = 1"; 
 // 			console.log(updateString);
 // 			db_server_task.query(updateString,function (error,result) {
-// 				if (!!error){DetailError = ('TaskServer.js: error update Current server'); functions.WriteLogError(DetailError);}		
+// 				if (!!error){DetailError = ('TaskServer.js: error update Current server'); functions.WriteLogError(DetailError,1);;}		
 // 			});
 // 		}
 // 		break;
@@ -87,7 +87,7 @@ exports.ClearAllSocket = function ClearAllSocket () {
 // 		var updateString  ="UPDATE `server_list` SET `ProtectedTime` = '"+timeUpdate+"' WHERE `server_list`.`ID` = 1";
 // 		console.log(updateString);
 // 		db_server_task.query(updateString,function (error,result) {
-// 			if (!!error){DetailError = ('TaskServer.js: error update ProtectedTime'); functions.WriteLogError(DetailError);}	
+// 			if (!!error){DetailError = ('TaskServer.js: error update ProtectedTime'); functions.WriteLogError(DetailError,1);;}	
 // 			console.log(result);
 // 		});
 // 		break;
@@ -119,7 +119,7 @@ exports.ClearAllSocket = function ClearAllSocket () {
 // 			}
 
 // 			db_server_task.query(updateServer,function (error) {
-// 				if (!!error){DetailError = ('TaskServer.js: error update ProtectedTime'); functions.WriteLogError(DetailError);}
+// 				if (!!error){DetailError = ('TaskServer.js: error update ProtectedTime'); functions.WriteLogError(DetailError,1);;}
 // 			});
 // 		});
 // 		break;

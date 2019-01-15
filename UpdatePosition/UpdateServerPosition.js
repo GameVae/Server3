@@ -24,8 +24,8 @@ exports.UpdateDatabase = function updateDatabase (serverInt) {
 exports.UpdatePosition = function updatePosition (serverInt,ID_Type) {
 	var updateString = "UPDATE `s"+serverInt+"_position` SET `Position_Cell`='"+rows[i].Position+"' WHERE `ID_Type`='"+ID_Type+"';"
 	db_position.query(updateString,function (error,result) {
-		if (!!error){DetailError = ('UpdateServerPosition.js: UpdatePosition '+ID_Type);functions.WriteLogError(DetailError);}
-		LogChange='UpdateServerPosition.js: UpdatePosition '+updateString;functions.LogChange(LogChange);
+		if (!!error){DetailError = ('UpdateServerPosition.js: UpdatePosition '+updateString);functions.WriteLogError(DetailError,1);}
+		LogChange='UpdateServerPosition.js: UpdatePosition '+updateString;functions.LogChange(LogChange,1);
 	});
 }
 
@@ -42,7 +42,7 @@ function updateFromPlayer(serverInt) {
 		break;
 	}
 	dbBase_info.query(queryString,function (error,rows) {
-		if (!!error){DetailError = ('UpdateServerPosition.js: query updateFromPlayer ');functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('UpdateServerPosition.js: updateFromPlayer '+updateString);functions.WriteLogError(DetailError,1);}
 		if (rows!=undefined) {
 			for (var i = 0; i < rows.length; i++) {
 				queryBaseTable(dbBase_info,rows[i],serverInt);
@@ -55,13 +55,13 @@ function queryBaseTable (dbBase_info,data,serverInt) {
 	var tableQuery = data.TABLE_NAME;
 	var stringTableQuery = "SELECT `ID_User`,`Position`,`BaseNumber` FROM `"+tableQuery+"`";
 	dbBase_info.query(stringTableQuery, function (error,rows) {
-		if (!!error){DetailError = ('UpdateServerPosition.js: query stringTableQuery ');functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('UpdateServerPosition.js: stringTableQuery '+stringTableQuery);functions.WriteLogError(DetailError,1);}
 		if (rows!=undefined) {
 			for (var i = 0; i < rows.length; i++) {
 				var updateString = "UPDATE `s"+serverInt+"_position` SET `Position_Cell`='"+rows[i].Position+"' WHERE `ID_Type`='"+rows[i].ID_User+"_0_"+rows[i].BaseNumber+"';";
 				db_position.query(updateString,function (error,updateResult) {
-					if (!!error){DetailError = ('UpdateServerPosition.js: query updateString ');functions.WriteLogError(DetailError);}
-					LogChange='UpdateServerPosition.js: updateString '+updateString;functions.LogChange(LogChange);
+					if (!!error){DetailError = ('UpdateServerPosition.js: queryBaseTable '+updateString);functions.WriteLogError(DetailError,1);}
+					LogChange='UpdateServerPosition.js: queryBaseTable '+updateString;functions.LogChange(LogChange,1);
 				});
 			}		
 		}
@@ -75,7 +75,7 @@ function updateFromRSS (serverInt) {
 	var queryString = "SELECT * FROM `s"+serverInt+"_rss`";
 	//console.log(queryString);
 	db_rss.query(queryString,function (error,rowsQueryString) {
-		if (!!error){DetailError = ('UpdateServerPosition.js: Error queryStringRSS '+ queryString);functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('UpdateServerPosition.js: Error queryStringRSS '+ queryString);functions.WriteLogError(DetailError,1);}
 		if (rowsQueryString.length>0) {
 			for (var i = 0; i < rowsQueryString.length; i++) {
 
@@ -89,7 +89,7 @@ function updateFromRSS (serverInt) {
 				"' WHERE `ID`='"+rowsQueryString[i].ID+"';";
 			
 				db_position.query(queryUpdatePos,function (error,resultQueryUpdatePos) {
-					if (!!error){DetailError = ('UpdateServerPosition.js: Error queryUpdatePos ');functions.WriteLogError(DetailError);}
+					if (!!error){DetailError = ('UpdateServerPosition.js: Error queryUpdatePos '+queryUpdatePosvv);functions.WriteLogError(DetailError,1);}
 				});
 			}			
 		}
