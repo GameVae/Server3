@@ -33,7 +33,7 @@ var data={
 };
 var dbDefend;
 
-S_DEPLOY (data)
+//S_DEPLOY (data)
 function S_DEPLOY (data) {
 	switch (parseInt(data.Server_ID)) {
 		case 1:
@@ -43,5 +43,5 @@ function S_DEPLOY (data) {
 		dbDefend = db_s2_base_defend;
 		break;
 	}
-	var stringQuery = 
+	//var stringQuery = 
 }
