@@ -1,3 +1,0 @@
-
- 2019-01-15T03:40:39.734Z: Search.js: query SELECT `ID_User`,`NameInGame`,`Server_ID` FROM `user_info` WHERE `NameInGame` LIKE '%uan%';
- 2019-01-15T03:40:39.737Z: Search.js: query SELECT * FROM `game_info_s1` WHERE `ID_User`='9'

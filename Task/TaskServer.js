@@ -40,7 +40,7 @@ exports.ClearAllSocket = function ClearAllSocket () {
 	var updateString = "UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null";
 	//console.log(updateString);
 	db_all_user.query(updateString,function (error,result) {
-		if (!!error){DetailError = ('TaskServer.js: ClearAllSocket '+updateString); functions.WriteLogError(DetailError,1);;}
+		if (!!error){DetailError = ('TaskServer.js: ClearAllSocket '+updateString); functions.WriteLogError(DetailError,1);}
 		logChangeDetail =("TaskServer.js: ClearAllSocket ConnectUser "+updateString); functions.LogChange(logChangeDetail,1);
 	});
 }

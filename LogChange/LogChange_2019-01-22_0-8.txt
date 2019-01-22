@@ -1,0 +1,29 @@
+
+ logChangeDetail: 2019-01-22T00:49:00.435Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-01-22T00:49:01.174Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='500,80,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-01-22T00:49:01.174Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-22T00:49:01.189Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-22T00:49:28.703Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-01-22T00:49:29.453Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='500,80,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-01-22T00:49:29.453Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-22T00:49:29.453Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='429,180,0' WHERE `ID_Type`='9_0_2';
+ logChangeDetail: 2019-01-22T01:10:21.261Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-22T01:10:21.268Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='CyksZbo37L_yxyv6AAAA', `TimeLogIn`='2019-01-22T01:10:21.263', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-01-22T01:10:43.045Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-01-22T01:10:43.041', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='CyksZbo37L_yxyv6AAAA'
+ logChangeDetail: 2019-01-22T01:28:23.242Z: R_REGISTER: SELECT * FROM `user_info` WHERE `UserName`='ndinhtoan44' OR `Email`='ndinhtoan47@yahoo.com.vn'
+ logChangeDetail: 2019-01-22T01:28:23.284Z: insert_User_Game_Info: INSERT INTO `all_users`.`user_info` (`UserName`, `Password`, `Email`, `NameInGame`, `Diamond`, `ResetVipTime`,`DateCreate`) VALUES ('ndinhtoan44','25d55ad283aa400af464c76d713c07ad','ndinhtoan47@yahoo.com.vn','ndinhtoan44','1000','1','2019-01-22T01:28:23.242Z')
+ logChangeDetail: 2019-01-22T01:28:23.294Z: stringInsert_game_info: INSERT INTO `all_users`.`game_info_s1` (`ID_User`, `NameInGame`, `ChatWorldColor`) VALUES ('43','ndinhtoan44','FFFFFF')
+ logChangeDetail: 2019-01-22T01:28:23.301Z: updateString: UPDATE `user_info` SET `ID_User` = '43',`Server_ID` ='1'  WHERE `user_info`.`ID` = '43'
+ logChangeDetail: 2019-01-22T01:28:23.306Z: updateDataPosition: INSERT INTO `s1_position` (`Position_Cell`, `ID_Type`, `Comment`) VALUES ('299,0,0','43_0_1','Player Base 1')
+ logChangeDetail: 2019-01-22T01:28:23.341Z: updateDatabase: UPDATE `43` SET `Position`= '299,0,0' WHERE ID = 1;
+ logChangeDetail: 2019-01-22T01:28:23.451Z: createNewTable_base_defend: CREATE TABLE `43` AS SELECT * FROM `s1_base_defend`;ALTER TABLE `43` ADD PRIMARY KEY (`ID`);ALTER TABLE `43` MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+ logChangeDetail: 2019-01-22T01:28:23.491Z: createNewTable_base_upgrade: CREATE TABLE `43_1` AS SELECT * FROM `s1_base_upgrade`;ALTER TABLE `43_1` ADD PRIMARY KEY (`ID`);ALTER TABLE `43_1` MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+ logChangeDetail: 2019-01-22T01:28:23.497Z: createNewTable_base_info: CREATE TABLE `43` AS SELECT * FROM `s1_base_info`;UPDATE `43` SET `ID_User` = '43';ALTER TABLE `43` ADD PRIMARY KEY (`ID`);ALTER TABLE `43` MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+ logChangeDetail: 2019-01-22T01:28:58.711Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-01-22T01:28:58.716Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='0UdrRwuNmPaacJnNAAAC', `TimeLogIn`='2019-01-22T01:28:58.712', `TimeLogOut`= null WHERE `ID_User`='43'
+ logChangeDetail: 2019-01-22T01:29:24.688Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-01-22T01:29:24.694Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='31loztdZhCnMyOTgAAAB', `TimeLogIn`='2019-01-22T01:29:24.689', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-01-22T01:29:37.287Z: Upgrade.js: updateUserMaterial: UPDATE `42` SET `Farm`=`Farm` - '5861', `Wood`=`Wood` - '5698', `Stone`=`Stone` - '8146', `Metal`=`Metal` - '5756' WHERE `ID` = 1
+ logChangeDetail: 2019-01-22T01:29:37.288Z: Upgrade.js: updateBaseUser: UPDATE `42` SET `UpgradeWait_ID`=17, `UpgradeWait_Might`=510, `UpgradeTime`='2019-01-22T01:47:37.283' WHERE `BaseNumber`=1;
+ logChangeDetail: 2019-01-22T01:30:12.665Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-01-22T01:30:12.662', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='31loztdZhCnMyOTgAAAB'
+ logChangeDetail: 2019-01-22T01:33:52.642Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-01-22T01:33:52.640', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='0UdrRwuNmPaacJnNAAAC'

@@ -20,10 +20,10 @@ function getStringChangeFile (intLocationFile) {
 	var stringTime ;
 	switch (intLocationFile) {
 		case 1:
-		stringTime = "./../LogChange/LogChange_"+getTimeNow().slice(0, 10);
+		stringTime = "./LogChange/LogChange_"+getTimeNow().slice(0, 10);
 		break;
 		case 2:
-		stringTime = "./../../LogChange/LogChange_"+getTimeNow().slice(0, 10);
+		stringTime = "./../LogChange/LogChange_"+getTimeNow().slice(0, 10);
 		break;
 	}
 	
@@ -49,10 +49,10 @@ function getStringErrorFile (intLocationFile) {
 	var stringTime;
 	switch (intLocationFile) {
 		case 1:
-		stringTime = "./../LogError/LogError_"+getTimeNow().slice(0, 10);
+		stringTime = "./LogError/LogError_"+getTimeNow().slice(0, 10);
 		break;
 		case 2:
-		stringTime = "./../../LogError/LogError_"+getTimeNow().slice(0, 10);
+		stringTime = "./../LogError/LogError_"+getTimeNow().slice(0, 10);
 		break;
 	}
 	

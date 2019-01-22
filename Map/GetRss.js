@@ -29,7 +29,7 @@ exports.R_GET_RSS = function R_GET_RSS (socket,serverInt) {
 	var queryString = "SELECT * FROM `"+table+"`";
 	console.log(queryString);
 	db_rss.query(queryString,function (error,rows) {
-		if (!!error){DetailError = ('GetRss.js: Error query getDataRss');functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('GetRss.js: Error query getDataRss');functions.WriteLogError(DetailError,1);}
 		socket.emit('R_GET_RSS',{R_GET_RSS:rows});
 	});
 }
@@ -40,7 +40,7 @@ exports.UpdateTimeHarvest = function updateTimeHarvest (serverInt) {
 	var currentTime = new Date().getTime();
 	var rowTime = 0;
 	db_rss.querry(queryStringTimePrepare,function (error,rows) {
-		if (!!error){DetailError = ('GetRss.js: Error query UpdateTimePrepare');functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('GetRss.js: Error query UpdateTimePrepare');functions.WriteLogError(DetailError,1);}
 		for (var i = 0; i < rows.length; i++) {
 			rowTime = new Date(rows[i].TimePrepare).getTime();
 			if (rowTime<=currentTime) {
@@ -60,7 +60,7 @@ function updateTimeHarvest () {
 	var currentTime = new Date().getTime();
 	var rowTime = 0;
 	db_rss.query(queryStringTimePrepare,function (error,rows) {
-		if (!!error){DetailError = ('GetRss.js: Error query UpdateTimePrepare');functions.WriteLogError(DetailError);}
+		if (!!error){DetailError = ('GetRss.js: Error query UpdateTimePrepare');functions.WriteLogError(DetailError,1);}
 
 		console.log(rows.length)
 		if (rows.length>0) {

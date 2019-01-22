@@ -1,0 +1,6 @@
+
+ logChangeDetail: 2019-01-18T01:37:09.801Z: Upgrade.js: updateUserMaterial: UPDATE `9` SET `Farm`=`Farm` - '1260', `Wood`=`Wood` - '1580', `Stone`=`Stone` - '2520', `Metal`=`Metal` - '940' WHERE `ID` = 1
+ logChangeDetail: 2019-01-18T01:37:09.802Z: Upgrade.js: updateBaseUser: UPDATE `9` SET `UpgradeWait_ID`=1, `UpgradeWait_Might`=126, `UpgradeTime`='2019-01-18T01:41:39.796' WHERE `BaseNumber`=1;
+ logChangeDetail: 2019-01-18T01:41:39.812Z: Upgrade.js: resetBaseInfoUpdate: UPDATE `9` SET `UpgradeWait_ID`= NULL, `UpgradeWait_Might`= NULL, `UpgradeTime`= NULL WHERE `BaseNumber` = 1
+ logChangeDetail: 2019-01-18T01:41:39.816Z: Upgrade.js: updateLevel: UPDATE `9_1` SET `Level`=`Level`+1 WHERE `ID` = 1
+ logChangeDetail: 2019-01-18T01:41:39.820Z: Upgrade.js: updateMight: SELECT `UpgradeWait_Might` AS Might FROM `9` WHERE `BaseNumber` = 1

@@ -1,0 +1,8 @@
+
+ 2019-01-18T02:22:48.672Z: Upgrade.js: query Level: SELECT * FROM `s1_base_info`.`9` INNER JOIN `s1_base_upgrade`.`9_1` WHERE `BaseNumber`=1 AND `s1_base_upgrade`.`9_1`.`ID`=1;
+ 2019-01-18T02:23:37.991Z: Upgrade.js: query Level: SELECT * FROM `s1_base_info`.`9` INNER JOIN `s1_base_upgrade`.`9_1` WHERE `BaseNumber`=1 AND `s1_base_upgrade`.`9_1`.`ID`=1;
+ 2019-01-18T02:24:25.732Z: Upgrade.js: query Level: SELECT * FROM `s1_base_info`.`9` INNER JOIN `s1_base_upgrade`.`9_1` WHERE `BaseNumber`=1 AND `s1_base_upgrade`.`9_1`.`ID`=1;
+ 2019-01-18T02:24:41.623Z: Upgrade.js: query Level: SELECT * FROM `s1_base_info`.`9` INNER JOIN `s1_base_upgrade`.`9_1` WHERE `BaseNumber`=1 AND `s1_base_upgrade`.`9_1`.`ID`=1;
+ 2019-01-18T02:24:41.624Z: Upgrade.js: query Level: SELECT * FROM `s1_base_info`.`9` INNER JOIN `s1_base_upgrade`.`9_1` WHERE `BaseNumber`=1 AND `s1_base_upgrade`.`9_1`.`ID`=1;
+ 2019-01-18T02:24:46.964Z: Upgrade.js: query Level: SELECT * FROM `s1_base_info`.`9` INNER JOIN `s1_base_upgrade`.`9_1` WHERE `BaseNumber`=1 AND `s1_base_upgrade`.`9_1`.`ID`=1;
+ 2019-01-18T02:25:51.680Z: Upgrade.js: query Level Upgrade: SELECT * FROM `s1_base_info`.`9` INNER JOIN `s1_base_upgrade`.`9_1` WHERE `BaseNumber`=1 AND `s1_base_upgrade`.`9_1`.`ID`=1;

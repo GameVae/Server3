@@ -3,15 +3,17 @@
 var db_all_user				= require('./../../Util/Database/Db_all_user.js');
 
 var db_s1_base_info			= require('./../../Util/Database/Db_s1_base_info.js');
+var db_s1_base_defend		= require('./../../Util/Database/Db_s1_base_defend.js');
 var db_s1_upgrade			= require('./../../Util/Database/Db_s1_base_upgrade.js');
 
 var db_s2_base_info			= require('./../../Util/Database/Db_s2_base_info.js');
+var db_s2_base_defend		= require('./../../Util/Database/Db_s2_base_defend.js');
 var db_s2_upgrade			= require('./../../Util/Database/Db_s2_base_upgrade.js');
 
 var functions 				= require('./../../Util/Functions.js');
 
 var Promise 				= require('promise');
-var dbInfo,dbUpgrade;
+var dbInfo,dbUpgrade,dbDefend;
 
 var playerData ={};
 var dataInfo={};
@@ -27,7 +29,7 @@ exports.R_BASE_INFO = function r_base_info (socket,ID_User,Server_ID) {
 	}
 	var stringQuery = "SELECT * FROM `"+ID_User+"`";
 	dbInfo.query(stringQuery, function (error,rows) {
-		if (!!error){DetailError = ('GetUserBase.js: query '+stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){DetailError = ('GetUserBase.js: query '+stringQuery); functions.WriteLogError(DetailError,1);}
 		var currentTime = functions.GetTime();
 		for (var i = 0; i < rows.length; i++) {
 			if (rows[i].UpgradeTime!=null) {
@@ -64,7 +66,7 @@ exports.R_BASE_UPGRADE = function r_base_upgrade (socket,ID_User,Server_ID) {
 	var stringQueryBaseNumber = "SELECT `BaseNumber` FROM `"+ID_User+"`";
 	//console.log(stringQueryBaseNumber)
 	dbInfo.query(stringQueryBaseNumber,function (error,rows) {
-		if (!!error){DetailError = ('GetUserBase.js: stringQueryBaseNumber '+stringQueryBaseNumber); functions.WriteLogError(DetailError,2);}
+		if (!!error){DetailError = ('GetUserBase.js: stringQueryBaseNumber '+stringQueryBaseNumber); functions.WriteLogError(DetailError,1);}
 		if (rows!=undefined) {
 			for (var i = 0; i < rows.length; i++) {
 				getBaseUpgrade (socket,dbUpgrade,ID_User,rows[i].BaseNumber);	
@@ -77,7 +79,7 @@ function getBaseUpgrade (socket,dbUpgrade,ID_User,BaseNumber) {
 	var queryBaseUpgrade = "SELECT * FROM `"+ID_User+"_"+BaseNumber+"`";
 	//console.log(queryBaseUpgrade)
 	dbUpgrade.query(queryBaseUpgrade,function(error,rows){
-		if (!!error){DetailError = ('GetUserBase.js: getBaseUpgrade '+queryBaseUpgrade); functions.WriteLogError(DetailError,2);}
+		if (!!error){DetailError = ('GetUserBase.js: getBaseUpgrade '+queryBaseUpgrade); functions.WriteLogError(DetailError,1);}
 		delete rows.ID;
 		socket.emit('R_BASE_UPGRADE',{
 			ID_User: ID_User,
@@ -107,7 +109,7 @@ exports.R_BASE_PLAYER = function r_base_player (socket,ID_User,Server_ID) {
 	"`ID_User`<>"+ID_User;
 
 	db_all_user.query(stringID, function (error,rows) {
-		if (!!error){DetailError = ('GetUserBase.js: query stringID :'+ ID_User); functions.WriteLogError(DetailError,2);}
+		if (!!error){DetailError = ('GetUserBase.js: query stringID :'+ ID_User); functions.WriteLogError(DetailError,1);}
 		if (rows!=undefined) {	
 			for (var i = 0; i < rows.length; i++) {
 				getData (socket,dbInfo,dbUpgrade,rows[i]);
@@ -121,7 +123,7 @@ function getData (socket,dbInfo,dbUpgrade,rowsData) {
 	var stringQuery = "SELECT `ID_User`,`BaseNumber`,`Position` FROM `"+rowsData.ID_User+"`";
 	//console.log(stringQuery);	
 	dbInfo.query(stringQuery,function (error,rows) {
-		if (!!error){DetailError = ('GetUserBase.js: query getData :'+ stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){DetailError = ('GetUserBase.js: query getData :'+ stringQuery); functions.WriteLogError(DetailError,1);}
 		if (rows!=undefined) {
 			//console.log(rows.length);
 			for (var i = 0; i < rows.length; i++) {
@@ -152,7 +154,7 @@ function getUpgrade (dbUpgrade,rowsData,level) {
 	var stringQuery = "SELECT `Level` From `"+rowsData.ID_User+"_"+rowsData.BaseNumber+"` WHERE `ID`= 1"
 	// console.log(stringQuery);
 	dbUpgrade.query(stringQuery,function(error,rows){
-		if (!!error){DetailError = ('GetUserBase.js: query getUpgrade :'+ stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){DetailError = ('GetUserBase.js: query getUpgrade :'+ stringQuery); functions.WriteLogError(DetailError,1);}
 		level(rows[0].Level);
 	});
 }
@@ -163,7 +165,32 @@ exports.R_PLAYER_INFO = function r_player_info (socket,ID_User,Server_ID) {
 	//console.log(stringQuery);
 	db_all_user.query(stringQuery,function (error,rows) {
 		// console.log(rows);
-		if (!!error){DetailError = ('GetUserBase.js: query R_PLAYER_INFO: '+ stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){DetailError = ('GetUserBase.js: query R_PLAYER_INFO: '+ stringQuery); functions.WriteLogError(DetailError,1);}
 		socket.emit('R_PLAYER_INFO',{R_PLAYER_INFO:rows});
 	});
 }
+
+
+//R_BASE_DEFEND (9,1);
+exports.R_BASE_DEFEND = function r_base_defend(socket,ID_User,Server_ID) {
+	switch (Server_ID) {
+		case 1:
+		dbDefend = db_s1_base_defend;
+		break;
+		case 2:
+		dbDefend = db_s2_base_defend;
+		break;
+	}
+	
+	var stringQuery = "SELECT * FROM `"+ID_User+"` ORDER BY `BaseNumber` ASC ";
+	dbDefend.query(stringQuery,function (error,rows) {
+		if (!!error){DetailError = ('GetUserBase.js: query R_BASE_DEFEND: '+ stringQuery); functions.WriteLogError(DetailError,1);}
+		//console.log(rows);
+		socket.emit('R_BASE_DEFEND',{R_BASE_DEFEND:rows});
+	});
+	
+
+}
+
+
+
