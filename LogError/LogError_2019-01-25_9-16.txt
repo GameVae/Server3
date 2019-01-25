@@ -1,0 +1,3 @@
+
+ 2019-01-25T03:56:40.049Z: TaskServer.js: queryId querySocketId SELECT * FROM `user_info` WHERE `Socket`= 'gJDlZinqZPMV9-wpAAAA'
+ 2019-01-25T03:56:56.517Z: TaskServer.js: queryId querySocketId SELECT * FROM `user_info` WHERE `Socket`= 'LBCLwq1lAjdx4JOgAAAA'

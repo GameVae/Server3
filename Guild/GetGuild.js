@@ -28,52 +28,111 @@ exports.Start = function start (io) {
 		socket.on('S_ACCEPT_APPLY',function (data) {
 			S_ACCEPT_APPLY(socket,data);
 		});
+		socket.on('S_REJECT_APPLY',function (data) {
+			S_REJECT_APPLY(socket,data);
+		});
 	});
 }
 
-var dataAccept={
+var dataReject={
 	ID_User: 9,
 	ID_Player: 42,
 	Guild_ID: 13
 }
+function S_REJECT_APPLY (data) {
+	checkGuildPosition (data,function (checkBool) {
+		if (checkBool) {
+			//updateReject (data);
+			R_REJECT_APPLY (socket,data);
+		}else{
+			//send error;
+		}
+	});
+}
+function updateReject (data) {
+	var stringUpdateGuild = "DELETE FROM `"+data.Guild_ID+"` WHERE `ID_User`='"+data.ID_Player+"'"; 
+	db_all_guild.query(stringUpdateUser,function (error,result) {
+		if (!!error) {console.log(error)};
+	});
+}
 
-S_ACCEPT_APPLY (dataAccept)
-function S_ACCEPT_APPLY (data) {
+function R_REJECT_APPLY (socket,data) {
+	var stringQuery = "SELECT `ID_User` FROM `'"+data.Guild_ID+"'";
+	db_all_user.query(stringQuery,function (error,rows) {
+		if (!!error) {console.log(error)};
+		for (var i = 0; i < rows.length; i++) {
+			querySocket (socket,rows[i].ID_User,data);
+		}
+	});
+}
+
+function querySocket (socket,ID_User,data) {
+	var stringSocket = "SELECT `Socket` FROM `user_info` WHERE `ID_User` ='"+ID_User+"';"
+	db_all_user.query(stringSocket,function (error,rows) {
+		for (var i = 0; i < rows.length; i++) {
+			R_REJECT_APPLY (socket,rows[i].Socket,data.ID_Player)
+		}
+	});
+}
+function R_REJECT_APPLY (socket,dataSocket,data) {
+	socket.broadcast.to(dataSocket).emit('R_REJECT_APPLY',{R_REJECT_APPLY:data});
+}
+
+// var dataAccept={
+// 	ID_User: 9,
+// 	ID_Player: 42,
+// 	Guild_ID: 13
+// }
+
+//S_ACCEPT_APPLY (dataAccept)
+function S_ACCEPT_APPLY (socket,data) {
 	checkGuildPosition (data,function (checkBool) {
 		//console.log('checkBool: '+checkBool)		
 		if (checkBool) {
-			//updateGuildAccept (data);
+			updateGuildAccept (data);
 			
 			new Promise((resolve,reject)=>{
 				var getGuildName = "SELECT `GuildName` FROM `guild_info` WHERE `Guild_ID`='"+data.Guild_ID+"'";
-				// db_all_guild.query(getGuildName,function (error,rows) {
-				// 	data.GuildName = rows[0].GuildName;
-				// 	resolve();
-				// });
+				db_all_guild.query(getGuildName,function (error,rows) {
+					data.GuildName = rows[0].GuildName;
+					resolve();
+				});
 
 			}).then(()=>{		
 				var stringUserInfo = "SELECT `Server_ID` FROM `user_info` WHERE `ID_User` ='"+data.ID_Player+"'";
-				// db_all_user.query(stringUserInfo,function (error,rows) {
-				// 	var stringUpdateUser = "UPDATE `game_info_s'"+rows[0].Server_ID+"'` SET `Guild_ID`='"+data.Guild_ID+"',`Guild_Name`='"+data.GuildName+"',`LastGuildID`=null";
+				db_all_user.query(stringUserInfo,function (error,rows) {
+					var stringUpdateUser = "UPDATE `game_info_s'"+rows[0].Server_ID+"'` SET `Guild_ID`='"+data.Guild_ID+"',`Guild_Name`='"+data.GuildName+"',`LastGuildID`=null";
 
-				// 	db_all_user.query(stringUpdateUser,function (error,result) {
-				// 		if (!!error) {console.log(error)};
-				// 	});
-				// });
+					db_all_user.query(stringUpdateUser,function (error,result) {
+						if (!!error) {console.log(error)};
+					});
+				});
 			}).then(()=>{
-				R_ACCEPT_APPLY (data);
+				queryUserInfo (socket,data);
 			});
 		}
 
 	});
 }
 
-function R_ACCEPT_APPLY (data) {
-	var stringQueryGuildMember = "SELECT * FROM `13` WHERE `ID_User`<>'"+data.ID_Player+"'";
+function queryUserInfo (socket,data) {
+	var stringQueryGuildMember = "SELECT `ID_User` FROM `13` WHERE `ID_User`<>'"+data.ID_Player+"'";
+	console.log(stringQueryGuildMember)
 	db_all_guild.query(stringQueryGuildMember, function (error,rows) {
-		
+		console.log(rows);
+		for (var i = 0; i < rows.length; i++) {
+			R_ACCEPT_APPLY (socket,rows[i].ID_User);
+		}
 	});
+}
 
+function R_ACCEPT_APPLY (socket,data) {
+	var stringQuery = "SELECT `Socket` FROM `user_info` WHERE `ID_User`='"+data+"'";
+	db_all_user.query(stringQuery,function (error,rows) {
+		for (var i = 0; i < rows.length; i++) {
+			socket.broadcast.to(rows[i].Socket).emit('R_ACCEPT_APPLY',{R_ACCEPT_APPLY:data});
+		}
+	});
 }
 
 function updateGuildAccept (data) {

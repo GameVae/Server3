@@ -193,5 +193,3 @@ exports.R_BASE_DEFEND = function r_base_defend(socket,ID_User,Server_ID) {
 
 }
 
-
-

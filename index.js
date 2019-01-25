@@ -76,8 +76,6 @@ function checkConnect (connectCounter,io) {
 			connectCounter--;
 			taskServer.RemoveConnectSocket(socket.id);
 			console.log('connectCounter: '+connectCounter);		
-
-			
 		});
 	});
 }
