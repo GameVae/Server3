@@ -61,12 +61,21 @@ function S_ACCEPT_APPLY (data) {
 				// 	});
 				// });
 			}).then(()=>{
-				var querySendToClient="";
+				R_ACCEPT_APPLY (data);
 			});
 		}
 
 	});
 }
+
+function R_ACCEPT_APPLY (data) {
+	var stringQueryGuildMember = "SELECT * FROM `13` WHERE `ID_User`<>'"+data.ID_Player+"'";
+	db_all_guild.query(stringQueryGuildMember, function (error,rows) {
+		
+	});
+
+}
+
 function updateGuildAccept (data) {
 	var Server_ID = 0;
 

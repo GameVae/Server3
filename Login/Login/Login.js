@@ -23,7 +23,7 @@ exports.Start = function start (io) {
 
 function S_LOGIN (socket,data) {
 
-	console.log('S_LOGIN: '+functions.GetTime().toISOString());
+	console.log('S_LOGIN: '+ new Date(functions.GetTime()).toISOString());
 	console.log(data);
 	// currentUser = getCurrentUser(data);
 	//console.log(currentUser);
@@ -113,14 +113,6 @@ function R_CHECK_DUPLICATE_LOGIN (socket,data) {
 	});
 }
 
-// function getCurrentUser (data) {
-// 	return currentUser ={
-// 		UserName: data.UserName,
-// 		Password: data.Password,
-// 		Model_Device: data.Model_Device,
-// 		Ram_Device: data.Ram_Device
-// 	}
-// }
 
 
 // var async 			= require('async');

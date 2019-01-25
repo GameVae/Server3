@@ -186,6 +186,7 @@ exports.R_BASE_DEFEND = function r_base_defend(socket,ID_User,Server_ID) {
 	dbDefend.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('GetUserBase.js: query R_BASE_DEFEND: '+ stringQuery); functions.WriteLogError(DetailError,1);}
 		//console.log(rows);
+	
 		socket.emit('R_BASE_DEFEND',{R_BASE_DEFEND:rows});
 	});
 	
