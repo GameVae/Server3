@@ -6,6 +6,7 @@ var getUserBase			= require('./GetUserBase.js')
 var getRss 				= require('./../../Map/GetRss.js');
 var getPosition			= require('./../../Map/GetPosition.js');
 var getFriend 			= require('./../../Friend/GetFriend.js');
+var getGuild 			= require('./../../Guild/GetGuild.js')
 var taskServer 			= require('./../../Task/TaskServer.js');
 var functions 			= require('./../../Util/Functions.js');
 
@@ -79,8 +80,9 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 			getUserBase.R_BASE_INFO(socket,dataUser.ID_User,dataUser.Server_ID);
 			getUserBase.R_BASE_DEFEND(socket,dataUser.ID_User,dataUser.Server_ID);
 			getUserBase.R_BASE_UPGRADE(socket,dataUser.ID_User,dataUser.Server_ID);
+			// getGuild.R_USER_GUILD(socket,dataUser.ID_User,dataUser.Server_ID);
 
-			getUserBase.R_BASE_PLAYER (socket,rows[0].ID_User,rows[0].Server_ID);
+			getUserBase.R_BASE_PLAYER(socket,rows[0].ID_User,rows[0].Server_ID);
 			getUserBase.R_PLAYER_INFO(socket,rows[0].ID_User,rows[0].Server_ID);
 
 			getRss.R_GET_RSS(socket,dataUser.Server_ID);
