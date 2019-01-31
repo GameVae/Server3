@@ -30,6 +30,7 @@ var data={
 	ID_User: 9,
 	Unit_ID: 16,
 	Quality: 500,
+	BaseNumber: 1
 };
 var dbDefend;
 
@@ -44,4 +45,8 @@ function S_DEPLOY (data) {
 		break;
 	}
 	//var stringQuery = 
+}
+
+function checkUnitAvailable (data) {
+	
 }

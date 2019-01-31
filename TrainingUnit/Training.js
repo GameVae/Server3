@@ -128,7 +128,7 @@ function updateUserMight (serverID,dataTraining) {
 function clearBaseInfo (dbBase,dataTraining) {
 	//console.log(dataTraining)
 	var clearString = "UPDATE `"+dataTraining.ID_User+"` SET "+
-	"`TrainingUnit_ID` = null, `TrainingTime`=null, `TrainingQuality`=null,`Training_Might`=null"
+	"`TrainingUnit_ID` = NULL, `TrainingTime`=NULL, `TrainingQuality`=NULL,`Training_Might`=NULL"
 	+" WHERE `BaseNumber` = "+dataTraining.BaseNumber;
 	dbBase.query(clearString,function (error,result) {
 		if (!!error){DetailError = ('Training.js: clearBaseInfo: ' + clearString);functions.WriteLogError(DetailError,2);}
@@ -252,13 +252,16 @@ exports.UpdateDatabase = function updateDatabase (serverInt) {
 	var database = "s"+serverInt+"_base_info";
 	var tableQuery;
 	var stringQuery = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='"+database+"' AND TABLE_NAME <>'"+database+"'";
-	// console.log(tableQuery)
+	
+
+	
 	
 	dbBase.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('Training.js: queryTable UpdateDatabase ' + serverInt);functions.WriteLogError(DetailError,2);}
 		if (rows!=undefined) {
+
 			for (var i = 0; i < rows.length; i++) {
-				tableQuery = "SELECT * FROM `"+rows[i].TABLE_NAME+"` WHERE `TrainingTime`<>null";
+				tableQuery = "SELECT * FROM `"+rows[i].TABLE_NAME+"` WHERE `TrainingTime`<> 'NULL'";
 				checkTimeDataBase (serverInt,dbBase,dbDefend,tableQuery);
 			}
 		}
@@ -266,13 +269,15 @@ exports.UpdateDatabase = function updateDatabase (serverInt) {
 }
 
 function checkTimeDataBase (serverInt,dbBase,dbDefend,tableQuery) {
+	
 	dbBase.query(tableQuery,function (error,rows) {
 		if (!!error){DetailError = ('Training.js: checkTimeDataBase ' + serverInt);functions.WriteLogError(DetailError,2);}
 		if (rows.length>0) {
-			//console.log(rows)
+			
+
 			var currentTime = functions.GetTime();
 			var databaseTime = functions.ExportTimeDatabase(rows[0].TrainingTime);
-			dataTraining={
+			var dataTr={
 				Server_ID: 			serverInt,
 				ID_User: 			rows[0].ID_User,
 				BaseNumber: 		rows[0].BaseNumber,
@@ -281,17 +286,19 @@ function checkTimeDataBase (serverInt,dbBase,dbDefend,tableQuery) {
 				TrainingQuality: 	rows[0].TrainingQuality,
 				TrainingMight: 		rows[0].Training_Might,
 			}
-			if (databaseTime<=currentTime) {
-				updateBaseDefend(dbDefend,dataTraining);
-				clearBaseInfo(dbBase,dataTraining);
-			}else{
-				trainingTimeOut =  new Date(databaseTime).getTime() -currentTime;
-				var stringTimeOut = dataTraining.ID_User+"_"+dataTraining.BaseNumber;
-				DictTimeOut[stringTimeOut]=setTimeout(function (dataTraining) {
-					setTimeUpdate (dataTraining);
-					delete DictTimeOut[stringTimeOut];
-				},trainingTimeOut , dataTraining);
+
+			var trainTime = 0;
+			if (databaseTime>currentTime) {
+				trainTime = new Date(databaseTime).getTime() - currentTime;
 			}
+
+			var stringTimeOut = dataTr.ID_User+"_"+dataTr.BaseNumber;
+			DictTimeOut[stringTimeOut]=setTimeout(function (dataTr) {
+				updateBaseDefend(dbDefend,dataTr);
+				updateUserMight(serverInt,dataTr);
+				clearBaseInfo(dbBase,dataTr);
+				delete DictTimeOut[stringTimeOut];
+			},trainTime, dataTr);
 		}
 	});
 }

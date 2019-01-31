@@ -137,9 +137,15 @@ function promote (data) {
 	}
 }
 function promoteLeader (data) {
-	
+	var dataLeader ={
+		ID_User: data.ID_User,
+		ID_Promote: data.ID_User,
+		Guild_ID: data.Guild_ID,
+		PromotePosition: 4,
+	}
 	checkLeaderPosition (data,function (returnBool) {
 		if (returnBool) {
+			updateGuildPosition (dataLeader);
 			updateGuildPosition (data);
 			sendClientPromote (socket,data,2);
 		}
