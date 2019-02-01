@@ -79,13 +79,9 @@ function S_TRAINING (data) {
 }
 
 function setTimeUpdate (data) {
-	
 	var queryServer = "SELECT `Server_ID` FROM `user_info` WHERE `ID_User` ='"+data.ID_User+"'";
-	
 	db_all_user.query(queryServer,function (error,rowsQueryServer) {
-
 		if (!!error){DetailError = ('Training.js: setTimeUpdate user_info ' + data.ID_User);functions.WriteLogError(DetailError,2);}
-
 		switch (rowsQueryServer[0].Server_ID) {
 			case 1:
 			dbBase 		= db_s1_base_info;

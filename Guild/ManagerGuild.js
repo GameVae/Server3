@@ -38,6 +38,31 @@ exports.S_KICKOUT_GUILD = function s_kickout_guild (socket,data) {
 			kickOutTime = functions.ImportTimeToDatabase(new Date(currentTime + timeRemove).toISOString());
 			updateKickOutGuild (data.Guild_ID,data.ID_User,data.ID_KickOut);
 			setTimeRemove (data,kickOutTime);
+			sendClientKickOut (socket,data);
+		}
+	});
+}
+function sendClientKickOut (socket,data) {
+	
+	var stringQuery = "SELECT `ID_User` FROM `"+data.Guild_ID+"`";
+	// console.log(stringQuery);
+	db_all_guild.query(stringQuery,function (error,rows) {
+		if (!!error){DetailError = ('ApplyGuild.js: sendApplyToGuildMember: '+ stringQuery);functions.WriteLogError(DetailError,2);}
+		if (rows.length>0) {
+			for (var i = 0; i < rows.length; i++) {
+				R_KICKOUT_GUILD (socket,rows[i],data);
+			}
+		}
+	});
+}
+function R_KICKOUT_GUILD (socket,row,data) {
+	// console.log(data.ID_User)
+	data.RemoveTime = timeRemove;
+	var stringQuery = "SELECT `Socket` FROM `user_info` WHERE `ID_User`='"+row.ID_User+"'";
+	db_all_user.query(stringQuery,function (error,rows) {
+		if (!!error){DetailError = ('ApplyGuild.js: sendApplyToGuildMember: '+ stringQuery);functions.WriteLogError(DetailError,2);}
+		if (rows[0].Socket!=null) {
+			socket.broadcast.to(rows[0].Socket).emit('R_KICKOUT_GUILD',{R_KICKOUT_GUILD:data});
 		}
 	});
 }
@@ -45,14 +70,15 @@ function updateUserInfo (data,Server_ID) {
 	getUserServerID (data.ID_KickOut,function (returnServer) {
 		var updateKickOut = "UPDATE `game_info_s"+returnServer+"` SET `LastGuildID`= '"+data.Guild_ID+"' WHERE `ID_User`='"+data.ID_KickOut+"'";
 		db_all_user.query(updateKickOut,function (error,result) {
-			if (!!error) {console.log(error);}
+			if (!!error){DetailError = ('ManagerGuild.js: updateUserInfo: '+ updateKickOut);functions.WriteLogError(DetailError,2);}
+			LogChange = 'ManagerGuild.js: updateUserInfo: '+updateKickOut; functions.LogChange(LogChange,2);
 		});
 	});
 }
 function getUserServerID (dataID_User,returnServer) {
 	var stringQueryUser = "SELECT `Server_ID` FROM `user_info` WHERE `ID_User`='"+dataID_User+"'";
 	db_all_user.query(stringQueryUser, function (error,rows) {
-		if (!!error) {console.log(error)};
+		if (!!error){DetailError = ('ManagerGuild.js: getUserServerID: '+ stringQueryUser);functions.WriteLogError(DetailError,2);}
 		returnServer(rows[0].Server_ID);
 	});
 }
@@ -60,7 +86,8 @@ function getUserServerID (dataID_User,returnServer) {
 function updateKickOutGuild (Guild_ID,ID_User,ID_KickOut) {
 	var updateTime = "UPDATE `"+Guild_ID+"` SET `RemoveTime`='"+kickOutTime+"' WHERE 1 `ID_User`='"+ID_KickOut+"'";
 	db_all_guild.query(updateTime,function (error,result) {
-		if (!!error) {console.log(error);}
+		if (!!error){DetailError = ('ManagerGuild.js: updateKickOutGuild: '+ updateTime);functions.WriteLogError(DetailError,2);}
+		LogChange = 'ManagerGuild.js: updateKickOutGuild: '+updateTime;functions.LogChange(LogChange,2);
 	});
 }
 function setTimeRemove (timeKickout,data) {
@@ -69,6 +96,7 @@ function setTimeRemove (timeKickout,data) {
 		var stringCheckGuild = "SELECT * FROM `"+data.Guild_ID+"` WHERE `ID_User`='"+data.ID_KickOut+"'";
 		delete DictTimeOut[stringTimeOut];
 		db_all_guild.query(stringCheckGuild, function (error,rows) {
+			if (!!error){DetailError = ('ManagerGuild.js: setTimeRemove: '+ stringCheckGuild);functions.WriteLogError(DetailError,2);}
 			if (rows.length>0&&rows[0].RemoveTime!=null) {
 				currentTime 	= functions.GetTime();
 				databaseTime 	= functions.ExportTimeDatabase(rows[0].RemoveTime);
@@ -86,12 +114,14 @@ function setTimeRemove (timeKickout,data) {
 function deleteGuildMember (data) {
 	var deleteMember = "DELETE FROM `13` WHERE `ID_User`='"+data.ID_KickOut+"'";
 	db_all_guild.query(deleteMember,function (error,result) {
-		if (!!error) {console.log(error)}
+		if (!!error){DetailError = ('ManagerGuild.js: deleteGuildMember: '+ deleteMember);functions.WriteLogError(DetailError,2);}
+		LogChange = 'ManagerGuild.js: deleteGuildMember: '+deleteMember;functions.LogChange(LogChange,2);
 	})
 	getUserServerID (data.ID_KickOut,function (returnServer) {
 		var clearLastGuild = "UPDATE `game_info_s"+returnServer+"` SET `LastGuildID`= null WHERE `ID_User`='"+data.ID_KickOut+"' AND `LastGuildID`='"+data.Guild_ID+"'";
 		db_all_user.query(clearLastGuild,function (error,results) {
-			if (!!error) {console.log(error);}
+			if (!!error){DetailError = ('ManagerGuild.js: clearLastGuild: '+ clearLastGuild);functions.WriteLogError(DetailError,2);}
+			LogChange = 'ManagerGuild.js: clearLastGuild: '+clearLastGuild;functions.LogChange(LogChange,2);
 		});
 	});
 	
@@ -100,6 +130,7 @@ function compareKickOutPosition (Guild_ID,ID_User,ID_KickOut,returnBool) {
 	var checkBool = false;
 	var stringCompare = "SELECT `GuildPosition` FROM `"+Guild_ID+"` WHERE `ID_User`='"+ID_User+"' UNION SELECT `GuildPosition` FROM `"+Guild_ID+"` WHERE `ID_User`='"+ID_KickOut+"'";
 	db_all_guild.query(stringCompare,function (error,rows) {
+		if (!!error){DetailError = ('ManagerGuild.js: compareKickOutPosition: '+ stringCompare);functions.WriteLogError(DetailError,2);}
 		if (rows[0].GuildPosition>rows[1].GuildPosition&&rows[0].GuildPosition>3) {
 			checkBool = true;
 		}
@@ -110,33 +141,29 @@ function getGuildPosition (Guild_ID,ID_User,returnPosition) {
 	var position = 1;
 	var stringQuery = "SELECT `GuildPosition` FROM `"+Guild_ID+"` WHERE `ID_User`='"+ID_User+"'";
 	db_all_guild.query(stringQuery,function (error,rows) {
-		if (!!error) {console.log(error)};
+		if (!!error){DetailError = ('ManagerGuild.js: getGuildPosition: '+ stringQuery);functions.WriteLogError(DetailError,2);}
 		position = rows[0].GuildPosition;
 		returnPosition(position);
 	});
 }
 
 
-var dataPromote={
-	ID_User: 9,
-	ID_Promote: 42,
-	Guild_ID: 13,
-	PromotePosition: 5,
-}
+// var dataPromote={
+// 	ID_User: 9,
+// 	ID_Promote: 42,
+// 	Guild_ID: 13,
+// 	PromotePosition: 5,
+// }
 
 exports.S_PROMOTE = function s_promote (socket,data) {
-	
-}
-
-promote (dataPromote)
-function promote (data) {
 	if (data.PromotePosition<5) {
 		promoteMember (socket,data);
 	}else{
-		promoteLeader (data);
+		promoteLeader (socket,data);
 	}
 }
-function promoteLeader (data) {
+
+function promoteLeader (socket,data) {
 	var dataLeader ={
 		ID_User: data.ID_User,
 		ID_Promote: data.ID_User,
@@ -155,6 +182,7 @@ function checkLeaderPosition (data,returnBool) {
 	var checkBool = false;
 	var queryLeader = "SELECT `GuildPosition` FROM `"+data.Guild_ID+"` WHERE `ID_User`='"+data.ID_User+"'"
 	db_all_guild.query(queryLeader,function (error,rows) {
+		if (!!error){DetailError = ('ManagerGuild.js: queryLeader: '+ queryLeader);functions.WriteLogError(DetailError,2);}
 		if (rows[0].GuildPosition==5) {
 			checkBool = true;
 		}
@@ -186,6 +214,7 @@ function sendClientPromote (socket,data,enumPromote) {
 			PromotePosition: 4
 		}
 		db_all_guild.query(queryGuild,function (error,rows) {
+			if (!!error){DetailError = ('ManagerGuild.js: sendClientPromote_Leader: '+ queryGuild);functions.WriteLogError(DetailError,2);}
 			if (rows.length>0) {
 				for (var i = 0; i < rows.length; i++) {
 					R_PROMOTE (socket,dataProLeader,rows[i].ID_User);	
@@ -196,11 +225,11 @@ function sendClientPromote (socket,data,enumPromote) {
 	}
 
 	db_all_guild.query(queryGuild,function (error,rows) {
+		if (!!error){DetailError = ('ManagerGuild.js: sendClientPromote_Member: '+ queryGuild);functions.WriteLogError(DetailError,2);}
 		if (rows.length>0) {
 			for (var i = 0; i < rows.length; i++) {
 				R_PROMOTE (socket,dataProMem,rows[i].ID_User)	
-			}
-			
+			}			
 		}
 	})
 }
@@ -208,12 +237,15 @@ function sendClientPromote (socket,data,enumPromote) {
 function R_PROMOTE (socket,data,ID_User) {
 	var getSocket = "SELECT `Socket` FROM `user_info` WHERE `ID_User`='"+ID_User+"'";
 	db_all_user.query(queryGuild,function (error,rows) {
-		//socket.broadcast.to(rows[i].Socket).emit('R_PROMOTE',{R_PROMOTE:dataPro});
+		if (!!error){DetailError = ('ManagerGuild.js: R_PROMOTE: '+ getSocket);functions.WriteLogError(DetailError,2);}
+		socket.broadcast.to(rows[i].Socket).emit('R_PROMOTE',{R_PROMOTE:dataPro});
 	})
 }
 function updateGuildPosition (data) {
 	var updatePos ="UPDATE `"+data.Guild_ID+"` SET `GuildPosition`='"+data.PromotePosition+"' WHERE `ID_User`='"+data.ID_Promote+"'";
 	db_all_guild.query(updatePos,function (error,result) {
+		if (!!error){DetailError = ('ManagerGuild.js: updateGuildPosition: '+ updatePos);functions.WriteLogError(DetailError,2);}
+		LogChange = 'ManagerGuild.js: updateGuildPosition: '+updatePos;functions.LogChange(LogChange,2);
 		if (!!error) {console.log(error);}
 	});
 }
@@ -222,6 +254,7 @@ function comparePromotePosition (data,returnBool) {
 	var checkBool = false;
 	var stringCompare = "SELECT `GuildPosition` FROM `"+data.Guild_ID+"` WHERE `ID_User`='"+data.ID_User+"' UNION SELECT `GuildPosition` FROM `"+data.Guild_ID+"` WHERE `ID_User`='"+data.ID_Promote+"'";
 	db_all_guild.query(stringCompare,function (error,rows) {
+		if (!!error){DetailError = ('ManagerGuild.js: comparePromotePosition: '+ stringCompare);functions.WriteLogError(DetailError,2);}
 		if ((rows[0].GuildPosition>rows[1].GuildPosition)&&(rows[0].GuildPosition>data.PromotePosition)) {
 			checkBool = true;
 		}

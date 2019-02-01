@@ -6,6 +6,7 @@ var functions 			= require('./../Util/Functions.js');
 
 var createGuild 		= require('./CreateGuild.js');
 var applyGuild 			= require('./ApplyGuild.js');
+var managerGuild 		= require('./ManagerGuild.js');
 
 var Promise 			= require('promise');
 var DetailError, LogChange;
@@ -22,6 +23,16 @@ exports.Start = function start (io) {
 		socket.on('S_ACCEPT_APPLY',function (data) {
 			applyGuild.S_ACCEPT_APPLY(socket,data);
 		});
+		socket.on('S_REJECT_APPLY',function (data) {
+			applyGuild.S_REJECT_APPLY(socket,data);
+		});
+		socket.on('S_KICKOUT_GUILD',function (data) {
+			managerGuild.S_KICKOUT_GUILD(socket,data);
+		});
+		socket.on('S_PROMOTE',function (data) {
+			managerGuild.S_PROMOTE(socket,data);
+		});
+
 	});
 }
 
@@ -59,6 +70,9 @@ function getGuildMember (socket,Guild_ID) {
 			delete rows[i].ID;
 			if (rows[i].AcceptTime!=null) {
 				rows[i].AcceptTime = (new Date(functions.ExportTimeDatabase(rows[i].AcceptTime))-currentTime)*0.001;
+			}
+			if (rows[i].RemoveTime!=null) {
+				rows[i].RemoveTime = (new Date(functions.ExportTimeDatabase(rows[i].RemoveTime))-currentTime)*0.001;
 			}
 			if (rows[i].LogOutTime!=null) {
 				rows[i].LogOutTime = (new Date(functions.ExportTimeDatabase(rows[i].LogOutTime))-currentTime)*0.001;
