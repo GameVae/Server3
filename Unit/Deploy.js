@@ -8,13 +8,10 @@ var db_s1_base_defend		= require('./../Util/Database/Db_s1_base_defend.js');
 var db_s2_base_info			= require('./../Util/Database/Db_s2_base_info.js');
 var db_s2_base_defend		= require('./../Util/Database/Db_s2_base_defend.js');
 
-
-
-
 var functions 		= require('./../Util/Functions.js');
 
 var DetailError;
-
+var dbDefend;
 
 
 exports.Start = function start (io) {
@@ -25,16 +22,16 @@ exports.Start = function start (io) {
 	});
 }
 
-var data={
+var dataDeploy={
 	Server_ID: 1,
 	ID_User: 9,
-	Unit_ID: 16,
-	Quality: 500,
+	ID_Unit: 16,
+	Quality: 5,
 	BaseNumber: 1
 };
-var dbDefend;
 
-//S_DEPLOY (data)
+
+S_DEPLOY (dataDeploy)
 function S_DEPLOY (data) {
 	switch (parseInt(data.Server_ID)) {
 		case 1:
@@ -44,9 +41,21 @@ function S_DEPLOY (data) {
 		dbDefend = db_s2_base_defend;
 		break;
 	}
-	//var stringQuery = 
+
+	checkUnitAvailable (dbDefend,data,function (checkBool) {
+		//console.log(checkBool)
+		if (checkBool) {
+			
+		}
+	})
 }
 
-function checkUnitAvailable (data) {
-	
+function checkUnitAvailable (dbDefend,data,checkBool) {
+	var returnBool = false;
+	var stringCheckQuality = "SELECT `Quality` FROM `"+data.ID_User+"` WHERE `ID_Unit`='"+data.ID_Unit+"' AND `BaseNumber`='"+data.BaseNumber+"'"
+	dbDefend.query(stringCheckQuality,function (error,rows) {
+		if (!!error) {console.log(error);}
+		if (rows[0].Quality>=data.Quality) {returnBool = true;}
+		checkBool(returnBool);
+	});
 }

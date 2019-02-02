@@ -46,6 +46,11 @@ var info 					= require('./Info/GetInfo.js');
 var friend 					= require('./Friend/GetFriend.js');
 friend.UpdateDatabase();
 
+var guild 					= require('./Guild/GetGuild.js');
+
+var guild_UpdateDatabase 	= require('./Guild/Guild_UpdateDatabase.js');
+guild_UpdateDatabase.UpdateDatabase(); 
+
 if (app.get('port') === process.env.PORT)
 {	
 	var connectCounter=0;
