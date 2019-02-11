@@ -50,6 +50,20 @@ function S_DEPLOY (data) {
 	})
 }
 
+function sendUnitToMap () {
+	
+}
+
+function updatePosition () {
+	
+}
+
+function function_name (argument) {
+	// body... 
+}
+
+// exports.LoginUnitPosition = 
+
 function checkUnitAvailable (dbDefend,data,checkBool) {
 	var returnBool = false;
 	var stringCheckQuality = "SELECT `Quality` FROM `"+data.ID_User+"` WHERE `ID_Unit`='"+data.ID_Unit+"' AND `BaseNumber`='"+data.BaseNumber+"'"
