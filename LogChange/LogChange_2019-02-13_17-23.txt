@@ -1,0 +1,10 @@
+
+ logChangeDetail: 2019-02-13T10:25:50.324Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-02-13T10:25:50.341Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='WMQ_FpO3D84eCiN1AAAA', `TimeLogIn`='2019-02-13T10:25:50.331', `TimeLogOut`= null WHERE `ID_User`='43'
+ logChangeDetail: 2019-02-13T10:26:28.015Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-02-13T10:26:28.012', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='WMQ_FpO3D84eCiN1AAAA'
+ logChangeDetail: 2019-02-13T10:26:36.658Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-02-13T10:26:36.664Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='hhZNZaXzupKA-w5mAAAB', `TimeLogIn`='2019-02-13T10:26:36.659', `TimeLogOut`= null WHERE `ID_User`='43'
+ logChangeDetail: 2019-02-13T10:26:45.778Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-02-13T10:26:45.772', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='hhZNZaXzupKA-w5mAAAB'
+ logChangeDetail: 2019-02-13T10:27:38.479Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-02-13T10:27:38.486Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='vdO1OQmPXTBYgpl3AAAC', `TimeLogIn`='2019-02-13T10:27:38.480', `TimeLogOut`= null WHERE `ID_User`='43'
+ logChangeDetail: 2019-02-13T10:28:21.958Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-02-13T10:28:21.954', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='vdO1OQmPXTBYgpl3AAAC'

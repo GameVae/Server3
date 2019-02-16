@@ -8,9 +8,11 @@ var db_s1_base_defend		= require('./../Util/Database/Db_s1_base_defend.js');
 var db_s2_base_info			= require('./../Util/Database/Db_s2_base_info.js');
 var db_s2_base_defend		= require('./../Util/Database/Db_s2_base_defend.js');
 
-var functions 		= require('./../Util/Functions.js');
+var db_position				= require('./../Util/Database/Db_position.js');
 
-var DetailError;
+var functions 				= require('./../Util/Functions.js');
+
+var DetailError, LogChange;
 var dbDefend;
 
 
@@ -45,24 +47,69 @@ function S_DEPLOY (data) {
 	checkUnitAvailable (dbDefend,data,function (checkBool) {
 		//console.log(checkBool)
 		if (checkBool) {
-			
+			sendUnitToMap (dbDefend,data);
+		}else{
+			DetailError = ('Deploy.js: checkUnitAvailable_ID_User: '+ data.ID_User
+				+"_Quality:_"+data.Quality
+				+"_BaseNumber:_"+data.BaseNumber
+				+"_ID_Unit:_"+data.ID_Unit);functions.WriteLogError(DetailError,2);
 		}
-	})
+	});
 }
 
-function sendUnitToMap () {
-	
+function sendUnitToMap (dbDefend,data) {
+	getBasePosition (data,function (resultPostion) {	
+		checkPosition (data,resultPostion,function (checkBool) {
+			if (checkBool) {
+				insertPosition (data,resultPostion);
+				updateBaseDefend (dbDefend,data);
+			}else {
+				console.log("error send Unit => reload data")
+			}
+		});
+	});
 }
 
-function updatePosition () {
-	
+function updateBaseDefend (dbDefend,data) {	
+	var stringUpdate = "UPDATE `"+data.ID_User+"` SET `Quality`=`Quality`-'"+data.Quality+"' WHERE `ID_Unit`= '"+data.ID_Unit+"' AND `BaseNumber`='"+data.BaseNumber+"'"
+	dbDefend.query(stringUpdate,function (error,result) {
+		if (!!error) {console.log(error);}
+	});
 }
 
-function function_name (argument) {
-	// body... 
+function checkPosition (data,Cellposition,resultCheck) {
+	var returnBool =true;
+	var stringCheck = "SELECT * FROM `s1_unit` WHERE `Position_Cell`='"+Cellposition+"'";
+	//console.log(stringCheck);
+	db_position.query(stringCheck,function (error,rows) {
+		if (rows.length>0) {returnBool = false;}
+		resultCheck(returnBool);
+	});
+}
+function insertPosition (data,Cellposition) {
+	// console.log(data);
+	// console.log(Cellposition);
+	var stringInsert = "INSERT INTO `s1_unit`(`ID_Unit`, `ID_User`, `BaseNumber`, `Quality`, `Position_Cell`) VALUES ('"
+	+data.ID_Unit+"','"
+	+data.ID_User+"','"
+	+data.BaseNumber+"','"
+	+data.Quality+"','"
+	+Cellposition
+	+"');"
+	//console.log(stringInsert);
+	db_position.query(stringInsert,function (error,result) {
+		if (!!error) {console.log(error)}
+	});
 }
 
-// exports.LoginUnitPosition = 
+function getBasePosition (data, returnResult) {
+	var stringBase = "SELECT `Position_Cell` FROM `s"+data.Server_ID+"_position` WHERE `ID_Type`= '"+data.ID_User+"_0_"+data.BaseNumber+"'"
+	db_position.query(stringBase,function (error,rows) {
+		if (!!error) {console.log(error);}
+		else{returnResult(rows[0].Position_Cell)}
+	});
+
+}
 
 function checkUnitAvailable (dbDefend,data,checkBool) {
 	var returnBool = false;
@@ -73,3 +120,4 @@ function checkUnitAvailable (dbDefend,data,checkBool) {
 		checkBool(returnBool);
 	});
 }
+

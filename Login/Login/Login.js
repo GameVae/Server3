@@ -2,12 +2,14 @@
 
 var db_all_user			= require('./../../Util/Database/Db_all_user.js');
 
+var getUnit 			= require('./GetUnit.js');
 var getUserBase			= require('./GetUserBase.js')
 var getRss 				= require('./../../Map/GetRss.js');
 var getPosition			= require('./../../Map/GetPosition.js');
 var getFriend 			= require('./../../Friend/GetFriend.js');
 var getGuild 			= require('./../../Guild/GetGuild.js')
 var taskServer 			= require('./../../Task/TaskServer.js');
+
 var functions 			= require('./../../Util/Functions.js');
 
 var dataUser={};
@@ -84,6 +86,9 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 
 			getUserBase.R_BASE_PLAYER(socket,rows[0].ID_User,rows[0].Server_ID);
 			getUserBase.R_PLAYER_INFO(socket,rows[0].ID_User,rows[0].Server_ID);
+
+
+			getUnit.R_UNIT(socket,rows[0].Server_ID);
 
 			getRss.R_GET_RSS(socket,dataUser.Server_ID);
 			getPosition.R_GET_POSITION(socket,dataUser.Server_ID);

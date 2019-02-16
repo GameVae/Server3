@@ -48,6 +48,8 @@ friend.UpdateDatabase();
 
 var guild 					= require('./Guild/GetGuild.js');
 
+var sendUnit				= require('./Unit/Deploy.js');
+
 var guild_UpdateDatabase 	= require('./Guild/Guild_UpdateDatabase.js');
 guild_UpdateDatabase.UpdateDatabase(); 
 
@@ -64,6 +66,7 @@ if (app.get('port') === process.env.PORT)
 	training.Start(io);
 	friend.Start(io);
 	info.Start(io);
+	sendUnit.Start(io);
 
 }
 

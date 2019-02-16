@@ -1,0 +1,14 @@
+
+ logChangeDetail: 2019-02-14T10:10:09.299Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-02-14T10:10:09.304Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='marDUA2pSnPBWt2rAAAr', `TimeLogIn`='2019-02-14T10:10:09.299', `TimeLogOut`= null WHERE `ID_User`='43'
+ logChangeDetail: 2019-02-14T10:10:39.739Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-02-14T10:10:39.736', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='marDUA2pSnPBWt2rAAAr'
+ logChangeDetail: 2019-02-14T10:11:27.665Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-02-14T10:11:27.669Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='7cl09vooB-0-r7hfAAAs', `TimeLogIn`='2019-02-14T10:11:27.665', `TimeLogOut`= null WHERE `ID_User`='43'
+ logChangeDetail: 2019-02-14T10:12:16.798Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-02-14T10:12:16.795', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='7cl09vooB-0-r7hfAAAs'
+ logChangeDetail: 2019-02-14T10:15:23.148Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-02-14T10:15:23.153Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='f31Kvegd5rH0GPJPAAAt', `TimeLogIn`='2019-02-14T10:15:23.149', `TimeLogOut`= null WHERE `ID_User`='43'
+ logChangeDetail: 2019-02-14T10:15:23.517Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-02-14T10:15:23.521Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='f31Kvegd5rH0GPJPAAAt', `TimeLogIn`='2019-02-14T10:15:23.518', `TimeLogOut`= null WHERE `ID_User`='43'
+ logChangeDetail: 2019-02-14T10:15:37.914Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-02-14T10:15:37.912', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='f31Kvegd5rH0GPJPAAAt'
+ logChangeDetail: 2019-02-14T10:18:04.399Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-02-14T10:18:04.403Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='ToBF4nx8aukBwFgRAAAu', `TimeLogIn`='2019-02-14T10:18:04.400', `TimeLogOut`= null WHERE `ID_User`='43'
