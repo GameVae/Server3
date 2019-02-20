@@ -1,20 +1,20 @@
 'use strict';
 
-var db_all_user		= require('./../Util/Database/Db_all_user.js');
+var db_all_user				= require('./../Util/Database/Db_all_user.js');
 
-var db_s1_base_info			= require('./../Util/Database/Db_s1_base_info.js');
+var db_s1_base_upgrade		= require('./../Util/Database/Db_s1_base_upgrade.js');
 var db_s1_base_defend		= require('./../Util/Database/Db_s1_base_defend.js');
 
-var db_s2_base_info			= require('./../Util/Database/Db_s2_base_info.js');
+var db_s2_base_upgrade		= require('./../Util/Database/Db_s2_base_upgrade.js');
 var db_s2_base_defend		= require('./../Util/Database/Db_s2_base_defend.js');
 
 var db_position				= require('./../Util/Database/Db_position.js');
-
+var db_training				= require('./../Util/Database/Db_training.js');
 var functions 				= require('./../Util/Functions.js');
 
 var DetailError, LogChange;
-var dbDefend;
-
+var dbDefend,dbUpgrade;
+var Promise = require('promise');
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
@@ -38,16 +38,18 @@ function S_DEPLOY (data) {
 	switch (parseInt(data.Server_ID)) {
 		case 1:
 		dbDefend = db_s1_base_defend;
+		dbUpgrade = db_s1_base_upgrade;
 		break;
 		case 2:
 		dbDefend = db_s2_base_defend;
+		dbUpgrade = db_s2_base_upgrade;
 		break;
 	}
 
 	checkUnitAvailable (dbDefend,data,function (checkBool) {
 		//console.log(checkBool)
 		if (checkBool) {
-			sendUnitToMap (dbDefend,data);
+			sendUnitToMap (dbDefend,dbUpgrade,data);
 		}else{
 			DetailError = ('Deploy.js: checkUnitAvailable_ID_User: '+ data.ID_User
 				+"_Quality:_"+data.Quality
@@ -57,18 +59,65 @@ function S_DEPLOY (data) {
 	});
 }
 
-function sendUnitToMap (dbDefend,data) {
+function sendUnitToMap (dbDefend,dbUpgrade,data) {
 	getBasePosition (data,function (resultPostion) {	
 		checkPosition (data,resultPostion,function (checkBool) {
 			if (checkBool) {
-				insertPosition (data,resultPostion);
-				updateBaseDefend (dbDefend,data);
+				getUnitLevel (data,dbUpgrade,function (returnValue) {
+					data["Level"]= returnValue.Level;
+					data["Hea_cur"]= returnValue.Hea_cur;
+					data["Health"]= returnValue.Health;
+					data["Attack"]= returnValue.Attack;
+					data["Defend"]= returnValue.Defend;
+					insertPosition (data,resultPostion);
+					updateBaseDefend (dbDefend,data);
+				});	
 			}else {
-				console.log("error send Unit => reload data")
+				console.log("error send Unit => reload data");
 			}
 		});
 	});
 }
+
+function getUnitLevel (data,dbUpgrade,returnResult) {
+	var level,unit;
+	var dataReturn={}
+	var returnValue={};
+	new Promise((resolve,reject)=>{
+		var stringLevel = "SELECT `Level` FROM `"+data.ID_User+"_"+data.BaseNumber+"` WHERE `ID` = '"+data.ID_Unit+"'";
+		dbUpgrade.query(stringLevel,function (error,rows) {
+			if (rows[0].Level==0) {console.log('error Level');}
+			level = rows[0].Level;
+			resolve();
+		});
+	}).then(()=>new Promise((resolve,reject)=>{
+		var stringUnit = "SELECT `Unit` FROM `unit` WHERE `ID_Unit`='"+data.ID_Unit+"'"
+		db_training.query(stringUnit,function (error,rows) {
+			unit = rows[0].Unit;
+			resolve();			
+		});
+	}).then(()=>new Promise((resolve,reject)=>{
+		var stringHea = "SELECT `Health`,`Attack`,`Defend` FROM `"+unit+"` WHERE `Level`='"+level+"'"
+		db_training.query(stringHea,function (error,rows) {
+			dataReturn.Level = level;
+			dataReturn.Unit = unit;
+			dataReturn.Hea_cur = rows[0].Health;
+			dataReturn.Health = rows[0].Health;
+			dataReturn.Attack = rows[0].Attack;
+			dataReturn.Defend = rows[0].Defend;
+			resolve();
+		});
+	}).then(()=>{
+		// returnValue["Level"] = level;
+		// returnValue["Hea_cur"] = Hea_cur;
+		// returnValue["Health"] = Health;
+		// returnValue["Attack"] = Attack;
+		// returnValue["Defend"] = Defend;
+		returnResult(dataReturn);
+	})));
+	
+}
+
 
 function updateBaseDefend (dbDefend,data) {	
 	var stringUpdate = "UPDATE `"+data.ID_User+"` SET `Quality`=`Quality`-'"+data.Quality+"' WHERE `ID_Unit`= '"+data.ID_Unit+"' AND `BaseNumber`='"+data.BaseNumber+"'"
@@ -89,11 +138,16 @@ function checkPosition (data,Cellposition,resultCheck) {
 function insertPosition (data,Cellposition) {
 	// console.log(data);
 	// console.log(Cellposition);
-	var stringInsert = "INSERT INTO `s1_unit`(`ID_Unit`, `ID_User`, `BaseNumber`, `Quality`, `Position_Cell`) VALUES ('"
+	var stringInsert = "INSERT INTO `s1_unit`(`ID_Unit`, `Level`, `ID_User`, `BaseNumber`, `Quality`,`Hea_cur`,`Health`,`Attack`,`Defend`, `Position_Cell`) VALUES ('"
 	+data.ID_Unit+"','"
+	+data.Level+"','"
 	+data.ID_User+"','"
 	+data.BaseNumber+"','"
 	+data.Quality+"','"
+	+data.Hea_cur+"','"
+	+data.Health+"','"
+	+data.Attack+"','"
+	+data.Defend+"','"
 	+Cellposition
 	+"');"
 	//console.log(stringInsert);

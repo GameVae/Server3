@@ -74,7 +74,6 @@ function S_TRAINING (data) {
 		DictTimeOut[stringTimeOut] = setTimeout(function (dataTraining) {
 			setTimeUpdate (dataTraining);
 		},trainingTimeOut , dataTraining);
-
 	})));
 }
 

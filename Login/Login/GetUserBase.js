@@ -12,7 +12,7 @@ var db_s2_upgrade			= require('./../../Util/Database/Db_s2_base_upgrade.js');
 
 var functions 				= require('./../../Util/Functions.js');
 
-var Promise 				= require('promise');
+// var Promise 				= require('promise');
 var dbInfo,dbUpgrade,dbDefend;
 
 var playerData ={};

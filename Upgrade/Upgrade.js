@@ -7,8 +7,10 @@ var db_s2_base_info			= require('./../Util/Database/Db_s2_base_info.js');
 var db_s2_upgrade			= require('./../Util/Database/Db_s2_base_upgrade.js');
 
 var db_all_user				= require('./../Util/Database/Db_all_user.js');
+var db_positon 				= require('./../Util/Database/Db_position.js');
 var db_upgrade_database		= require('./../Util/Database/Db_upgrade_database.js');
 
+var upgrade_Redis 			= require ('./Upgrade_Redis.js')
 
 var functions 				= require('./../Util/Functions.js');
 
@@ -191,6 +193,7 @@ function setTimerUpdateDatabase (timeOut,data) {
 				}
 
 				checkUnlock (dbUpgrade,data);
+				
 
 				stringUpdateBaseUpgrade ="UPDATE `"+data.ID_User+"_"+data.BaseNumber+"` SET `Level`=`Level`+1 WHERE `ID` = "+ data.ID_Upgrade;
 				//console.log('stringUpdateBaseUpgrade '+stringUpdateBaseUpgrade);
@@ -237,15 +240,52 @@ function checkUnlock (dbUpgrade,data) {
 		db_upgrade_database.query(tableQuery,function(error,rows_tableQuery){
 			if (!!error){DetailError = ('Upgrade.js: query tableQuery : '+ tableQuery); functions.WriteLogError(DetailError,2);}
 			
-			if (rows_tableQuery[0].Unlock_ID!=0) { returnUnlockID=rows_tableQuery[0].Unlock_ID;
-				
+			if (rows_tableQuery[0].Unlock_ID!=0) { 
+				returnUnlockID=rows_tableQuery[0].Unlock_ID;				
 				var stringUpgrade = "UPDATE `"+data.ID_User+"_"+data.BaseNumber+"` SET `Level`= 1 WHERE `ID`= "+returnUnlockID;
-				dbUpgrade.query(stringUpgrade,function (error,result) {
-					
+				dbUpgrade.query(stringUpgrade,function (error,result) {					
 					if (!!error){DetailError = ('Upgrade.js: query checkUnlock upgrade: '+ stringUpgrade); functions.WriteLogError(DetailError,2);}
 					LogChange='Upgrade.js: checkUnlock upgrade: '+stringUpgrade;functions.LogChange(LogChange,2);	
 				});
 			}
+
+			checkUnitInMap (data,levelUpgrade,rows_tableQuery[0]);
 		});
+	});
+}
+
+function checkUnitInMap (data,levelUpgrade,rows_tableQuery) {
+	if (data.ID_Upgrade<35&&data.ID_Upgrade>14) {
+		var dataUnitUpgrade ={};
+		dataUnitUpgrade.Health = rows_tableQuery.Health;
+		dataUnitUpgrade.Attack = rows_tableQuery.Attack;
+		dataUnitUpgrade.Defend = rows_tableQuery.Defend;
+		
+		var stringQueryUnit = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID_User`='"+data.ID_User+"' AND `BaseNumber`='"+data.BaseNumber+"' AND `ID_Unit` ='"+data.ID_Upgrade+"'"
+		db_positon.query(stringQueryUnit,function (error,rows) {
+			if (!!error){DetailError = ('Upgrade.js: query checkUnitInMap : '+ stringQueryUnit); functions.WriteLogError(DetailError,2);}
+			if (rows.length>0) {
+				updateUnitInMap (data,levelUpgrade,dataUnitUpgrade);
+
+				for (var i = 0; i < rows.length; i++) {
+					upgrade_Redis.UpdateRedis_UnitInMap(data,levelUpgrade,dataUnitUpgrade,rows[i].ID)
+				}
+			}
+		});
+	}
+}
+
+
+function updateUnitInMap (data,levelUpgrade,dataUnitUpgrade) {
+	var stringUpdate = "UPDATE `s1_unit` SET `Level`= '"+levelUpgrade
+	+"', `Health`= '"+dataUnitUpgrade.Health
+	+"',`Attack`= '"+dataUnitUpgrade.Attack
+	+"',`Defend`='"+dataUnitUpgrade.Defend
+	+"' WHERE `ID_Unit` ='"+data.ID_Upgrade
+	+"' AND `ID_User`='"+data.ID_User
+	+"' AND `BaseNumber`='"+data.BaseNumber+"';"
+	db_positon.query(stringUpdate,function (error,result) {
+		if (!!error){DetailError = ('Upgrade.js: updateUnitInMap : '+ stringUpdate); functions.WriteLogError(DetailError,2);}
+		LogChange='Upgrade.js: updateUnitInMap: '+stringUpdate;functions.LogChange(LogChange,2);
 	});
 }
