@@ -33,7 +33,7 @@ var dataDeploy={
 };
 
 
-S_DEPLOY (dataDeploy)
+//S_DEPLOY (dataDeploy)
 function S_DEPLOY (data) {
 	switch (parseInt(data.Server_ID)) {
 		case 1:
@@ -108,11 +108,6 @@ function getUnitLevel (data,dbUpgrade,returnResult) {
 			resolve();
 		});
 	}).then(()=>{
-		// returnValue["Level"] = level;
-		// returnValue["Hea_cur"] = Hea_cur;
-		// returnValue["Health"] = Health;
-		// returnValue["Attack"] = Attack;
-		// returnValue["Defend"] = Defend;
 		returnResult(dataReturn);
 	})));
 	

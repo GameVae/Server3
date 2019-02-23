@@ -18,6 +18,7 @@ exports.GetUnitData = function getUnitData (clientRedis,serverInt) {
 
 //getUnitInfo ('clientRedis',1);
 function getUnitInfo (clientRedis,serverInt) {
+	deleteHashKey (clientRedis,serverInt);
 	var stringUnit = "SELECT * FROM `s"+serverInt+"_unit`"
 	db_position.query(stringUnit,function (error,rows) {
 		for (var i = 0; i < rows.length; i++) {
@@ -28,7 +29,10 @@ function getUnitInfo (clientRedis,serverInt) {
 		}	
 	});
 }
-
+function deleteHashKey (clientRedis,server_ID) {
+	var stringHkey = "s"+server_ID+"_unit";
+	clientRedis.del(stringHkey);
+}
 /*
 Update Redis: parse String to Json => Update value => parse to Json 
 */

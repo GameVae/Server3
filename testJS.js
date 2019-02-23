@@ -800,7 +800,7 @@
 // 	// 	console.log('timeOut2');
 // 	// 	console.log(timeOut);
 // 	// });
-	
+
 
 // }
 
@@ -840,23 +840,23 @@
 // 	console.log(error)
 // })
 
-var db_all_user			= require('./Util/Database/Db_all_user.js');
+// var db_all_user			= require('./Util/Database/Db_all_user.js');
 
-var dataInfo={};
-r_base_info()
+// var dataInfo={};
+// r_base_info()
 
-function r_base_info () {
-	var stringQuery = "SELECT * FROM `game_info_s1`";
-	db_all_user.query(stringQuery, function (error,rows) {
+// function r_base_info () {
+// 	var stringQuery = "SELECT * FROM `game_info_s1`";
+// 	db_all_user.query(stringQuery, function (error,rows) {
 	
-		
-		for (var i = 0; i < rows.length; i++) {
-			dataInfo[rows[i].ID]=rows[i];
-			delete dataInfo[rows[i].ID].ID;	
-		}
-		console.log(dataInfo);
-	});
-}
+
+// 		for (var i = 0; i < rows.length; i++) {
+// 			dataInfo[rows[i].ID]=rows[i];
+// 			delete dataInfo[rows[i].ID].ID;	
+// 		}
+// 		console.log(dataInfo);
+// 	});
+// }
 
 
 
@@ -882,3 +882,38 @@ function r_base_info () {
 // 	}).then(()=>{
 // 		console.log(playerData);
 // 	});
+'use strict';
+var thisTestT={};
+// thisTestT['a'] = 5;
+
+var functions = require('./Util/Functions.js');
+var i = 0;
+
+thisTest(2000);
+cleartInter ('a')
+// // thisInter();
+// var thistTestT={};
+
+
+function thisTest (paraTime) {	
+	thisTestT['a'] = setInterval(function () {
+		var time = functions.GetTime();
+		i++;
+		console.log(i+"_1_"+time);	
+	}, paraTime);
+
+	// thisTestT['b'] = setInterval(function () {
+	// 	var time = functions.GetTime();
+	// 	i++;
+	// 	console.log(i+"_2_"+time);	
+	// 	if (i>5) {
+	// 		clearInterval(thisTestT['a'])
+	// 	}
+	// }, paraTime);
+}
+
+function cleartInter (para) {
+	setTimeout(function (para) {
+		clearInterval(thisTestT[para])
+	}, 7000, para)	
+}

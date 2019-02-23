@@ -1,5 +1,6 @@
 var armyData 		= require("./Redis/Data/ArmyData.js");
 var unitData 		= require("./Redis/Unit/Unit.js");
+var positionData 	= require("./Redis/Position/Position.js");
 
 var redis = require("redis"),
 client = redis.createClient();
@@ -21,17 +22,18 @@ client.on("error", function (err) {
 //armyData.SetLevelData(client,dataTest.dataTraining);//chỉ cần chạy 1 lần để lấy dữ liệu
 //armyData.GetLevelData(client,dataTest.dataTraining);
 //armyData.SetHLvData(client,dataTest.dataTraining);
-// unitData.GetUnitData(client,1)
+unitData.GetUnitData(client,1)
 //unitData.UpdateData(client)
+positionData.GetPosition(1);
 
-var dataUnit ={
-	Server_ID: 	1,
-	ID: 		4,
-	ID_Unit: 	16,
-	ID_User: 	9
-}
+// var dataUnit ={
+// 	Server_ID: 	1,
+// 	ID: 		4,
+// 	ID_Unit: 	16,
+// 	ID_User: 	9
+// }
 // unitData.GetUnitValue(client,dataUnit)
-unitData.GetAvgUnit(client);
+//unitData.GetAvgUnit(client);
 
 
 

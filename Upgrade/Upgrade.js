@@ -261,7 +261,7 @@ function checkUnitInMap (data,levelUpgrade,rows_tableQuery) {
 		dataUnitUpgrade.Attack = rows_tableQuery.Attack;
 		dataUnitUpgrade.Defend = rows_tableQuery.Defend;
 		
-		var stringQueryUnit = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID_User`='"+data.ID_User+"' AND `BaseNumber`='"+data.BaseNumber+"' AND `ID_Unit` ='"+data.ID_Upgrade+"'"
+		var stringQueryUnit = "SELECT * FROM `s"+data.ID_Server+"_unit` WHERE `ID_User`='"+data.ID_User+"' AND `BaseNumber`='"+data.BaseNumber+"' AND `ID_Unit` ='"+data.ID_Upgrade+"'"
 		db_positon.query(stringQueryUnit,function (error,rows) {
 			if (!!error){DetailError = ('Upgrade.js: query checkUnitInMap : '+ stringQueryUnit); functions.WriteLogError(DetailError,2);}
 			if (rows.length>0) {

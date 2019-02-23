@@ -43,13 +43,11 @@ function S_LOGIN (socket,data) {
 					var databaseTime = functions.ExportTimeDatabase(rows[0].BlockedTime) - functions.GetTime()
 					socket.emit('R_BLOCKED',{BlockedForever:0,Time: databaseTime});
 					updateSetBlockTime (blockTime,socket,data);
-				}
-				
+				}				
 			}else{
 				if (rows[0].Password==data.Password&&rows[0].UserName==data.UserName) {
 					R_USER_INFO (socket,rows[0].ID_User,rows[0].Server_ID);
-					socket.emit('R_LOGIN',{LoginBool:1});
-					
+					socket.emit('R_LOGIN',{LoginBool:1});					
 				}
 				else{					
 					socket.emit('R_LOGIN',{LoginBool:0});
@@ -75,6 +73,7 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 
 		db_all_user.query(queryServer,function (error,rowsServer) {
 			if (!!error){DetailError = ('Login.js: R_USER_INFO queryUser :'+ queryServer); functions.WriteLogError(DetailError,1);}
+			
 			dataUser.Server_ID = rowsServer[0].Server_ID;
 			dataUser.Diamond = rowsServer[0].Diamond;
 			dataUser.ResetVipTime = rowsServer[0].ResetVipTime;
@@ -84,11 +83,11 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 			getUserBase.R_BASE_UPGRADE(socket,dataUser.ID_User,dataUser.Server_ID);
 			// getGuild.R_USER_GUILD(socket,dataUser.ID_User,dataUser.Server_ID);
 
-			getUserBase.R_BASE_PLAYER(socket,rows[0].ID_User,rows[0].Server_ID);
-			getUserBase.R_PLAYER_INFO(socket,rows[0].ID_User,rows[0].Server_ID);
+			getUserBase.R_BASE_PLAYER(socket,rows[0].ID_User,rowsServer[0].Server_ID);
+			getUserBase.R_PLAYER_INFO(socket,rows[0].ID_User,rowsServer[0].Server_ID);
 
 
-			getUnit.R_UNIT(socket,rows[0].Server_ID);
+			getUnit.R_UNIT(socket,rows[0].ID_User,rowsServer[0].Server_ID);
 
 			getRss.R_GET_RSS(socket,dataUser.Server_ID);
 			getPosition.R_GET_POSITION(socket,dataUser.Server_ID);
