@@ -43,8 +43,7 @@ exports.UpdateData = function updateData (clientRedis) {
 		result.Quality = 12;
 		console.log(result.Quality)
 		clientRedis.set(keyUpdate,JSON.stringify(result));
-	})
-	
+	})	
 }
 
 exports.GetUnitValue = function getUnitValue (clientRedis,data) {	

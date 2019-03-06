@@ -33,8 +33,18 @@ var dataDeploy={
 };
 
 
-//S_DEPLOY (dataDeploy)
-function S_DEPLOY (data) {
+
+exports.Start =  function start (io) {
+	io.on('connection', function(socket){
+		socket.on('S_DEPLOY', function (data){
+			//console.log('socketID: '+socket.id);
+			S_DEPLOY (socket,data);
+		});
+	});
+}
+
+// S_DEPLOY (dataDeploy)
+function S_DEPLOY (socket,data) {
 	switch (parseInt(data.Server_ID)) {
 		case 1:
 		dbDefend = db_s1_base_defend;
@@ -49,7 +59,7 @@ function S_DEPLOY (data) {
 	checkUnitAvailable (dbDefend,data,function (checkBool) {
 		//console.log(checkBool)
 		if (checkBool) {
-			sendUnitToMap (dbDefend,dbUpgrade,data);
+			sendUnitToMap (socket,dbDefend,dbUpgrade,data);
 		}else{
 			DetailError = ('Deploy.js: checkUnitAvailable_ID_User: '+ data.ID_User
 				+"_Quality:_"+data.Quality
@@ -59,7 +69,7 @@ function S_DEPLOY (data) {
 	});
 }
 
-function sendUnitToMap (dbDefend,dbUpgrade,data) {
+function sendUnitToMap (socket,dbDefend,dbUpgrade,data) {
 	getBasePosition (data,function (resultPostion) {	
 		checkPosition (data,resultPostion,function (checkBool) {
 			if (checkBool) {
@@ -69,8 +79,8 @@ function sendUnitToMap (dbDefend,dbUpgrade,data) {
 					data["Health"]= returnValue.Health;
 					data["Attack"]= returnValue.Attack;
 					data["Defend"]= returnValue.Defend;
-					insertPosition (data,resultPostion);
-					updateBaseDefend (dbDefend,data);
+					insertPosition (socket,data,resultPostion);
+					updateBaseDefend (dbDefend,data);					
 				});	
 			}else {
 				console.log("error send Unit => reload data");
@@ -109,7 +119,8 @@ function getUnitLevel (data,dbUpgrade,returnResult) {
 		});
 	}).then(()=>{
 		returnResult(dataReturn);
-	})));
+	})
+	));
 	
 }
 
@@ -130,7 +141,7 @@ function checkPosition (data,Cellposition,resultCheck) {
 		resultCheck(returnBool);
 	});
 }
-function insertPosition (data,Cellposition) {
+function insertPosition (socket,data,Cellposition) {
 	// console.log(data);
 	// console.log(Cellposition);
 	var stringInsert = "INSERT INTO `s1_unit`(`ID_Unit`, `Level`, `ID_User`, `BaseNumber`, `Quality`,`Hea_cur`,`Health`,`Attack`,`Defend`, `Position_Cell`) VALUES ('"
@@ -147,7 +158,29 @@ function insertPosition (data,Cellposition) {
 	+"');"
 	//console.log(stringInsert);
 	db_position.query(stringInsert,function (error,result) {
-		if (!!error) {console.log(error)}
+		if (!!error) {console.log(error);}
+		// console.log(result);
+		var dataDeploy = {
+			ID : result.insertId,
+			ID_Unit : data.ID_Unit,
+			Level : data.Level,
+			ID_User : data.ID_User,
+			BaseNumber : data.BaseNumber,
+			Quality : data.Quality,
+			Health : data.Health,
+			Hea_cur : data.Hea_cur,
+			Position_Cell : Cellposition,
+			Next_Cell : null,
+			End_Cell : null,
+			TimeMoveNextCell : null,
+			TimeFinishMove : null,
+			ListMove : null,
+			Status : 0,
+			Attack_Base_ID : null,
+			Attack_Unit_ID : null,
+			AttackedBool : 0,
+		}
+		socket.emit("R_DEPLOY",{R_DEPLOY: dataDeploy});
 	});
 }
 
@@ -157,7 +190,6 @@ function getBasePosition (data, returnResult) {
 		if (!!error) {console.log(error);}
 		else{returnResult(rows[0].Position_Cell)}
 	});
-
 }
 
 function checkUnitAvailable (dbDefend,data,checkBool) {
@@ -169,4 +201,3 @@ function checkUnitAvailable (dbDefend,data,checkBool) {
 		checkBool(returnBool);
 	});
 }
-

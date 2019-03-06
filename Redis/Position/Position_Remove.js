@@ -16,21 +16,21 @@ var redis = require('redis');
 var client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-exports.GetPosition = function getPosition (server_ID){
-	getPosition_test (server_ID);
-}
+// exports.GetPosition = function getPosition (server_ID){
+// 	getPosition_test (server_ID);
+// }
 
-function getPosition_test (server_ID) {
-	//deleteHashKey (server_ID);
-	var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"'";
-	//console.log(stringQuery)
-	db_position.query(stringQuery,function (error,rows) {
-		/*lấy vị trí => lấy theo ID_Unit tính range*/
-		for (var i = 0; i < rows.length; i++) {
-			getRangeUnit (rows[i],server_ID);
-		}
-	});
-}
+// function getPosition_test (server_ID) {
+// 	//deleteHashKey (server_ID);
+// 	var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"'";
+// 	//console.log(stringQuery)
+// 	db_position.query(stringQuery,function (error,rows) {
+// 		/*lấy vị trí => lấy theo ID_Unit tính range*/
+// 		for (var i = 0; i < rows.length; i++) {
+// 			getRangeUnit (rows[i],server_ID);
+// 		}
+// 	});
+// }
 
 function deleteHashKey (server_ID) {
 	var stringHkey = "s"+server_ID+"_pos";
@@ -39,32 +39,26 @@ function deleteHashKey (server_ID) {
 	});
 }
 
-function getRangeUnit (row,server_ID) {
-	if (row.ID_Unit>15&&row.ID_Unit<20) {unitRange1 (row,server_ID);}
-	if (row.ID_Unit>20&&row.ID_Unit<25) {unitRange2 (row,server_ID);}
-	if (row.ID_Unit>25&&row.ID_Unit<30) {unitRange1 (row,server_ID);}
-	if (row.ID_Unit>30&&row.ID_Unit<35) {unitRange3 (row,server_ID);}
+function getRangeUnit (data) {
+	if (data.ID_Unit>15&&data.ID_Unit<20) {unitRange1 (data);}
+	if (data.ID_Unit>20&&data.ID_Unit<25) {unitRange2 (data);}
+	if (data.ID_Unit>25&&data.ID_Unit<30) {unitRange1 (data);}
+	if (data.ID_Unit>30&&data.ID_Unit<35) {unitRange3 (data);}
 }
 
-function unitRange1 (row,server_ID) {
+function unitRange1 (data) {
 	var posCenter = row.Position_Cell;;
 	var posX = parseInt(posCenter.split(",")[0]);
 	var posY = parseInt(posCenter.split(",")[1]);
 
-	var stringHkey = "s"+server_ID+"_pos";
+	var stringHkey = "s"+data.server_ID+"_pos";
 	var stringKey=[];
-	var ID_Key = server_ID+"_"+row.ID_Unit+"_"+row.ID_User+"_"+row.ID;
+	var ID_Key = data.server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	
-	stringKey[0] = row.Position_Cell;
+	stringKey[0] = data.Position_Cell;
 	
 	if (posY%2==0) {
 		//even
-		// new Vector3Int(-1, 0, 0),
-		// new Vector3Int(-1,-1, 0),
-		// new Vector3Int(-1, 1, 0),
-		// new Vector3Int( 0, 1, 0),
-		// new Vector3Int( 0,-1, 0),
-		// new Vector3Int( 1, 0, 0),
 		stringKey[1] = (posX-1) +","+posY+",0";
 		stringKey[2] = (posX-1) +","+(posY-1)+",0";
 		stringKey[3] = (posX-1) +","+(posY+1)+",0";
@@ -73,12 +67,6 @@ function unitRange1 (row,server_ID) {
 		stringKey[6] = (posX-1) +","+(posY)+",0";
 	}else{
 		//odd
-		// new Vector3Int(-1, 0, 0),
-		// new Vector3Int( 0,-1, 0),
-		// new Vector3Int( 0, 1, 0),
-		// new Vector3Int( 1,-1, 0),
-		// new Vector3Int( 1, 1, 0),
-		// new Vector3Int( 1, 0, 0),
 		stringKey[1] = (posX-1)+","+(posY)+",0";
 		stringKey[2] = (posX)+","+(posY-1)+",0";
 		stringKey[3] = (posX)+","+(posY+1)+",0";
@@ -92,39 +80,25 @@ function unitRange1 (row,server_ID) {
 	}
 }
 
-getPosition_test (1)
-//checkValue ("s1_pos","488,81,0","1_16_9_10")
-
 function checkValue (stringHkey,stringKey,ID_Key) {
 	client.hexists(stringHkey,stringKey,function (error,resultBool) {
 		if (resultBool==1) {
 			client.hget(stringHkey,stringKey,function (error,rows) {
 				var result = rows.split("/");
-				if (!result.includes(ID_Key)) {
-					addValue (stringHkey,stringKey,rows,ID_Key);
+				if (result.includes(ID_Key)) {
+					removeValue (stringHkey,stringKey,rows,ID_Key);
 				}
 			});
-		}else{
-			addValue (stringHkey,stringKey,"",ID_Key);
 		}
 	});
 }
 
-function addValue (stringHkey,stringKey,data,ID_Key) {
-	client.hset(stringHkey,stringKey,data+ID_Key+"/");
-}
-
-function removeValue (stringHkey,stringKey,ID_Key) {
-	client.hget(stringHkey,stringKey,function (error,rows) {
-		var result = rows.split("/");
-		if (result.includes(ID_Key)) {
-			var stringReplace = rows.replace(ID_Key+"/","");
-			client.hset(stringHkey,stringKey,stringReplace);
-			if (stringReplace.length==0) {
-				client.hdel(stringHkey,stringKey);
-			}
-		}
-	});
+function removeValue (stringHkey,stringKey,rows,ID_Key) {
+	var stringReplace = rows.replace(ID_Key+"/","");
+	client.hset(stringHkey,stringKey,stringReplace);
+	if (stringReplace.length==0) {
+		client.hdel(stringHkey,stringKey);
+	}
 }
 
 function unitRange2 (row,server_ID) {
@@ -140,18 +114,6 @@ function unitRange2 (row,server_ID) {
 
 	if (posY%2==0) {
 		//even
-		// new Vector3Int(-2, 0, 0),
-		// new Vector3Int(-2,-1, 0),
-		// new Vector3Int(-2, 1, 0),
-		// new Vector3Int(-1,-2, 0),
-		// new Vector3Int(-1, 2, 0),
-		// new Vector3Int( 0,-2, 0),
-		// new Vector3Int( 0, 2, 0),
-		// new Vector3Int( 1, 2, 0),
-		// new Vector3Int( 1,-2, 0),
-		// new Vector3Int( 1,-1, 0),
-		// new Vector3Int( 1, 1, 0),
-		// new Vector3Int( 2, 0, 0),
 		stringKey[1] = (posX-1) +","+posY+",0";
 		stringKey[2] = (posX-1) +","+(posY-1)+",0";
 		stringKey[3] = (posX-1) +","+(posY+1)+",0";
@@ -173,19 +135,6 @@ function unitRange2 (row,server_ID) {
 		stringKey[18] = (posX+2)+","+(posY)+",0";
 
 	}else {
-		//odd
-		// new Vector3Int(-2, 0, 0),
-		// new Vector3Int(-1,-1, 0),
-		// new Vector3Int(-1, 1, 0),
-		// new Vector3Int(-1,-2, 0),
-		// new Vector3Int(-1, 2, 0),
-		// new Vector3Int( 0,-2, 0),
-		// new Vector3Int( 0, 2, 0),
-		// new Vector3Int( 1,-2, 0),
-		// new Vector3Int( 1, 2, 0),
-		// new Vector3Int( 2,-1, 0),
-		// new Vector3Int( 2, 1, 0),
-		// new Vector3Int( 2, 0, 0),
 		stringKey[1] = (posX-1)+","+(posY)+",0";
 		stringKey[2] = (posX)+","+(posY-1)+",0";
 		stringKey[3] = (posX)+","+(posY+1)+",0";
@@ -223,24 +172,6 @@ function unitRange3 (row,server_ID) {
 	
 	if (posY%2==0) {
 		//even
-		// new Vector3Int( -3, 0, 0),
-		// new Vector3Int( -3, 1, 0),
-		// new Vector3Int( -3,-1, 0),
-		// new Vector3Int( -2, 2, 0),
-		// new Vector3Int( -2,-2, 0),
-		// new Vector3Int( -2, 3, 0),
-		// new Vector3Int( -2,-3, 0),
-		// new Vector3Int( -1, 3, 0),
-		// new Vector3Int( -1,-3, 0),
-		// new Vector3Int(  0, 3, 0),
-		// new Vector3Int(  0,-3, 0),
-		// new Vector3Int(  1, 3, 0),
-		// new Vector3Int(  1,-3, 0),
-		// new Vector3Int(  2, 2, 0),
-		// new Vector3Int(  2,-2, 0),
-		// new Vector3Int(  2, 1, 0),
-		// new Vector3Int(  2,-1, 0),
-		// new Vector3Int(  3, 0, 0),
 		stringKey[0] = (posX-2)+","+(posY)+",0";
 		stringKey[1] = (posX-2)+","+(posY-1)+",0";
 		stringKey[2] = (posX-2)+","+(posY+1)+",0";
@@ -274,24 +205,6 @@ function unitRange3 (row,server_ID) {
 		stringKey[29] = (posX+3)+","+(posY)+",0";
 	}else {
 		//odd
-		// new Vector3Int( -3, 0, 0),
-		// new Vector3Int( -2, 1, 0),
-		// new Vector3Int( -2,-1, 0),
-		// new Vector3Int( -2, 2, 0),
-		// new Vector3Int( -2,-2, 0),
-		// new Vector3Int( -1, 3, 0),
-		// new Vector3Int( -1,-3, 0),
-		// new Vector3Int(  0, 3, 0),
-		// new Vector3Int(  0,-3, 0),
-		// new Vector3Int(  1, 3, 0),
-		// new Vector3Int(  1,-3, 0),
-		// new Vector3Int(  2, 3, 0),
-		// new Vector3Int(  2,-3, 0),
-		// new Vector3Int(  2, 2, 0),
-		// new Vector3Int(  2,-2, 0),
-		// new Vector3Int(  3, 1, 0),
-		// new Vector3Int(  3,-1, 0),
-		// new Vector3Int(  3, 0, 0),
 		stringKey[0] = (posX-2)+","+(posY)+",0";
 		stringKey[1] = (posX-1)+","+(posY-1)+",0";
 		stringKey[2] = (posX-1)+","+(posY+1)+",0";

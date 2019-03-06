@@ -2,6 +2,8 @@ var armyData 		= require("./Redis/Data/ArmyData.js");
 var unitData 		= require("./Redis/Unit/Unit.js");
 var positionData 	= require("./Redis/Position/Position.js");
 
+var Promise 		= require('promise');
+
 var redis = require("redis"),
 client = redis.createClient();
 
@@ -24,7 +26,19 @@ client.on("error", function (err) {
 //armyData.SetHLvData(client,dataTest.dataTraining);
 unitData.GetUnitData(client,1)
 //unitData.UpdateData(client)
-positionData.GetPosition(1);
+
+getRedisData (1);
+
+function getRedisData (server_ID) {
+	new Promise((resolve,reject)=>{
+		positionData.GetPosition(server_ID);
+		resolve();
+	}).then(()=>{
+		console.log('finish get postion');
+	})
+}
+
+
 
 // var dataUnit ={
 // 	Server_ID: 	1,

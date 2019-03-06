@@ -882,38 +882,51 @@
 // 	}).then(()=>{
 // 		console.log(playerData);
 // 	});
-'use strict';
-var thisTestT={};
-// thisTestT['a'] = 5;
+// 'use strict';
+// var thisTestT={};
+// // thisTestT['a'] = 5;
 
-var functions = require('./Util/Functions.js');
-var i = 0;
+// var functions = require('./Util/Functions.js');
+// var i = 0;
 
-thisTest(2000);
-cleartInter ('a')
-// // thisInter();
-// var thistTestT={};
+// thisTest(2000);
+// cleartInter ('a')
+// // // thisInter();
+// // var thistTestT={};
 
 
-function thisTest (paraTime) {	
-	thisTestT['a'] = setInterval(function () {
-		var time = functions.GetTime();
-		i++;
-		console.log(i+"_1_"+time);	
-	}, paraTime);
+// function thisTest (paraTime) {	
+// 	thisTestT['a'] = setInterval(function () {
+// 		var time = functions.GetTime();
+// 		i++;
+// 		console.log(i+"_1_"+time);	
+// 	}, paraTime);
 
-	// thisTestT['b'] = setInterval(function () {
-	// 	var time = functions.GetTime();
-	// 	i++;
-	// 	console.log(i+"_2_"+time);	
-	// 	if (i>5) {
-	// 		clearInterval(thisTestT['a'])
-	// 	}
-	// }, paraTime);
-}
+// 	// thisTestT['b'] = setInterval(function () {
+// 	// 	var time = functions.GetTime();
+// 	// 	i++;
+// 	// 	console.log(i+"_2_"+time);	
+// 	// 	if (i>5) {
+// 	// 		clearInterval(thisTestT['a'])
+// 	// 	}
+// 	// }, paraTime);
+// }
 
-function cleartInter (para) {
-	setTimeout(function (para) {
-		clearInterval(thisTestT[para])
-	}, 7000, para)	
+// function cleartInter (para) {
+// 	setTimeout(function (para) {
+// 		clearInterval(thisTestT[para])
+// 	}, 7000, para)	
+// }
+
+
+var testFunc = require('./Test/Test.js');
+testFunc.Inter1("stringPara");
+testFunc.Inter2("stringPara");
+
+test ("stringPara",2);
+
+function test (stringPara,caseNumber) {
+	setTimeout(function (stringPara,caseNumber) {
+		testFunc.ClearInterval("stringPara",caseNumber)
+	}, 5000, stringPara,caseNumber)
 }

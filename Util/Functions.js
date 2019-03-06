@@ -2,6 +2,35 @@
 const   fs          = require('fs');
 var path 			= require('path');
 
+exports.UnitStatus = {
+	Base: 			0,
+	Move: 			1,
+	Attack_Unit: 	2,
+	Attack_Base: 	3,
+	Attacked: 		4,
+	Gathering: 		5,
+	Standby: 		6,
+}
+
+exports.RedisData ={
+	Data0 : 0,
+	Data1 : 1,
+	TestUnit : 2,
+}
+
+var Vectorcity = 2;
+var StraightLine = 2*1400;
+var DiagonalLine = 2*1262;
+// var StraightTime = 1400;
+// var DiagonalTime = 1262;
+var StraightTime = StraightLine / Vectorcity;
+var DiagonalTime = DiagonalLine / Vectorcity;
+
+exports.TimeMove ={
+	Straight : StraightTime,
+	Diagonal : DiagonalTime,
+}
+
 exports.WriteLogError = function(detailError,intLocationFile){
 	console.log(getTimeNow()+": Error "+detailError);
 	fs.appendFile(getStringErrorFile (intLocationFile), "\r\n "+ getTimeNow() +": "+detailError, (err) => {
@@ -56,7 +85,6 @@ function getStringErrorFile (intLocationFile) {
 		break;
 	}
 	
-
 	var caseHour = parseInt((new Date().getHours()-1)/8);
 	var stringHour;
 	switch (caseHour) {

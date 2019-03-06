@@ -50,6 +50,8 @@ var guild 					= require('./Guild/GetGuild.js');
 
 var sendUnit				= require('./Unit/Deploy.js');
 
+var moveUnit 				= require('./Unit/Moving.js');
+
 var guild_UpdateDatabase 	= require('./Guild/Guild_UpdateDatabase.js');
 guild_UpdateDatabase.UpdateDatabase(); 
 
@@ -67,7 +69,8 @@ if (app.get('port') === process.env.PORT)
 	friend.Start(io);
 	info.Start(io);
 	sendUnit.Start(io);
-
+	moveUnit.Start(io);
+	
 }
 
 function checkConnect (connectCounter,io) {
