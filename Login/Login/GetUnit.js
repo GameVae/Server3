@@ -20,17 +20,17 @@ exports.R_UNIT = function r_unit (socket,ID_User,Server_ID) {
 				rows[i]["TimeFinishMove"] = (new Date(functions.ExportTimeDatabase(rows[i].TimeFinishMove))-currentTime)*0.001;
 			}
 			if (rows[i].ListMove!=null) {
-				for (var j = 0; j < rows[i].ListMove.length; j++) {
-					if (rows[i].ListMove[j].length>0) {
-						rows[i].ListMove[j].TimeMoveNextCell = (new Date(functions.ExportTimeDatabase(rows[i].ListMove[j].TimeMoveNextCell))-currentTime)*0.001;
+				var ListMoveJson = JSON.parse(rows[i].ListMove)
+				for (var j = 0; j < ListMoveJson.length; j++) {
+					if (ListMoveJson.length>0) {
+						ListMoveJson.TimeMoveNextCell = (new Date(functions.ExportTimeDatabase(ListMoveJson[j].TimeMoveNextCell))-currentTime)*0.001;
 					}				
 				}
 			}
-			
 			delete rows[i].Attack;
 			delete rows[i].Defend;
 		}
-		dataUnit = rows;
+		dataUnit = rows;		
 		socket.emit('R_UNIT',{R_UNIT:dataUnit});
 	});
 }

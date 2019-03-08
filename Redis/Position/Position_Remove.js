@@ -9,28 +9,12 @@
 var db_position				= require('./../../Util/Database/Db_position.js');
 // var db_all_user				= require('./../../Util/Database/Db_all_user.js');
 
-// var functions 				= require('./../../Util/Functions.js');
+var functions 				= require('./../../Util/Functions.js');
 var Promise 				= require('promise');
 
 var redis = require('redis');
 var client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
-
-// exports.GetPosition = function getPosition (server_ID){
-// 	getPosition_test (server_ID);
-// }
-
-// function getPosition_test (server_ID) {
-// 	//deleteHashKey (server_ID);
-// 	var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"'";
-// 	//console.log(stringQuery)
-// 	db_position.query(stringQuery,function (error,rows) {
-// 		/*lấy vị trí => lấy theo ID_Unit tính range*/
-// 		for (var i = 0; i < rows.length; i++) {
-// 			getRangeUnit (rows[i],server_ID);
-// 		}
-// 	});
-// }
 
 function deleteHashKey (server_ID) {
 	var stringHkey = "s"+server_ID+"_pos";
@@ -39,7 +23,7 @@ function deleteHashKey (server_ID) {
 	});
 }
 
-function getRangeUnit (data) {
+exports.PostionRemove = function postionRemove (data) {
 	if (data.ID_Unit>15&&data.ID_Unit<20) {unitRange1 (data);}
 	if (data.ID_Unit>20&&data.ID_Unit<25) {unitRange2 (data);}
 	if (data.ID_Unit>25&&data.ID_Unit<30) {unitRange1 (data);}
@@ -47,14 +31,14 @@ function getRangeUnit (data) {
 }
 
 function unitRange1 (data) {
-	var posCenter = row.Position_Cell;;
+	var posCenter = data.Position_Cell;;
 	var posX = parseInt(posCenter.split(",")[0]);
 	var posY = parseInt(posCenter.split(",")[1]);
 
-	var stringHkey = "s"+data.server_ID+"_pos";
-	var stringKey=[];
-	var ID_Key = data.server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	
+	var stringHkey = "s"+data.Server_ID+"_pos";
+	var stringKey = [];
+	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	console.log(ID_Key)
 	stringKey[0] = data.Position_Cell;
 	
 	if (posY%2==0) {
@@ -101,16 +85,16 @@ function removeValue (stringHkey,stringKey,rows,ID_Key) {
 	}
 }
 
-function unitRange2 (row,server_ID) {
-	var posCenter = row.Position_Cell;;
+function unitRange2 (data) {
+	var posCenter = data.Position_Cell;
 	var posX = parseInt(posCenter.split(",")[0]);
 	var posY = parseInt(posCenter.split(",")[1]);
 
-	var stringHkey = "s"+server_ID+"_pos";
+	var stringHkey = "s"+data.Server_ID+"_pos";
 	var stringKey=[];
-	var ID_Key = server_ID+"_"+row.ID_Unit+"_"+row.ID_User+"_"+row.BaseNumber;
+	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.BaseNumber;
 	
-	stringKey[0] = row.Position_Cell;
+	stringKey[0] = data.Position_Cell;
 
 	if (posY%2==0) {
 		//even
@@ -161,14 +145,14 @@ function unitRange2 (row,server_ID) {
 	}
 }
 
-function unitRange3 (row,server_ID) {
-	var posCenter = row.Position_Cell;;
+function unitRange3 (data) {
+	var posCenter = data.Position_Cell;;
 	var posX = parseInt(posCenter.split(",")[0]);
 	var posY = parseInt(posCenter.split(",")[1]);
 
-	var stringHkey = "s"+server_ID+"_pos";
+	var stringHkey = "s"+data.Server_ID+"_pos";
 	var stringKey=[];
-	var ID_Key = server_ID+"_"+row.ID_Unit+"_"+row.ID_User+"_"+row.BaseNumber;
+	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.BaseNumber;
 	
 	if (posY%2==0) {
 		//even

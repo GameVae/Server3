@@ -1,0 +1,14 @@
+
+ logChangeDetail: 2019-03-07T10:28:26.610Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-07T10:28:27.453Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-07T10:28:27.455Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-07T10:28:27.459Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-07T10:28:41.128Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-03-07T10:28:41.135Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='wPce2k4h8cIabujpAAAA', `TimeLogIn`='2019-03-07T10:28:41.131', `TimeLogOut`= null WHERE `ID_User`='43'
+ logChangeDetail: 2019-03-07T10:28:49.445Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-07T10:28:49.442', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='wPce2k4h8cIabujpAAAA'
+ logChangeDetail: 2019-03-07T10:29:52.922Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-07T10:29:52.927Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='mON1z5nQRqCvBB7tAAAB', `TimeLogIn`='2019-03-07T10:29:52.923', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-07T10:30:19.480Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-03-07T10:30:19.485Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='OcYnNyU0YCA3FnlmAAAC', `TimeLogIn`='2019-03-07T10:30:19.480', `TimeLogOut`= null WHERE `ID_User`='43'
+ logChangeDetail: 2019-03-07T10:30:50.925Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-07T10:30:50.923', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='OcYnNyU0YCA3FnlmAAAC'
+ logChangeDetail: 2019-03-07T10:31:55.973Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-07T10:31:55.971', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='mON1z5nQRqCvBB7tAAAB'

@@ -1,13 +1,6 @@
 'use strict';
-// var db_s1_base_info			= require('./../../Util/Database/Db_s1_base_info.js');
-// var db_s1_base_defend		= require('./../../Util/Database/Db_s1_base_defend.js');
 
-// var db_s2_base_info			= require('./../../Util/Database/Db_s2_base_info.js');
-// var db_s2_base_defend		= require('./../../Util/Database/Db_s2_base_defend.js');
-
-// var db_training				= require('./../../Util/Database/Db_training.js');
 var db_position				= require('./../../Util/Database/Db_position.js');
-// var db_all_user				= require('./../../Util/Database/Db_all_user.js');
 
 // var functions 				= require('./../../Util/Functions.js');
 var Promise 				= require('promise');
@@ -92,7 +85,7 @@ function unitRange1 (row,server_ID) {
 	}
 }
 
-getPosition_test (1)
+//getPosition_test (1)
 //checkValue ("s1_pos","488,81,0","1_16_9_10")
 
 function checkValue (stringHkey,stringKey,ID_Key) {

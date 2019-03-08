@@ -35,20 +35,43 @@ var S_MOVE_data = { Server_ID: 1,
 	ID: 13,
 	ID_Unit: 16,
 	ID_User: 42,
-	Position_Cell: '11,12,0',
+	Position_Cell: '489,82,0',
 	Next_Cell: '10,11,0',
 	End_Cell: '10,9,0',
 	TimeMoveNextCell: '2019-03-06T03:33:19.686',
 	TimeFinishMove: '2019-03-05T01:25:22.210',
 	ListMove:[ { CurrentCell: '10,11,0',	NextCell: '10,10,0',TimeMoveNextCell: '2019-03-05T01:25:19.686' } ] };
-checkAttackUnit (S_MOVE_data,'11,12,0')
-function checkAttackUnit (data,stringPos) {
+//
+
+// checkPostionAttackUnit (S_MOVE_data,S_MOVE_data.Position_Cell)
+
+function checkPostionAttackUnit (data,stringPos) {
+	// console.log(data);
 	var stringHkey = "s"+data.Server_ID+"_pos";
+	client.hexists(stringHkey,stringPos,function (error,rows) {
+		if (rows==1) {
+			getListUnit (stringHkey,stringPos)
+		}
+		// console.log(rows);
+	});	
+}
+
+function getListUnit (data,stringHkey,stringPos) {
 	client.hget(stringHkey,stringPos,function (error,rows) {
-		console.log(rows)
+		var listUnit = rows.split("/").filter(String);
+		console.log(listUnit)
 	});
 }
 
+var listUnit = [ '1_16_9_11', '1_16_9_10' ]
+checkUnitAttack (listUnit)
+function checkUnitAttack (data,listUnitAttack) {
+	var ID_User_Attack=0;
+	for (var i = 0; i < listUnitAttack.length; i++) {
+		ID_User_Attack = listUnitAttack[i].split("_")[2];
+		console.log(ID_User_Attack)
+	}
+}
 //updateRedisAttackDatabase (1)
 function updateRedisAttackDatabase (server_ID) {
 	

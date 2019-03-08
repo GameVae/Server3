@@ -4,6 +4,7 @@ var db_position				= require('./../../Util/Database/Db_position.js');
 var functions 				= require('./../../Util/Functions.js');
 
 var attackFunc 				= require('./../Attack/Attack.js');
+var positionRemove 			= require('./../Position/Position_Remove.js');
 
 var redis = require("redis"),
 client = redis.createClient();
@@ -15,14 +16,14 @@ var currentTime,stringData;
 
 exports.MoveCalc = function move (data) {
 	stringData = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-
 }
 
 
 // var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":42,"Position_Cell":"11,12,0","Next_Cell":"10,11,0","End_Cell":"10,9,0","TimeMoveNextCell":1262,"TimeFinishMove":3786,"ListMove":[{"CurrentCell":"10,11,0","NextCell":"10,10,0","TimeMoveNextCell":"1262"},{"CurrentCell":"10,10,0","NextCell":"10,9,0","TimeMoveNextCell":"2324"}]}
 //var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":42,"Position_Cell":"11,12,0","Next_Cell":"10,11,0","End_Cell":"10,9,0","TimeMoveNextCell":1262,"TimeFinishMove":3786,"ListMove":[{"CurrentCell":"10,11,0","NextCell":"10,10,0","TimeMoveNextCell":1262}]}
 // var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":42,"Position_Cell":"7,7,0","Next_Cell":"10,12,0","End_Cell":"10,12,0","TimeMoveNextCell":1400,"TimeFinishMove":1400,"ListMove":[]}
-var S_MOVE_data = { Server_ID: 1,
+var S_MOVE_data = { 
+	Server_ID: 1,
 	ID: 13,
 	ID_Unit: 16,
 	ID_User: 42,
@@ -31,25 +32,24 @@ var S_MOVE_data = { Server_ID: 1,
 	End_Cell: '10,9,0',
 	TimeMoveNextCell: '2019-03-06T03:33:19.686',
 	TimeFinishMove: '2019-03-05T01:25:22.210',
-	ListMove:[ { CurrentCell: '10,11,0',	NextCell: '10,10,0',TimeMoveNextCell: '2019-03-05T01:25:19.686' } ] };
+	ListMove:[ { CurrentCell: '10,11,0', NextCell: '10,10,0', TimeMoveNextCell: '2019-03-05T01:25:19.686' } ] };
 
-//test (S_MOVE_data);
+test (S_MOVE_data);
 
 
 function test (data) {
 	var stringData = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-
+	positionRemove.PostionRemove(data);
 	checkRedisKey (data,stringData,function (checkBool) {
 		// console.log(checkBool);
 		if (checkBool) {			
 			//setTimerUpdateDatabase (data,stringData);
 			//setTimerMoveAttack (data,stringData);
-			//remove value in redis
-			
 		}else {
 			console.log('error select unit');
 		}
 	});
+
 }
 
 function setTimerMoveAttack (data,stringData) {
@@ -89,13 +89,14 @@ function checkTimeMoveNextCell (data,stringKey) {
 	}, timeMove, data,stringPos);
 }
 
-function checkPostionUnit (data,stringPos) {
+function checkPostionAttackUnit (data,stringPos) {
+	//attackFunc
 	var stringHkey = "s"+data.Server_ID+"_pos";
 
 	client.hexists(stringHkey,stringPos,function (error,rows) {
 		if (rows==1) {
-//attackFunc
-		}
+
+}
 		// console.log(rows);
 	})
 }

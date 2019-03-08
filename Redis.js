@@ -2,6 +2,7 @@ var armyData 		= require("./Redis/Data/ArmyData.js");
 var unitData 		= require("./Redis/Unit/Unit.js");
 var positionData 	= require("./Redis/Position/Position.js");
 
+var functions 		= require('./Util/Functions.js');
 var Promise 		= require('promise');
 
 var redis = require("redis"),
@@ -10,11 +11,7 @@ client = redis.createClient();
 // if you'd like to select database 3, instead of 0 (default), call
 // client.select(3, function() { /* ... */ });
 
-var dataTest={
-	default: 		0,
-	dataTraining: 	1,
-	dataUnit: 		2,
-}
+
 client.select(dataTest.dataUnit);
 
 client.on("error", function (err) {
