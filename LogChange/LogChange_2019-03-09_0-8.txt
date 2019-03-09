@@ -1,0 +1,87 @@
+
+ logChangeDetail: 2019-03-09T01:01:09.525Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:01:10.256Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:01:10.258Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:01:10.260Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:01:28.883Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:01:28.890Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='FV75Bhu4TZVTbtBhAAAA', `TimeLogIn`='2019-03-09T01:01:28.886', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:02:56.406Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:02:56.403', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='FV75Bhu4TZVTbtBhAAAA'
+ logChangeDetail: 2019-03-09T01:04:49.960Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:04:51.055Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:04:51.057Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:04:51.059Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:04:55.948Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:04:55.954Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='gPxbuE_432aMlcx_AAAA', `TimeLogIn`='2019-03-09T01:04:55.951', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:05:47.537Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:05:47.535', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='gPxbuE_432aMlcx_AAAA'
+ logChangeDetail: 2019-03-09T01:07:40.572Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:07:41.683Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:07:41.685Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:07:41.687Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:07:47.890Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:07:47.897Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='kdOq9w6DRu2u-jQuAAAA', `TimeLogIn`='2019-03-09T01:07:47.894', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:13:51.303Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:13:52.039Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:13:52.041Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:13:52.043Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:14:13.610Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:14:13.616Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='YPMWWxtuJnlKk_7HAAAA', `TimeLogIn`='2019-03-09T01:14:13.613', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:15:04.777Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:15:04.776', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='YPMWWxtuJnlKk_7HAAAA'
+ logChangeDetail: 2019-03-09T01:17:08.774Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:17:08.779Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='Cq3Dk08UtW4nSOoRAAAB', `TimeLogIn`='2019-03-09T01:17:08.775', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:17:25.291Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:17:25.289', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='Cq3Dk08UtW4nSOoRAAAB'
+ logChangeDetail: 2019-03-09T01:23:51.560Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:23:52.380Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:23:52.382Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:23:52.385Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:23:58.221Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:23:58.227Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='PqXyElDBcjeVbynAAAAA', `TimeLogIn`='2019-03-09T01:23:58.224', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:23:59.212Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:24:00.200Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:24:00.202Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:24:00.205Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:24:27.300Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:24:27.298', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='r9ewdEH-avhiArc9AAAA'
+ logChangeDetail: 2019-03-09T01:24:35.294Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:24:35.299Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='rXSKyB93tmDU4XxeAAAB', `TimeLogIn`='2019-03-09T01:24:35.296', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:24:36.275Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:24:37.031Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:24:37.034Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:24:37.036Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:25:04.045Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:25:04.989Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:25:04.992Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:25:04.994Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:25:18.002Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:25:18.208Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='K1BsaKAhwMNwOhipAAAA', `TimeLogIn`='2019-03-09T01:25:18.005', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:25:19.602Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:25:27.796Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:25:27.794', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='trD8VWnWTgSDrWwbAAAA'
+ logChangeDetail: 2019-03-09T01:25:30.140Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:25:30.144Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:25:30.146Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:26:02.592Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:26:03.398Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:26:03.402Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:26:03.404Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:26:12.132Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:26:12.129', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='yxw8WEZ8o50kZJ5WAAAA'
+ logChangeDetail: 2019-03-09T01:26:21.007Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:26:21.974Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:26:21.975Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:26:21.978Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:26:28.371Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:26:28.379Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='Lb1OGC10snrxlXrwAAAA', `TimeLogIn`='2019-03-09T01:26:28.374', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:27:19.959Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:27:19.956', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='Lb1OGC10snrxlXrwAAAA'
+ logChangeDetail: 2019-03-09T01:27:47.043Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:27:47.047Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='gcTWfmuVIVPyJ2b4AAAB', `TimeLogIn`='2019-03-09T01:27:47.044', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:28:56.538Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:28:56.536', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='gcTWfmuVIVPyJ2b4AAAB'
+ logChangeDetail: 2019-03-09T01:41:59.705Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-03-09T01:41:59.769Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-09T01:41:59.804Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-09T01:41:59.813Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-09T01:42:06.429Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:42:06.439Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='ud1H6yJHBIX09yTlAAAA', `TimeLogIn`='2019-03-09T01:42:06.433', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:43:41.888Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:43:41.887', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='ud1H6yJHBIX09yTlAAAA'
+ logChangeDetail: 2019-03-09T01:43:59.886Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:43:59.890Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='tXnZlCcAL2Nn3AaKAAAB', `TimeLogIn`='2019-03-09T01:43:59.887', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:45:34.366Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:45:34.363', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='tXnZlCcAL2Nn3AaKAAAB'
+ logChangeDetail: 2019-03-09T01:45:59.024Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-09T01:45:59.028Z: TaskServer.js: updateString UPDATE `user_info` SET `Socket` ='8ixaKTBvxBhG2tyeAAAC', `TimeLogIn`='2019-03-09T01:45:59.024', `TimeLogOut`= null WHERE `ID_User`='42'
+ logChangeDetail: 2019-03-09T01:52:18.640Z: TaskServer.js: removeUser ConnectUser UPDATE `user_info` SET `TimeLogOut`='2019-03-09T01:52:18.638', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='8ixaKTBvxBhG2tyeAAAC'

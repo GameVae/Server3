@@ -62,8 +62,9 @@ function getListUnit (data,stringHkey,stringPos) {
 		console.log(listUnit)
 	});
 }
-
+// lấy listUnit?
 var listUnit = [ '1_16_9_11', '1_16_9_10' ]
+
 checkUnitAttack (listUnit)
 function checkUnitAttack (data,listUnitAttack) {
 	var ID_User_Attack=0;
@@ -72,10 +73,10 @@ function checkUnitAttack (data,listUnitAttack) {
 		console.log(ID_User_Attack)
 	}
 }
-//updateRedisAttackDatabase (1)
-function updateRedisAttackDatabase (server_ID) {
+// //updateRedisAttackDatabase (1)
+// function updateRedisAttackDatabase (server_ID) {
 	
-}
+// }
 
 //checkUnitDef (1,attack,defend);
 
@@ -104,7 +105,7 @@ function getAttackCalc (server_ID,dataAttack,dataDefend) {
 			resolve();
 		});
 	}).then(()=> new Promise((resolve,reject)=>{
-		client.hmget(stringHkey,attack,function (error,rows) {
+		client.hmget(stringHkey,dataAttack,function (error,rows) {
 			for (var i = 0; i < rows.length; i++) {
 				var result = JSON.parse(rows[i]);
 				CounterMul[i] = checkCounter(result,def);

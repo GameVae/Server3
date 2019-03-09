@@ -10,11 +10,11 @@ var redis = require("redis"),
 client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-var DictTimeOut = {};
-var DictTimeMove = {};
+var DictMoveTimeOut = {};
+var DictTimeMoveAttack = {};
 var currentTime,stringData;
 
-exports.MoveCalc = function move (data) {
+exports.MoveCalc = function moveCalc (data) {
 	stringData = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 }
 
@@ -33,7 +33,7 @@ var S_MOVE_data = {
 	TimeMoveNextCell: '2019-03-06T03:33:19.686',
 	TimeFinishMove: '2019-03-05T01:25:22.210',
 	ListMove:[ { CurrentCell: '10,11,0', NextCell: '10,10,0', TimeMoveNextCell: '2019-03-05T01:25:19.686' } ] };
-
+//
 test (S_MOVE_data);
 
 
@@ -53,10 +53,11 @@ function test (data) {
 }
 
 function setTimerMoveAttack (data,stringData) {
-	clearTimeout(DictTimeMove[stringData]);
-	delete DictTimeMove[stringData];
+
+	clearTimeout(DictTimeMoveAttack[stringData]);
+	delete DictTimeMoveAttack[stringData];
 	if (data.TimeMoveNextCell!=null) {checkTimeMoveNextCell (data,stringData);}
-	
+
 }
 function checkTimeMoveNextCell (data,stringKey) {
 	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
@@ -83,9 +84,9 @@ function checkTimeMoveNextCell (data,stringKey) {
 		timeMove = data.TimeMoveNextCell - timeCheck;
 		stringPos = data.Next_Cell;
 	}
-	
-	DictTimeMove[stringKey] = setTimeout(function (data,stringPos) {
-		checkPostionUnit (data,stringPos);
+
+	DictTimeMoveAttack[stringKey] = setTimeout(function (data,stringPos) {
+		checkPostionAttackUnit (data,stringPos);
 	}, timeMove, data,stringPos);
 }
 
@@ -96,24 +97,22 @@ function checkPostionAttackUnit (data,stringPos) {
 	client.hexists(stringHkey,stringPos,function (error,rows) {
 		if (rows==1) {
 
-}
+		}
 		// console.log(rows);
 	})
 }
 
 function setTimerUpdateDatabase (data,stringKey) {
-	clearTimeout(DictTimeOut[stringKey]);
-	delete DictTimeOut[stringKey];
-
+	clearMoveTimeout (stringData);
 	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
 	// console.log(data.TimeMoveNextCell);
-	DictTimeOut[stringKey] = setTimeout(function (stringKey) {
+	DictMoveTimeOut[stringKey] = setTimeout(function (stringKey) {
 		var updateData = data;
 		var Position_Cell = data.Position_Cell;
 
 		if (data.ListMove.length>0) {
 			if (updateData.Next_Cell!=data.ListMove[0].CurrentCell) {
-				console.log('error postion Time Update')
+				console.log('error postion Time Update');
 			}else {
 				updateData.Position_Cell = updateData.Next_Cell;
 				updateData.Next_Cell = data.ListMove[0].NextCell;
@@ -130,11 +129,10 @@ function setTimerUpdateDatabase (data,stringKey) {
 			updateData.TimeFinishMove = null;
 			updateData.Status = functions.UnitStatus.Standby;
 		}
-
+		//updateDatabase (updateData);
 		updateRedisData (stringKey,updateData,Position_Cell);
 
 	}, data.TimeMoveNextCell, stringKey);
-
 }
 
 function updateDatabase (data) {
@@ -146,7 +144,7 @@ function updateDatabase (data) {
 	+"`ListMove`='"+data.ListMove+"',"
 	+"`Status`='"+unitStatus.Move+
 	"' WHERE `ID`='"+data.ID+"'";
-	console.log(stringUpdate);
+	// console.log(stringUpdate);
 	db_position.query(stringUpdate,function (error,result) {
 		if (!!error) {console.log(error);}
 	});
@@ -182,8 +180,11 @@ function checkRedisKey (data,stringKey,returnCheck) {
 		returnCheck(returnBool);
 	});
 }
-
+function clearMoveTimeout (stringData) {
+	clearTimeout(DictMoveTimeOut[stringData]);
+	delete DictMoveTimeOut[stringData];
+}
 exports.ClearMoveTimeout = function clearMoveTimeout (stringData) {
-	clearTimeout(DictTimeOut[stringData]);
-	delete DictTimeOut[stringData];
+	clearTimeout(DictMoveTimeOut[stringData]);
+	delete DictMoveTimeOut[stringData];
 }
