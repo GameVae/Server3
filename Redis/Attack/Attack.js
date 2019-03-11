@@ -42,37 +42,75 @@ var S_MOVE_data = { Server_ID: 1,
 	TimeFinishMove: '2019-03-05T01:25:22.210',
 	ListMove:[ { CurrentCell: '10,11,0',	NextCell: '10,10,0',TimeMoveNextCell: '2019-03-05T01:25:19.686' } ] };
 //
-
-// checkPostionAttackUnit (S_MOVE_data,S_MOVE_data.Position_Cell)
-
-function checkPostionAttackUnit (data,stringPos) {
-	// console.log(data);
-	var stringHkey = "s"+data.Server_ID+"_pos";
-	client.hexists(stringHkey,stringPos,function (error,rows) {
-		if (rows==1) {
-			getListUnit (stringHkey,stringPos)
+// setAttackData (1,'1_16_42_13','1_16_9_9')
+exports.SetAttackData = function setAttackData (Server_ID,ID_Defend,ID_Attack) {
+	var stringHkey = "s"+Server_ID+"_attack";
+	client.hexists(stringHkey,ID_Defend,function (error,resultBool) {
+		if (resultBool==1) {
+			client.hget(stringHkey,ID_Defend,function (error,result) {
+				if (!result.includes(ID_Attack)) {
+					checkAttacking (Server_ID,ID_Attack,function (returnBool) {
+						if (returnBool) {addValue (stringHkey,ID_Defend,result,ID_Attack);}
+					});
+				}
+			});
+		}else{
+			checkAttacking (Server_ID,ID_Attack,function (returnBool) {
+				if (returnBool) {addValue (stringHkey,ID_Defend,"",ID_Attack);}
+			});
 		}
-		// console.log(rows);
-	});	
+
+	})
 }
 
-function getListUnit (data,stringHkey,stringPos) {
-	client.hget(stringHkey,stringPos,function (error,rows) {
-		var listUnit = rows.split("/").filter(String);
-		console.log(listUnit)
+function addValue (stringHkey,ID_Defend,data,ID_Attack) {
+	// console.log(stringHkey,ID_Defend,data,ID_Attack)
+	client.hset(stringHkey,ID_Defend,data+ID_Attack+"/");
+}
+
+// checkAttacking (1,'1_16_9_10',function (returnBool) {
+// 	console.log(returnBool)
+// })
+function checkAttacking (Server_ID,ID_Attack,returnBool) {
+	var stringHkey = "s"+Server_ID+"_unit";
+	var checkBool = false;
+	client.hget(stringHkey,ID_Attack, function (error,rows) {
+	//console.log(rows)
+		var result = JSON.parse(rows);
+		if (result.Status==functions.UnitStatus.Standby) {checkBool = true;}
+		returnBool(checkBool);
 	});
 }
-// lấy listUnit?
-var listUnit = [ '1_16_9_11', '1_16_9_10' ]
+// checkPostionAttackUnit (S_MOVE_data,S_MOVE_data.Position_Cell)
 
-checkUnitAttack (listUnit)
-function checkUnitAttack (data,listUnitAttack) {
-	var ID_User_Attack=0;
-	for (var i = 0; i < listUnitAttack.length; i++) {
-		ID_User_Attack = listUnitAttack[i].split("_")[2];
-		console.log(ID_User_Attack)
-	}
-}
+// function checkPostionAttackUnit (data,stringPos) {
+// 	// console.log(data);
+// 	var stringHkey = "s"+data.Server_ID+"_pos";
+// 	client.hexists(stringHkey,stringPos,function (error,rows) {
+// 		if (rows==1) {
+// 			getListUnit (stringHkey,stringPos)
+// 		}
+// 		// console.log(rows);
+// 	});	
+// }
+
+// function getListUnit (data,stringHkey,stringPos) {
+// 	client.hget(stringHkey,stringPos,function (error,rows) {
+// 		var listUnit = rows.split("/").filter(String);
+// 		console.log(listUnit)
+// 	});
+// }
+// lấy listUnit?
+// var listUnit = [ '1_16_9_11', '1_16_9_10' ]
+
+//checkUnitAttack (S_MOVE_data,listUnit)
+// function checkUnitAttack (data,listUnitAttack) {
+// 	var ID_User_Attack=0;
+// 	for (var i = 0; i < listUnitAttack.length; i++) {
+// 		ID_User_Attack = listUnitAttack[i].split("_")[2];
+// 		console.log(ID_User_Attack)
+// 	}
+// }
 // //updateRedisAttackDatabase (1)
 // function updateRedisAttackDatabase (server_ID) {
 	

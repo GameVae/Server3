@@ -91,9 +91,15 @@ function removeValue (stringHkey,stringKey,ID_Key) {
 exports.CheckFriendData = function checkFriendData (ID_User,ID_Player,returnBool) {
 	var checkBool = false;
 	var stringHkey = "all_friends";
-	client.hget(stringHkey,ID_User,function (error,rows) {
-		var result = rows.split("/");
-		if (result.includes(ID_Player)) {checkBool = true;}
-		returnBool(checkBool);
+	client.hexists(stringHkey,ID_User,function (error,resultBool) {
+		if (resultBool==1) {
+			client.hget(stringHkey,ID_User,function (error,rows) {
+				var result = rows.split("/");
+				if (result.includes(ID_Player)) {checkBool = true;}
+				returnBool(checkBool);
+			});
+		}else{
+			returnBool(checkBool);
+		}
 	});
 }
