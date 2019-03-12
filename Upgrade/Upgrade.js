@@ -20,14 +20,14 @@ var DetailError, LogChange;
 
 var DictTimeOut={};
 
-var dataIns = {
-	ID_Server:'1',
-	ID_User: '9',
-	BaseNumber: '1',
-	ID_Upgrade: '1',
-	UpgradeType:'1',
-	Level:'1'
-}
+// var dataIns = {
+// 	ID_Server:'1',
+// 	ID_User: '9',
+// 	BaseNumber: '1',
+// 	ID_Upgrade: '1',
+// 	UpgradeType:'1',
+// 	Level:'1'
+// }
 /*level nào thì lấy tài nguyên level đó nâng cấp lên lv1=>lv2 lấy tài nguyên hao tốn cùng hàng lv1*/
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
@@ -60,7 +60,6 @@ function S_UPGRADE (data) {
 	
 	dbBase.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('Upgrade.js: query S_UPGRADE'+stringQuery); functions.WriteLogError(DetailError,2);}
-
 		if (parseInt(data.UpgradeType)==1 && rows[0].UpgradeTime==null) {
 			if (data.Level==rows[0].Level||data.Level==0) {
 				materialCalc (dbBase,data,rows[0]);
@@ -72,15 +71,12 @@ function S_UPGRADE (data) {
 		}else {
 			if (!!error){DetailError = ('Upgrade.js: updateUserMaterial : '+ stringQuery); functions.WriteLogError(DetailError,2);}
 			LogChange='Upgrade.js: updateUserMaterial: '+stringQuery;functions.LogChange(LogChange,2);
-			console.log('fail in upgrade '+ stringQuery);
 		}
 	});
 }
 
 function materialCalc (dbBase,data,rowUpgrade) {
-
 	var stringMaterial = "SELECT * FROM `"+rowUpgrade.Name_Upgrade+"` WHERE `Level`= "+data.Level;
-
 	db_upgrade_database.query(stringMaterial,function (error,rows) {
 		if (!!error){DetailError = ('Upgrade.js: materialCalc ' + stringMaterial);functions.WriteLogError(DetailError,2);}
 		checkMaterial (dbBase,data,rows[0]);
@@ -103,8 +99,6 @@ function checkMaterial (dbBase,data,rowsMaterial) {
 }
 
 function updateUserMaterial (dbBase,data,rowsMaterial) {
-	// console.log(rowsMaterial);
-
 	var stringUpdateUser = "UPDATE `"+data.ID_User+"` SET"+
 	" `Farm`=`Farm` - '"+rowsMaterial.FoodCost+
 	"', `Wood`=`Wood` - '"+rowsMaterial.WoodCost+
@@ -118,10 +112,7 @@ function updateUserMaterial (dbBase,data,rowsMaterial) {
 	});
 }
 
-function updateBaseUser (dbBase,data,rowUpgrade) {
-	// console.log(data);
-	// console.log(rowUpgrade);
-	
+function updateBaseUser (dbBase,data,rowUpgrade) {	
 	var stringUpgrade;
 	var timeUpgrade = functions.GetTime()+rowUpgrade.TimeInt*1000;
 	var stringTime = new Date(timeUpgrade).toISOString();
@@ -162,8 +153,6 @@ function setTimerUpdateDatabase (timeOut,data) {
 			if (!!error){DetailError = ('Upgrade.js: query getData : '+ queryUser); functions.WriteLogError(DetailError,2);}
 
 			if (rows!=undefined) {
-				//console.log("here: ")
-
 				switch (rows[0].Server_ID) {
 					case 1:
 					dbBase = db_s1_base_info;
@@ -194,14 +183,12 @@ function setTimerUpdateDatabase (timeOut,data) {
 
 				checkUnlock (dbUpgrade,data);
 				
-
 				stringUpdateBaseUpgrade ="UPDATE `"+data.ID_User+"_"+data.BaseNumber+"` SET `Level`=`Level`+1 WHERE `ID` = "+ data.ID_Upgrade;
 				//console.log('stringUpdateBaseUpgrade '+stringUpdateBaseUpgrade);
 				dbUpgrade.query(stringUpdateBaseUpgrade,function (error,result) {
 					if (!!error){DetailError = ('Upgrade.js: updateLevel' + stringUpdateBaseUpgrade);functions.WriteLogError(DetailError,2);}
 					LogChange='Upgrade.js: updateLevel: '+stringUpdateBaseUpgrade;functions.LogChange(LogChange,2);
 				});
-
 				
 				//console.log("stringQueryMightBonus: "+stringQueryMightBonus)
 				dbBase.query(stringQueryMightBonus,function(error,rows){
@@ -266,7 +253,6 @@ function checkUnitInMap (data,levelUpgrade,rows_tableQuery) {
 			if (!!error){DetailError = ('Upgrade.js: query checkUnitInMap : '+ stringQueryUnit); functions.WriteLogError(DetailError,2);}
 			if (rows.length>0) {
 				updateUnitInMap (data,levelUpgrade,dataUnitUpgrade);
-
 				for (var i = 0; i < rows.length; i++) {
 					upgrade_Redis.UpdateRedis_UnitInMap(data,levelUpgrade,dataUnitUpgrade,rows[i].ID)
 				}

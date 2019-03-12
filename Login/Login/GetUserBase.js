@@ -115,7 +115,7 @@ function getBaseUpgrade (socket,dbUpgrade,ID_User,BaseNumber) {
 
 // 	var playerData ={};
 // 	stringHkey = "s"+Server_ID+"_base_info";
-	
+
 // 	new Promise((resolve,reject)=>{
 // 		client.del(stringHkey,function (error,result) {
 // 			resolve();
@@ -202,21 +202,19 @@ exports.R_BASE_PLAYER  = function r_base_player (socket,ID_User,Server_ID){
 			}			
 		})
 	}).then(()=> {
-		client.hkeys(stringHkey,function (error,rows) {	
-			// client.hvals(stringHkey,function (error,rowsAll) {	
-			// 	socket.emit('R_BASE_PLAYER',{R_BASE_PLAYER:rowsAll});
-			// })
-			// client.hgetall(stringHkey,function (error,rowsAll) {	
-			// 	socket.emit('R_BASE_PLAYER',{R_BASE_PLAYER:rowsAll});
-			// })
-			client.hvals(stringHkey,function (error,rowsAll) {
-				socket.emit('R_BASE_PLAYER',{R_BASE_PLAYER:rowsAll});
-			})
-		})
+		getBasePlayerData (socket,stringHkey);
 	})
 	)));
 }
 
+function getBasePlayerData (socket,stringHkey) {
+	client.hkeys(stringHkey,function (error,rows) {
+		client.hvals(stringHkey,function (error,rowsAll) {
+			socket.emit('R_BASE_PLAYER',{R_BASE_PLAYER:rowsAll});
+		})
+	})
+	
+}
 // r_base_player (9,1)
 // function r_base_player (ID_User,Server_ID){
 // 	switch (parseInt(Server_ID)) {
@@ -232,7 +230,7 @@ exports.R_BASE_PLAYER  = function r_base_player (socket,ID_User,Server_ID){
 
 // 	var playerData ={};
 // 	stringHkey = "s"+Server_ID+"_base_info";
-	
+
 // 	new Promise((resolve,reject)=>{
 // 		client.del(stringHkey,function (error,result) {
 // 			resolve();
@@ -264,7 +262,7 @@ exports.R_BASE_PLAYER  = function r_base_player (socket,ID_User,Server_ID){
 // 	}).then(()=> {
 
 // 		client.hkeys(stringHkey,function (error,rows) {	
-			
+
 // 			var result=[]
 // 			client.hvals(stringHkey,function (error,rows) {
 // 				for (var i = 0; i < rows.length; i++) {
@@ -287,7 +285,7 @@ exports.R_BASE_PLAYER  = function r_base_player (socket,ID_User,Server_ID){
 // 			// })
 
 // 		})
-		
+
 // 	})
 
 // 	)));

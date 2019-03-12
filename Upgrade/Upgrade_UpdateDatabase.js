@@ -9,7 +9,7 @@ var db_s2_upgrade			= require('./../Util/Database/Db_s2_base_upgrade.js');
 var db_all_user				= require('./../Util/Database/Db_all_user.js');
 var db_upgrade_database		= require('./../Util/Database/Db_upgrade_database.js');
 
-
+var upgrade_Redis 			= require('./Upgrade_Redis.js')
 var functions 				= require('./../Util/Functions.js');
 
 // var Promise 				= require('promise');
@@ -135,10 +135,11 @@ function checkUnlock (dbUpgrade,dataUpgrade) {
 	var levelUpgrade;
 	var stringQueryLevel = "SELECT `Level` FROM `"+dataUpgrade.ID_User+"_"+dataUpgrade.BaseNumber+"` WHERE "+
 	"`ID`='"+dataUpgrade.LevelUp_ID+"'";
-
+	// console.log(dataUpgrade);
+	// console.log(stringQueryLevel)
 	dbUpgrade.query(stringQueryLevel, function (error,rows) {
 		if (!!error){DetailError = ('Upgrade.js: stringQueryLevel: ' + stringQueryLevel);functions.WriteLogError(DetailError,1);}
-
+		
 		levelUpgrade = rows[0].Level;
 
 		var stringQuery = "SELECT * FROM `upgrade` WHERE `ID`="+dataUpgrade.LevelUp_ID;
@@ -158,7 +159,29 @@ function checkUnlock (dbUpgrade,dataUpgrade) {
 						LogChange='Upgrade.js: checkUnlock upgrade: '+stringUpgrade;functions.LogChange(LogChange,1);	
 					});
 				}
+				checkUnitInMap (dataUpgrade,levelUpgrade,rows_tableQuery[0]);
 			});
 		});
 	});
+}
+
+function checkUnitInMap (data,levelUpgrade,rows_tableQuery) {
+	if (data.ID_Upgrade<35&&data.ID_Upgrade>14) {
+		var dataUnitUpgrade ={};
+		dataUnitUpgrade.Health = rows_tableQuery.Health;
+		dataUnitUpgrade.Attack = rows_tableQuery.Attack;
+		dataUnitUpgrade.Defend = rows_tableQuery.Defend;
+		
+		var stringQueryUnit = "SELECT * FROM `s"+data.ID_Server+"_unit` WHERE `ID_User`='"+data.ID_User+"' AND `BaseNumber`='"+data.BaseNumber+"' AND `ID_Unit` ='"+data.ID_Upgrade+"'"
+		db_positon.query(stringQueryUnit,function (error,rows) {
+			if (!!error){DetailError = ('Upgrade.js: query checkUnitInMap : '+ stringQueryUnit); functions.WriteLogError(DetailError,2);}
+			if (rows.length>0) {
+				updateUnitInMap (data,levelUpgrade,dataUnitUpgrade);
+
+				for (var i = 0; i < rows.length; i++) {
+					upgrade_Redis.UpdateRedis_UnitInMap(data,levelUpgrade,dataUnitUpgrade,rows[i].ID)
+				}
+			}
+		});
+	}
 }

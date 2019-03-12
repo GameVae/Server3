@@ -42,8 +42,6 @@ var S_MOVE_data = {
 	ListMove:[ { CurrentCell: '10,11,0', NextCell: '10,10,0', TimeMoveNextCell: '2019-03-05T01:25:19.686' } ] };
 //
 // test (S_MOVE_data);
-
-
 function test (data) {
 	var stringData = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	positionRemove.PostionRemove(data);
@@ -109,8 +107,7 @@ function checkPostionAttackUnit (data,stringPos) {
 					getAttackData (data,unitResult[i])
 				}				
 			});
-		}
-		
+		}		
 	})
 }
 
