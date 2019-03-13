@@ -1,8 +1,12 @@
-var db_all_user  	= require('./../Util/Database/Db_all_user.js');
-var db_server_task 	= require('./../Util/Database/Db_server_task.js');
-var functions		= require('./../Util/Functions.js');
-var testRegister	= require('./../Login/Register/Register.js');
-var index 			= require('./../index.js');
+var db_all_user  		= require('./../Util/Database/Db_all_user.js');
+var db_server_task 		= require('./../Util/Database/Db_server_task.js');
+var functions			= require('./../Util/Functions.js');
+var testRegister		= require('./../Login/Register/Register.js');
+//var index 				= require('./../index.js');
+
+var redis 				= require("redis"),
+client 					= redis.createClient();
+client.select(functions.RedisData.TestUnit);
 
 var DetailError,logChangeDetail ;
 
@@ -19,22 +23,95 @@ exports.ConnectSocket = function connectSocket (id,ID_User) {
 		logChangeDetail =("TaskServer.js: updateString "+updateString); functions.LogChange(logChangeDetail,2);
 	});
 }
+exports.RedisConnectSocket = function redisConnectSocket (Server_ID,ID_User,idSocket) {
+	var stringHkey = "s"+Server_ID+"_socket";
+	var stringKey = ID_User;
+	client.hset(stringHkey,stringKey,idSocket);
+
+}
+// redisConnectSocket (1,5,5555)
+// redisConnectSocket (1,45,45555)
+// redisConnectSocket (1,52,65555)
+
+// function redisConnectSocket (Server_ID,ID_User,idSocket) {
+// 	var stringHkey = "s"+Server_ID+"_socket";
+// 	var stringKey = ID_User;
+// 	client.hset(stringHkey,stringKey,idSocket);
+
+// }
+
+
 
 exports.RemoveConnectSocket = function removeConnectSocket (id) {
 	var queryId = "SELECT * FROM `user_info` WHERE `Socket`= '"+id+"'";
 	db_all_user.query(queryId,function (error,rows) {
-		if (!!error){DetailError = ('TaskServer.js: queryId querySocketId '+queryId); functions.WriteLogError(DetailError,2);;}
+		if (!!error){DetailError = ('TaskServer.js: queryId querySocketId '+queryId); functions.WriteLogError(DetailError,2);}
 		if (rows!=undefined) {
 			var currentTime =functions.ImportTimeToDatabase(functions.GetTimeNow());
 			var removeUser = "UPDATE `user_info` SET `TimeLogOut`='"+currentTime+"', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='"+id+"'";
 			db_all_user.query(removeUser,function (error,result) {
-				if (!!error){DetailError = ('TaskServer.js: removeUser ConnectUser '+removeUser); functions.WriteLogError(DetailError,2);;}
+				if (!!error){DetailError = ('TaskServer.js: removeUser ConnectUser '+removeUser); functions.WriteLogError(DetailError,2);}
 				logChangeDetail =("TaskServer.js: removeUser ConnectUser "+removeUser); functions.LogChange(logChangeDetail,2);
 			});	
+			//console.log('RemoveConnectSocket');
+			if (rows.length>0) {
+				redisRemoveSocket (rows[0].Server_ID,rows[0].ID_User);
+			}			
+		}
+	})	
+}
+
+function redisRemoveSocket (server_ID,ID_User) {
+	var stringHkey = "s"+server_ID+"_socket";
+	var stringKey = ID_User;
+	client.hexists(stringHkey,stringKey,function (error,resultBool){
+		if (resultBool==1) {
+			client.hdel(stringHkey,stringKey,function (error,result) {
+				if (!!error) {console.log(error)}
+			});
 		}
 	})
-	
 }
+// var data = {
+// 	ID: 42,
+// 	ID_User: 42,
+// 	UserName: 'ndinhtoan45',
+// 	Password: '25d55ad283aa400af464c76d713c07ad',
+// 	Email: 'asdc123@gmail.com',
+// 	NameInGame: 'ndinhtoan45',
+// 	Server_ID: 1,
+// 	Diamond: 1000,
+// 	ResetVipTime: 6,
+// 	TimeLogIn: '2019-03-12T20:15:23.000Z',
+// 	TimeLogOut: null,
+// 	Socket: 'rqKFnBH7AjkKEptvAAAA',
+// 	DateCreate: '2019-01-03T23:36:52.000Z',
+// 	Model_Device: null,
+// 	Ram_Device: null,
+// 	BlockedTime: null,
+// 	BlockedForever: 0,
+// 	Password_Recover_Key: null,
+// 	Password_Recover_Time: null } 
+// //
+// removeConnectSocket (data.Socket)
+// function removeConnectSocket (id) {
+// 	var queryId = "SELECT * FROM `user_info` WHERE `Socket`= '"+id+"'";
+// 	db_all_user.query(queryId,function (error,rows) {
+// 		if (!!error){DetailError = ('TaskServer.js: queryId querySocketId '+queryId); functions.WriteLogError(DetailError,2);;}
+// 		if (rows!=undefined) {
+// 			var currentTime =functions.ImportTimeToDatabase(functions.GetTimeNow());
+// 			var removeUser = "UPDATE `user_info` SET `TimeLogOut`='"+currentTime+"', `TimeLogIn`=null, `Socket`=null WHERE `Socket`='"+id+"'";
+// 			// db_all_user.query(removeUser,function (error,result) {
+// 			// 	if (!!error){DetailError = ('TaskServer.js: removeUser ConnectUser '+removeUser); functions.WriteLogError(DetailError,2);;}
+// 			// 	logChangeDetail =("TaskServer.js: removeUser ConnectUser "+removeUser); functions.LogChange(logChangeDetail,2);
+// 			// });	
+// 			console.log('RemoveConnectSocket')
+// 			console.log(rows)
+// 			//redisRemoveSocket (rows[0].Server_ID,rows[0].ID_User)
+// 		}
+// 	})
+
+// }
 
 exports.ClearAllSocket = function ClearAllSocket () {
 	var updateString = "UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null";

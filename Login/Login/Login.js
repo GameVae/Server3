@@ -60,7 +60,7 @@ function S_LOGIN (socket,data) {
 }
 
 function R_USER_INFO (socket,ID_User,Server_ID) {
-	var queryString = "SELECT * FROM `game_info_s1` WHERE `ID_User`='"+ID_User+"'";
+	var queryString = "SELECT * FROM `game_info_s"+Server_ID+"` WHERE `ID_User`='"+ID_User+"'";
 	db_all_user.query(queryString,function (error,rows) {
 		if (!!error){DetailError = ('Login.js: S_USER_INFO queryUser :'+ queryString); functions.WriteLogError(DetailError,1);}
 		dataUser= rows[0];
@@ -68,7 +68,8 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 		getFriend.GetFriendInfo(socket,dataUser.ID_User);
 
 		taskServer.ConnectSocket(socket.id,ID_User);
-
+		taskServer.RedisConnectSocket(Server_ID,ID_User,socket.id);
+		
 		var queryServer = "SELECT * FROM `user_info` WHERE `ID_User`='"+ID_User+"'";
 
 		db_all_user.query(queryServer,function (error,rowsServer) {

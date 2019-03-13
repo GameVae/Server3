@@ -59,7 +59,6 @@ exports.SetAttackData = function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 				if (returnBool) {addValue (stringHkey,ID_Defend,"",ID_Attack);}
 			});
 		}
-
 	})
 }
 
