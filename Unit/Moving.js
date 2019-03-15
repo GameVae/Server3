@@ -2,7 +2,6 @@
 
 // var db_all_user		= require('./../Util/Database/Db_all_user.js');
 var db_position		= require('./../Util/Database/Db_position.js');
-var moving_R_Move  	= require('./Moving_R_Move.js');
 // var moveRedis 		= require('./../Redis/Move/Move.js');
 
 var functions 		= require('./../Util/Functions.js');
@@ -13,15 +12,12 @@ var currentTime;
 var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(functions.RedisData.TestUnit);
-var dataClient ={}
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){	
-			R_MOVE (io,socket,data.S_MOVE);
-			// moving_R_Move.R_MOVE(io,socket,data.S_MOVE);
+			R_MOVE (io,socket,data.S_MOVE);	
 			S_MOVE (socket,data.S_MOVE);
-
 		});
 	});
 }
@@ -43,12 +39,11 @@ function sendSocketRedis (socket,rowData,dataMove) {
 		if (rowsSocket.length>0) {
 			client.hmget(stringHkey,rowsSocket,function (error,socketIDValue) {
 				for (var i = 0; i < socketIDValue.length; i++) {
-				sendToClient (socket,socketIDValue[i],rowData)
-			}
-		});		
-		}
-		
-	})
+					sendToClient (socket,socketIDValue[i],rowData);
+				}
+			});		
+		}		
+	});
 }
 
 function sendToClient (socket,socketID,rowData) {
@@ -56,6 +51,7 @@ function sendToClient (socket,socketID,rowData) {
 	// console.log(socketID,rowData)
 	socket.broadcast.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
 }
+
 // var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":42,"Position_Cell":"11,12,0","Next_Cell":"10,11,0","End_Cell":"10,9,0","TimeMoveNextCell":1262,"TimeFinishMove":3786,"ListMove":[{"CurrentCell":"10,11,0","NextCell":"10,10,0","TimeMoveNextCell":"1262"},{"CurrentCell":"10,10,0","NextCell":"10,9,0","TimeMoveNextCell":"2324"}]}
 var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":52,"Position_Cell":"11,12,0","Next_Cell":"10,11,0","End_Cell":"10,9,0","TimeMoveNextCell":1262,"TimeFinishMove":3786,"ListMove":[{"CurrentCell":"10,11,0","NextCell":"10,10,0","TimeMoveNextCell":1262}]}
 // var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":42,"Position_Cell":"7,7,0","Next_Cell":"10,12,0","End_Cell":"10,12,0","TimeMoveNextCell":1400,"TimeFinishMove":1400,"ListMove":[]}
