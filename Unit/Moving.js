@@ -2,7 +2,7 @@
 
 // var db_all_user		= require('./../Util/Database/Db_all_user.js');
 var db_position		= require('./../Util/Database/Db_position.js');
-// var moveRedis 		= require('./../Redis/Move/Move.js');
+var moveUnit 		= require('./../Redis/Move/Move.js');
 
 var functions 		= require('./../Util/Functions.js');
 
@@ -15,7 +15,8 @@ client.select(functions.RedisData.TestUnit);
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
-		socket.on('S_MOVE', function (data){	
+		socket.on('S_MOVE', function (data){
+			// moveUnit.ClearMoveTimeout(stringData)
 			R_MOVE (io,socket,data.S_MOVE);	
 			S_MOVE (socket,data.S_MOVE);
 		});
@@ -48,7 +49,7 @@ function sendSocketRedis (socket,rowData,dataMove) {
 
 function sendToClient (socket,socketID,rowData) {
 	// io.to(socketID).emit('R_MOVE',{R_MOVE:dataMove});
-	// console.log(socketID,rowData)
+	 // console.log(socketID,rowData)
 	socket.broadcast.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
 }
 
@@ -68,13 +69,14 @@ function S_MOVE (socket,data) {
 		// ListMove[i].TimeMoveNextCell = calc;
 		//console.log(ListMove[i].TimeMoveNextCell)
 	}
-	console.log(data);
-	//moveRedis.MoveCalc (data)	
+	// console.log(data);
+	moveUnit.MoveCalc (socket,data);
 	updateDataBase (data);
 }
 
 function updateDataBase (data) {
 	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+	+"`Position_Cell`='"+data.Position_Cell+"',"
 	+"`Next_Cell`='"+data.Next_Cell+"',"
 	+"`End_Cell`='"+data.End_Cell+"',"
 	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
@@ -82,8 +84,19 @@ function updateDataBase (data) {
 	+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
 	+"`Status`='"+functions.UnitStatus.Move+
 	"' WHERE `ID`='"+data.ID+"'";
-	//console.log(stringUpdate);
+
 	db_position.query(stringUpdate,function (error,result) {
 		if (!!error) {console.log(error);}
-	})
+		var stringQuery = "SELECT * FROM `s1_unit` WHERE `ID`='"+data.ID+"'";
+		db_position.query(stringQuery,function (error,rows) {
+			updateRedisData (data,rows);
+		});
+	});
+
+}
+
+function updateRedisData (data,rowsData) {
+	var stringHkey ="s1_unit";
+	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	client.hset(stringHkey,stringKey,JSON.stringify(rowsData))
 }

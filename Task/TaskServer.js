@@ -8,7 +8,7 @@ var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-var DetailError,logChangeDetail ;
+var DetailError,logChangeDetail;
 
 // updateTimeOffline ()
 function updateTimeOffline () {

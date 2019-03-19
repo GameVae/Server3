@@ -85,42 +85,6 @@ function checkAttacking (Server_ID,ID_Defend,ID_Attack,returnBool) {
 		returnBool(checkBool);
 	});
 }
-// checkPostionAttackUnit (S_MOVE_data,S_MOVE_data.Position_Cell)
-
-// function checkPostionAttackUnit (data,stringPos) {
-// 	// console.log(data);
-// 	var stringHkey = "s"+data.Server_ID+"_pos";
-// 	client.hexists(stringHkey,stringPos,function (error,rows) {
-// 		if (rows==1) {
-// 			getListUnit (stringHkey,stringPos)
-// 		}
-// 		// console.log(rows);
-// 	});	
-// }
-
-// function getListUnit (data,stringHkey,stringPos) {
-// 	client.hget(stringHkey,stringPos,function (error,rows) {
-// 		var listUnit = rows.split("/").filter(String);
-// 		console.log(listUnit)
-// 	});
-// }
-// lấy listUnit?
-// var listUnit = [ '1_16_9_11', '1_16_9_10' ]
-
-//checkUnitAttack (S_MOVE_data,listUnit)
-// function checkUnitAttack (data,listUnitAttack) {
-// 	var ID_User_Attack=0;
-// 	for (var i = 0; i < listUnitAttack.length; i++) {
-// 		ID_User_Attack = listUnitAttack[i].split("_")[2];
-// 		console.log(ID_User_Attack)
-// 	}
-// }
-// //updateRedisAttackDatabase (1)
-// function updateRedisAttackDatabase (server_ID) {
-	
-// }
-
-//checkUnitDef (1,attack,defend);
 
 function checkUnitDef (server_ID,dataAttack,dataDefend) {
 	var stringHkey = "s"+server_ID+"_unit";	
@@ -133,16 +97,6 @@ function checkUnitDef (server_ID,dataAttack,dataDefend) {
 	});
 }
 
-//getAttackCalc (1,attack,defend)
-// AttackFun () 
-// function AttackFun () {
-// 	var stringHkey ="test";
-// 	var stringKey ="this";
-// 	client.hset(stringHkey,stringKey,"value",function (error,rows) {
-// 			console.log(error)
-// 		console.log(rows)
-// 	})
-// }
 function getAttackCalc (server_ID,dataAttack,dataDefend) {
 	var stringHkey = "s"+server_ID+"_unit";
 	var def = {};
@@ -245,3 +199,50 @@ function returnCaseUnit (dataUnit) {
 	else {returnCase = 4;}
 	return returnCase;
 }
+
+// checkPostionAttackUnit (S_MOVE_data,S_MOVE_data.Position_Cell)
+
+// function checkPostionAttackUnit (data,stringPos) {
+// 	// console.log(data);
+// 	var stringHkey = "s"+data.Server_ID+"_pos";
+// 	client.hexists(stringHkey,stringPos,function (error,rows) {
+// 		if (rows==1) {
+// 			getListUnit (stringHkey,stringPos)
+// 		}
+// 		// console.log(rows);
+// 	});	
+// }
+
+// function getListUnit (data,stringHkey,stringPos) {
+// 	client.hget(stringHkey,stringPos,function (error,rows) {
+// 		var listUnit = rows.split("/").filter(String);
+// 		console.log(listUnit)
+// 	});
+// }
+// lấy listUnit?
+// var listUnit = [ '1_16_9_11', '1_16_9_10' ]
+
+//checkUnitAttack (S_MOVE_data,listUnit)
+// function checkUnitAttack (data,listUnitAttack) {
+// 	var ID_User_Attack=0;
+// 	for (var i = 0; i < listUnitAttack.length; i++) {
+// 		ID_User_Attack = listUnitAttack[i].split("_")[2];
+// 		console.log(ID_User_Attack)
+// 	}
+// }
+// //updateRedisAttackDatabase (1)
+// function updateRedisAttackDatabase (server_ID) {
+	
+// }
+
+//checkUnitDef (1,attack,defend);
+//getAttackCalc (1,attack,defend)
+// AttackFun () 
+// function AttackFun () {
+// 	var stringHkey ="test";
+// 	var stringKey ="this";
+// 	client.hset(stringHkey,stringKey,"value",function (error,rows) {
+// 			console.log(error)
+// 		console.log(rows)
+// 	})
+// }

@@ -2,7 +2,7 @@
 
 var db_position				= require('./../../Util/Database/Db_position.js');
 
-// var functions 				= require('./../../Util/Functions.js');
+var functions 				= require('./../../Util/Functions.js');
 var Promise 				= require('promise');
 
 var redis = require('redis');
@@ -28,7 +28,7 @@ function getPosition_test (server_ID) {
 function deleteHashKey (server_ID) {
 	var stringHkey = "s"+server_ID+"_pos";
 	client.del(stringHkey,function (error,rows) {
-		console.log(rows)
+		//console.log(rows)
 	});
 }
 

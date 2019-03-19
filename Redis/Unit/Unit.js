@@ -29,6 +29,7 @@ function getUnitInfo (clientRedis,serverInt) {
 		}	
 	});
 }
+
 function deleteHashKey (clientRedis,server_ID) {
 	var stringHkey = "s"+server_ID+"_unit";
 	clientRedis.del(stringHkey);

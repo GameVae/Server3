@@ -217,7 +217,6 @@ function getBasePlayerData (socket,stringHkey) {
 			socket.emit('R_BASE_PLAYER',{R_BASE_PLAYER:array});
 		})
 	})
-	
 }
 
 function getUpgrade (dbUpgrade,ID_User,resolve) {

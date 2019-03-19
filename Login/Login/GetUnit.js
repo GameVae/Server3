@@ -14,18 +14,19 @@ exports.R_UNIT = function r_unit (socket,ID_User,Server_ID) {
 		var currentTime = functions.GetTime();
 		for (var i = 0; i < rows.length; i++) {
 			if (rows[i].TimeMoveNextCell != null) {
-				rows[i]["TimeMoveNextCell"] = (new Date(functions.ExportTimeDatabase(rows[i].TimeMoveNextCell))-currentTime)*0.001;		
+				rows[i]["TimeMoveNextCell"] = (new Date(functions.ExportTimeDatabase(rows[i].TimeMoveNextCell))-currentTime);		
 			}
 			if (rows[i].TimeFinishMove != null) {
-				rows[i]["TimeFinishMove"] = (new Date(functions.ExportTimeDatabase(rows[i].TimeFinishMove))-currentTime)*0.001;
+				rows[i]["TimeFinishMove"] = (new Date(functions.ExportTimeDatabase(rows[i].TimeFinishMove))-currentTime);
 			}
 			if (rows[i].ListMove!=null) {
-				var ListMoveJson = JSON.parse(rows[i].ListMove)
-				for (var j = 0; j < ListMoveJson.length; j++) {
-					if (ListMoveJson.length>0) {
-						ListMoveJson.TimeMoveNextCell = (new Date(functions.ExportTimeDatabase(ListMoveJson[j].TimeMoveNextCell))-currentTime)*0.001;
-					}				
-				}
+				var ListMoveJson = JSON.parse(rows[i].ListMove);
+				if (ListMoveJson.length>0) {
+					for (var j = 0; j < ListMoveJson.length; j++) {	
+						ListMoveJson[j].TimeMoveNextCell = (new Date(functions.ExportTimeDatabase(ListMoveJson[j].TimeMoveNextCell))-currentTime);
+					}
+				}				
+				rows[i].ListMove = ListMoveJson;
 			}
 			delete rows[i].Attack;
 			delete rows[i].Defend;
@@ -34,4 +35,3 @@ exports.R_UNIT = function r_unit (socket,ID_User,Server_ID) {
 		socket.emit('R_UNIT',{R_UNIT:dataUnit});
 	});
 }
-

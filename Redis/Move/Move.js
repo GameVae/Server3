@@ -1,15 +1,14 @@
 'use strict';
+var move_GetNewPos 			= require('./Move_GetNewPos.js');
+
 var db_position				= require('./../../Util/Database/Db_position.js');
-
-var functions 				= require('./../../Util/Functions.js');
-
-
-var attackFunc 				= require('./../Attack/Attack.js');
+// var attackFunc 				= require('./../Attack/Attack.js');
 var guildData				= require('./../Guild/GuildData.js');
 var friendData				= require('./../Friend/FriendData.js');
-
-
 var positionRemove 			= require('./../Position/Position_Remove.js');
+
+//var redisFunc 				=  require('./../../Redis.js');
+var functions 				= require('./../../Util/Functions.js');
 
 var redis = require("redis"),
 client = redis.createClient();
@@ -20,49 +19,169 @@ var Promise 				= require('promise');
 var DictMoveTimeOut = {};
 var DictTimeMoveAttack = {};
 var currentTime,stringData;
+var DetailError, logChangeDetail;
 
-exports.MoveCalc = function moveCalc (data) {
-	stringData = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+exports.MoveCalc = function moveCalc (socketdata) {
+	moveCalc2 (socket,data)
 }
 
-
-// var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":42,"Position_Cell":"11,12,0","Next_Cell":"10,11,0","End_Cell":"10,9,0","TimeMoveNextCell":1262,"TimeFinishMove":3786,"ListMove":[{"CurrentCell":"10,11,0","NextCell":"10,10,0","TimeMoveNextCell":"1262"},{"CurrentCell":"10,10,0","NextCell":"10,9,0","TimeMoveNextCell":"2324"}]}
-//var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":42,"Position_Cell":"11,12,0","Next_Cell":"10,11,0","End_Cell":"10,9,0","TimeMoveNextCell":1262,"TimeFinishMove":3786,"ListMove":[{"CurrentCell":"10,11,0","NextCell":"10,10,0","TimeMoveNextCell":1262}]}
-// var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":42,"Position_Cell":"7,7,0","Next_Cell":"10,12,0","End_Cell":"10,12,0","TimeMoveNextCell":1400,"TimeFinishMove":1400,"ListMove":[]}
-var S_MOVE_data = { 
-	Server_ID: 1,
-	ID: 13,
+var S_MOVE_data = { Server_ID: 1,
+	ID: 10,
 	ID_Unit: 16,
-	ID_User: 42,
-	Position_Cell: '11,12,0',
-	Next_Cell: '10,11,0',
-	End_Cell: '10,9,0',
-	TimeMoveNextCell: '2019-03-06T03:33:19.686',
-	TimeFinishMove: '2019-03-05T01:25:22.210',
-	ListMove:[ { CurrentCell: '10,11,0', NextCell: '10,10,0', TimeMoveNextCell: '2019-03-05T01:25:19.686' } ] };
+	ID_User: 9,
+	Position_Cell: '11,11,0',
+	Next_Cell: '11,11,0',
+	End_Cell: '11,11,0',
+	TimeMoveNextCell: '2019-03-19T01:27:24.473',
+	TimeFinishMove: '2019-03-19T01:27:24.473',
+	ListMove: [] }
 //
-// test (S_MOVE_data);
-function test (data) {
-	var stringData = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+// moveCalc2 (S_MOVE_data)
+function moveCalc2 (socket,data) {
+	// console.log(data)
+	var stringHkey = "s"+data.Server_ID+"_unit";
+	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	clearMoveTimeout(stringKey);
 	positionRemove.PostionRemove(data);
-	checkRedisKey (data,stringData,function (checkBool) {
-		// console.log(checkBool);
-		if (checkBool) {			
-			//setTimerUpdateDatabase (data,stringData);
-			//setTimerMoveAttack (data,stringData);
-		}else {
-			console.log('error select unit');
-		}
-	});
+	setTimerUpdateDatabase (data,stringKey);
+	// setTimerUpdateDatabase2 (socket,data,stringKey);
+	//setTimerMoveAttack (data,stringData);
 
+	// checkRedisKey (stringHkey,stringKey,function (checkBool) {
+	// 	// console.log(checkBool);
+	// 	if (checkBool) {			
+	// 		setTimerUpdateDatabase (data,stringKey);
+	// 		
+	// 	}else {
+	// 		DetailError = ('Move.js: MoveCalc checkRedisKey error select unit: '+stringKey); functions.WriteLogError(DetailError,3);
+	// 	}
+	// });
 }
 
-function setTimerMoveAttack (data,stringData) {
+function setTimerUpdateDatabase2 (socket,data,stringKey) {
+	// console.log(data.TimeMoveNextCell)
+	var timeOut = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();	
+	// console.log(timeOut);
 
+	DictMoveTimeOut[stringKey] = setTimeout(function (stringKey) {
+		var updateData = data;
+		var Position_Cell = data.Position_Cell;
+		// console.log(updateData.Next_Cell,data.ListMove[0].Position_Cell)
+		if (data.ListMove.length>0) {
+			if (updateData.Next_Cell!=data.ListMove[0].Position_Cell) {
+				DetailError = ('Move.js: setTimerUpdateDatabase: '+stringKey); functions.WriteLogError(DetailError,3);
+				// console.log(updateData)
+				// console.log(updateData.Next_Cell,data.ListMove[0].Position_Cell)
+			}else{
+				updateData.Position_Cell = data.Next_Cell;
+				updateData.Next_Cell = data.ListMove[0].Next_Cell;
+				updateData.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;					
+				updateData.ListMove.shift();
+				// console.log(updateData.ListMove)
+				updateDatabase (updateData);
+				setTimerUpdateDatabase (updateData,stringKey);
+			}
+		}else{	
+			checkPosition (updateData,function (returnBool) {				
+				if (returnBool) {
+					console.log(returnBool)
+					move_GetNewPos.SendGetNewPos(socket,updateData);
+				}else{
+					var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET"+
+					" `Position_Cell`='"+data.Next_Cell
+					+"',`Next_Cell`= NULL,`End_Cell`=NULL,`TimeMoveNextCell`=NULL,`TimeFinishMove`=NULL,`ListMove`=NULL,`Status`='"+functions.UnitStatus.Standby+"' "+
+					"WHERE `ID`='"+data.ID+"'";
+					db_position.query(stringUpdate,function (error,result) {
+						if (!!error){DetailError = ('Move.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,3);}
+						logChangeDetail =("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,3);
+					});
+				}
+			})						
+		}
+		//console.log(updateData)
+		// updateRedisData (stringKey,updateData,Position_Cell);
+	}, timeOut, stringKey);
+}
+
+function checkPosition (data,returnBool) {
+	var checkBool = false;
+	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE "+
+	"`Status`='"+functions.UnitStatus.Standby
+	+"' AND `Position_Cell`='"+data.End_Cell
+	+"' AND `ID`<>'"+data.ID+"'";
+	db_position.query(stringQuery,function (error,rows) {
+		if (rows.length>0) {checkBool =true;}
+		returnBool(checkBool);
+	});
+}
+
+function setTimerUpdateDatabase (data,stringKey) {
+	// console.log(data.TimeMoveNextCell)
+	var timeOut = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();	
+	// console.log(timeOut);
+
+	DictMoveTimeOut[stringKey] = setTimeout(function (stringKey) {
+		var updateData = data;
+		var Position_Cell = data.Position_Cell;
+		// console.log(updateData.Next_Cell,data.ListMove[0].Position_Cell)
+		if (data.ListMove.length>0) {
+			if (updateData.Next_Cell!=data.ListMove[0].Position_Cell) {
+				DetailError = ('Move.js: setTimerUpdateDatabase: '+stringKey); functions.WriteLogError(DetailError,3);
+				// console.log(updateData)
+				// console.log(updateData.Next_Cell,data.ListMove[0].Position_Cell)
+			}else{
+				updateData.Position_Cell = data.Next_Cell;
+				updateData.Next_Cell = data.ListMove[0].Next_Cell;
+				updateData.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;					
+				updateData.ListMove.shift();
+				// console.log(updateData.ListMove)
+				updateDatabase (updateData);
+				setTimerUpdateDatabase (updateData,stringKey);
+			}
+		}else{	
+			// check pos
+			
+			// console.log(updateData.Next_Cell)
+			var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET"+
+			" `Position_Cell`='"+data.Next_Cell
+			+"',`Next_Cell`= NULL,`End_Cell`=NULL,`TimeMoveNextCell`=NULL,`TimeFinishMove`=NULL,`ListMove`=NULL,`Status`='"+functions.UnitStatus.Standby+"' "+
+			"WHERE `ID`='"+data.ID+"'";
+			//console.log(stringUpdate);
+			db_position.query(stringUpdate,function (error,result) {
+				if (!!error){DetailError = ('Move.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,3);}
+				logChangeDetail =("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,3);
+			});
+			
+		}
+		//console.log(updateData)
+		// updateDatabase (updateData);
+
+		//updateDatabase (updateData);
+		// updateRedisData (stringKey,updateData,Position_Cell);
+
+	}, timeOut, stringKey);
+}
+
+function updateDatabase (data) {
+	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+	+"`Position_Cell`='"+data.Position_Cell+"',"
+	+"`Next_Cell`='"+data.Next_Cell+"',"
+	+"`End_Cell`='"+data.End_Cell+"',"
+	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+	+"`ListMove`='"+JSON.stringify(data.ListMove)+"',"
+	+"`Status`='"+functions.UnitStatus.Move+
+	"' WHERE `ID`='"+data.ID+"'";
+	//console.log(stringUpdate);
+	db_position.query(stringUpdate,function (error,result) {
+		if (!!error){DetailError = ('Move.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,3);}
+		logChangeDetail =("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,3);
+	});
+}
+function setTimerMoveAttack (data,stringData) {
 	clearTimeout(DictTimeMoveAttack[stringData]);
 	delete DictTimeMoveAttack[stringData];
 	if (data.TimeMoveNextCell!=null) {checkTimeMoveNextCell (data,stringData);}
-
 }
 function checkTimeMoveNextCell (data,stringKey) {
 	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
@@ -90,11 +209,11 @@ function checkTimeMoveNextCell (data,stringKey) {
 		stringPos = data.Next_Cell;
 	}
 
-	DictTimeMoveAttack[stringKey] = setTimeout(function (data,stringPos) {
-		checkPostionAttackUnit (data,stringPos);
-	}, timeMove, data,stringPos);
+	// DictTimeMoveAttack[stringKey] = setTimeout(function (data,stringPos) {
+	// 	checkPostionAttackUnit (data,stringPos);
+	// }, timeMove, data,stringPos);
 }
-checkPostionAttackUnit (S_MOVE_data,'489,82,0',)
+//checkPostionAttackUnit (S_MOVE_data,'489,82,0',)
 function checkPostionAttackUnit (data,stringPos) {
 	//attackFunc
 	var stringHkey = "s"+data.Server_ID+"_pos";
@@ -102,13 +221,18 @@ function checkPostionAttackUnit (data,stringPos) {
 		var ID_Defend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 		if (rows==1) {
 			client.hget(stringHkey,stringPos,function (error,rowsPos){
+				if (!!error){DetailError = ('Move.js: checkPostionAttackUnit: '+stringPos); functions.WriteLogError(DetailError,3);}	
 				var unitResult = rowsPos.split("/").filter(String);
 				for (var i = 0; i < unitResult.length; i++) {
-					getAttackData (data,unitResult[i])
-				}				
+					if (unitResult[i].split("_")[2]!=data.ID_User) {
+						getAttackData (data,unitResult[i]);
+					}			
+				}
 			});
 		}		
-	})
+	});
+
+
 }
 
 function getAttackData (data,ID_Player) {
@@ -133,53 +257,9 @@ function getAttackData (data,ID_Player) {
 	}))
 	)
 }
-function setTimerUpdateDatabase (data,stringKey) {
-	clearMoveTimeout (stringData);
-	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
-	// console.log(data.TimeMoveNextCell);
-	DictMoveTimeOut[stringKey] = setTimeout(function (stringKey) {
-		var updateData = data;
-		var Position_Cell = data.Position_Cell;
 
-		if (data.ListMove.length>0) {
-			if (updateData.Next_Cell!=data.ListMove[0].CurrentCell) {
-				console.log('error postion Time Update');
-			}else {
-				updateData.Position_Cell = updateData.Next_Cell;
-				updateData.Next_Cell = data.ListMove[0].NextCell;
-				updateData.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
-				data.ListMove.splice(0, 1);				
-				updateData.ListMove = data.ListMove;
-			}
-			setTimerUpdateDatabase (updateData,stringKey);
-		}else{
-			updateData.Position_Cell = data.Next_Cell;
-			updateData.End_Cell = null;
-			updateData.Next_Cell = null;
-			updateData.TimeMoveNextCell = null;
-			updateData.TimeFinishMove = null;
-			updateData.Status = functions.UnitStatus.Standby;
-		}
-		//updateDatabase (updateData);
-		updateRedisData (stringKey,updateData,Position_Cell);
 
-	}, data.TimeMoveNextCell, stringKey);
-}
 
-function updateDatabase (data) {
-	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-	+"`Next_Cell`='"+data.Next_Cell+"',"
-	+"`End_Cell`='"+data.EndCell+"',"
-	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-	+"`ListMove`='"+data.ListMove+"',"
-	+"`Status`='"+unitStatus.Move+
-	"' WHERE `ID`='"+data.ID+"'";
-	// console.log(stringUpdate);
-	db_position.query(stringUpdate,function (error,result) {
-		if (!!error) {console.log(error);}
-	});
-}
 
 function updateRedisData (stringKey,updateData,Position_Cell) {
 	var stringHkey = "s"+updateData.Server_ID+"_unit";
@@ -187,35 +267,28 @@ function updateRedisData (stringKey,updateData,Position_Cell) {
 		var result = JSON.parse(rows);
 		// console.log(result.Position_Cell)
 		// console.log(data.Position_Cell)
+		// console.log('updateRedisData')
+		// console.log(updateData,Position_Cell,rows)
 		if (result.Position_Cell!=Position_Cell) {
-			console.log('error position unit');
+			DetailError = ('Move.js: updateRedisData: position unit: '+stringKey); functions.WriteLogError(DetailError,3);
 		}else{
 			result.Position_Cell = updateData.Position_Cell;
 			result.Next_Cell = updateData.Next_Cell;
-			result.EndCell = updateData.End_Cell;
+			result.End_Cell = updateData.End_Cell;
 			result.TimeMoveNextCell = updateData.TimeMoveNextCell;
 			result.TimeFinishMove = updateData.TimeFinishMove;
 			result.ListMove = updateData.ListMove;
 			result.Status = updateData.Status;
 			//console.log(result);
-			client.hset(stringHkey,stringKey,stringify(result));			
+			client.hset(stringHkey,stringKey,JSON.stringify(result));			
 		}
 	});
 }
 
-function checkRedisKey (data,stringKey,returnCheck) {
-	var stringHkey = "s"+data.Server_ID+"_unit";
-	var returnBool = false;
-	client.hexists(stringHkey,stringKey,function (error,rows) {
-		if (rows==1) {returnBool=true;}
-		returnCheck(returnBool);
-	});
-}
 function clearMoveTimeout (stringData) {
 	clearTimeout(DictMoveTimeOut[stringData]);
 	delete DictMoveTimeOut[stringData];
 }
-exports.ClearMoveTimeout = function clearMoveTimeout (stringData) {
-	clearTimeout(DictMoveTimeOut[stringData]);
-	delete DictMoveTimeOut[stringData];
+exports.ClearMoveTimeout = function clearTimeout (stringData) {
+	clearMoveTimeout (stringData);
 }

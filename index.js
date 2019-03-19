@@ -4,7 +4,11 @@ var app				= express();
 var server			= require('http').createServer(app);
 var io 				= require('socket.io').listen(server);
 
+var redisFunc 		= require('./Redis.js');
+redisFunc.UpdateUnitData(1);
+
 var functions 		= require('./Util/Functions.js');
+
 
 var db_server_task 	= require('./Util/Database/Db_server_task.js');
 
@@ -51,6 +55,10 @@ var guild 					= require('./Guild/GetGuild.js');
 var sendUnit				= require('./Unit/Deploy.js');
 
 var moveUnit 				= require('./Unit/Moving.js');
+
+var moving_Update 			= require('./Unit/Moving_Update.js');
+// moving_Update.UpdateDataBase(1);
+
 
 var guild_UpdateDatabase 	= require('./Guild/Guild_UpdateDatabase.js');
 guild_UpdateDatabase.UpdateDatabase(); 

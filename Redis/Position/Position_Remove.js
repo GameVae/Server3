@@ -12,6 +12,7 @@ var db_position				= require('./../../Util/Database/Db_position.js');
 var functions 				= require('./../../Util/Functions.js');
 var Promise 				= require('promise');
 
+
 var redis = require('redis');
 var client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
@@ -19,7 +20,7 @@ client.select(functions.RedisData.TestUnit);
 function deleteHashKey (server_ID) {
 	var stringHkey = "s"+server_ID+"_pos";
 	client.del(stringHkey,function (error,rows) {
-		console.log(rows)
+		//console.log(rows)
 	});
 }
 
@@ -38,7 +39,7 @@ function unitRange1 (data) {
 	var stringHkey = "s"+data.Server_ID+"_pos";
 	var stringKey = [];
 	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	console.log(ID_Key)
+	//console.log(ID_Key)
 	stringKey[0] = data.Position_Cell;
 	
 	if (posY%2==0) {

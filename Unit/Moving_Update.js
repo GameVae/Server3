@@ -4,54 +4,61 @@
 var db_position			= require('./../Util/Database/Db_position.js');
 var db_server_task 		= require('./../Util/Database/Db_server_task.js');
 // var moveRedis 		= require('./../Redis/Move/Move.js');
+var move 				= require('./../Redis/Move/Move.js');
 
 var functions 		= require('./../Util/Functions.js');
+var DetailError,logChangeDetail;
 
 var Promise = require('promise')
 
 var DetailError;
 var currentTime,offlineTime,calcTime;
-
+// move.Test(2)
 exports.UpdateDataBase = function updateDataBase (serverInt) {
-	
+	updateDataBase (serverInt);
 }
-
-updateDataBase (1)
-
+//updateDataBase (1)
 function updateDataBase (serverInt) {
-
-	new Promise((resolve,reject)=>{
-		var stringQuery = "SELECT `Time` FROM `task` WHERE `Task`='OfflineTime';"
-		db_server_task.query(stringQuery,function (error,rows) {
-			offlineTime=functions.ExportTimeDatabase(rows[0].Time)
-			
-			resolve();
-		});
-	}).then(()=>new Promise((resolve,reject)=>{
-		var stringQuery = "SELECT * FROM `s"+serverInt+"_unit` WHERE `TimeFinishMove`<> 'Null'";
-		db_position.query(stringQuery,function (error,rows) {
-			if (!!error) {console.log(error);}
-			if (rows.length>0) {
-				for (var i = 0; i < rows.length; i++) {
-					getDataUpdate (serverInt,offlineTime,rows[i])
-				}
+	var stringQuery = "SELECT * FROM `s"+serverInt+"_unit` WHERE `TimeFinishMove`<> 'Null'";
+	db_position.query(stringQuery,function (error,rows) {
+		if (!!error){DetailError = ('Moving_Update.js: updateDataBase TimeFinishMove: '+stringQuery); functions.WriteLogError(DetailError,2);}
+		if (rows.length>0) {
+			for (var i = 0; i < rows.length; i++) {
+				getDataUpdate (serverInt,rows[i]);
 			}
-		});
-		
-	})
-	)
+		}
+	});
 
 }
+function getDataUpdate (serverInt,data){
+	var updateData =data;
+	updateData.Server_ID = serverInt;
+	var currentTime = functions.GetTime();
+	// calcTime = currentTime - functions.ExportTimeDatabase(updateData.TimeMoveNextCell) + functions.TimeMove.Diagonal*0.5
+	calcTime =functions.TimeMove.Diagonal*0.5 - functions.ExportTimeDatabase(updateData.TimeMoveNextCell);
+	updateData.TimeMoveNextCell = functions.ExportTimeDatabase(updateData.TimeMoveNextCell)+calcTime;
+	updateData.TimeFinishMove = functions.ExportTimeDatabase(updateData.TimeFinishMove)+calcTime;
+	var ListMove = JSON.parse(updateData.ListMove);
+	//console.log(ListMove)
+	if (ListMove!=null) {
+		for (var i = 0; i < ListMove.length; i++) {
+			ListMove[i].TimeMoveNextCell = functions.ExportTimeDatabase(ListMove[i].TimeMoveNextCell)+calcTime;
+		}
+		updateData.ListMove = ListMove;
+	}
+	move.MoveCalc(updateData)
+	// console.log(updateData)
+}
 
-var ListMove = [ { Position_Cell: '14,13,0',
-Next_Cell: '15,14,0',
-TimeMoveNextCell: '2019-03-14T04:21:05.044' },
-{ Position_Cell: '15,14,0',
-Next_Cell: '15,15,0',
-TimeMoveNextCell: '2019-03-14T04:21:06.306' },
-{ Position_Cell: '15,15,0',
-Next_Cell: '16,15,0',
-TimeMoveNextCell: '2019-03-14T04:21:07.706' } ]
+// var ListMove = [ { Position_Cell: '14,13,0',
+// Next_Cell: '15,14,0',
+// TimeMoveNextCell: '2019-03-14T04:21:05.044' },
+// { Position_Cell: '15,14,0',
+// Next_Cell: '15,15,0',
+// TimeMoveNextCell: '2019-03-14T04:21:06.306' },
+// { Position_Cell: '15,15,0',
+// Next_Cell: '16,15,0',
+// TimeMoveNextCell: '2019-03-14T04:21:07.706' } ]
 //
 // updateListMove (ListMove)
 // function updateListMove (list) {
@@ -62,40 +69,7 @@ TimeMoveNextCell: '2019-03-14T04:21:07.706' } ]
 
 // 	}
 // }
-function getDataUpdate (serverInt,offlineTime,data){
-	var updateData = data;
-	updateData.TimeMoveNextCell = functions.ExportTimeDatabase(updateData.TimeMoveNextCell)
-	calcTime = offlineTime - updateData.TimeMoveNextCell;
-	console.log(calcTime);
-	var ListMove = JSON.parse(updateData.ListMove);
-	for (var i = 0; i < ListMove.length; i++) {
-		var timeUpdate = functions.ExportTimeDatabase(ListMove[i].TimeMoveNextCell)+calcTime;
-		ListMove[i].TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(timeUpdate).toISOString());
-		// console.log(ListMove[i].TimeMoveNextCell);
-	}
-	
-	console.log(updateData.ListMove);
-	// updateData.ListMove = ListMove;
-	// console.log(updateData.ListMove);
-	//console.log(JSON.parse(updateData.ListMove))
-	
-	// for (var i = 0; i < updateData.ListMove.length; i++) {
-		
-	// }
 
-	// if (calcTime >= 0) {
-	// 	updateData.TimeMoveNextCell = currentTime + 1000;
-
-	// 	if (updateData.ListMove!=null) {
-	// 		for (var i = 0; i < updateData.ListMove.length; i++) {
-
-	// 			updateData.ListMove[i]
-	// 		}
-	// 	}
-	// }
-	// console.log(offlineTime)
-	// console.log(updateData.TimeMoveNextCell);
-}
 
 
 // function getDataUpdate (serverInt,rowData) {
@@ -138,20 +112,20 @@ function getDataUpdate (serverInt,offlineTime,data){
 // 	}
 // 	return returnData;
 // }
-function updateUnit (serverInt,updateData) {
-	var stringUpdate = "UPDATE `s"+serverInt+"_unit` SET "+
-	"`Position_Cell`='"+updateData.Position_Cell+"',"+
-	"`Next_Cell`='"+updateData.Next_Cell+"',"+
-	"`End_Cell`='"+updateData.End_Cell+"',"+
-	"`TimeMoveNextCell`='"+updateData.TimeMoveNextCell+"',"+
-	"`TimeFinishMove`='"+updateData.TimeFinishMove+"',"+
-	"`ListMove`='"+updateData.ListMove+"',"+
-	"`Status`='"+updateData.Status+"';"
-	console.log(stringUpdate);
-	// db_position.query(stringUpdate,function (error,result) {
-	// 	if (!!error) {console.log(error);}
-	// })
-}
+// function updateUnit (serverInt,updateData) {
+// 	var stringUpdate = "UPDATE `s"+serverInt+"_unit` SET "+
+// 	"`Position_Cell`='"+updateData.Position_Cell+"',"+
+// 	"`Next_Cell`='"+updateData.Next_Cell+"',"+
+// 	"`End_Cell`='"+updateData.End_Cell+"',"+
+// 	"`TimeMoveNextCell`='"+updateData.TimeMoveNextCell+"',"+
+// 	"`TimeFinishMove`='"+updateData.TimeFinishMove+"',"+
+// 	"`ListMove`='"+updateData.ListMove+"',"+
+// 	"`Status`='"+updateData.Status+"';"
+// 	console.log(stringUpdate);
+// 	// db_position.query(stringUpdate,function (error,result) {
+// 	// 	if (!!error) {console.log(error);}
+// 	// })
+// }
 
 // function updateDataBase (data) {
 // 	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
@@ -213,3 +187,24 @@ function updateUnit (serverInt,updateData) {
 // 		if (!!error) {console.log(error);}
 // 	})
 // }
+
+	// new Promise((resolve,reject)=>{
+	// 	var stringQuery = "SELECT `Time` FROM `task` WHERE `Task`='OfflineTime';"
+	// 	db_server_task.query(stringQuery,function (error,rows) {
+	// 		if (!!error){DetailError = ('Moving_Update.js: updateDataBase OfflineTime: '+stringQuery); functions.WriteLogError(DetailError,2);}
+	// 		offlineTime=functions.ExportTimeDatabase(rows[0].Time);			
+	// 		resolve();
+	// 	});
+	// }).then(()=>new Promise((resolve,reject)=>{
+	// 	var stringQuery = "SELECT * FROM `s"+serverInt+"_unit` WHERE `TimeFinishMove`<> 'Null'";
+	// 	db_position.query(stringQuery,function (error,rows) {
+	// 		if (!!error){DetailError = ('Moving_Update.js: updateDataBase TimeFinishMove: '+stringQuery); functions.WriteLogError(DetailError,2);}
+	// 		if (rows.length>0) {
+	// 			for (var i = 0; i < rows.length; i++) {
+	// 				getDataUpdate (serverInt,offlineTime,rows[i]);
+	// 			}
+	// 		}
+	// 	});
+		
+	// })
+	// );
