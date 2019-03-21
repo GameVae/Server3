@@ -12,7 +12,9 @@ client.select(functions.RedisData.TestUnit);
 exports.GetPosition = function getPosition (server_ID){
 	getPosition_test (server_ID);
 }
-
+exports.AddPosition = function addPosition (data) {
+	getRangeUnit (data,data.Server_ID)
+}
 function getPosition_test (server_ID) {
 	//deleteHashKey (server_ID);
 	var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"'";

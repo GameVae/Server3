@@ -54,6 +54,9 @@ function getStringChangeFile (intLocationFile) {
 		case 2:
 		stringTime = "./../LogChange/LogChange_"+getTimeNow().slice(0, 10);
 		break;
+		case 3:
+		stringTime = "./../../LogChange/LogChange_"+getTimeNow().slice(0, 10);
+		break;
 	}
 	
 	var caseHour = parseInt((new Date().getHours()-1)/8);

@@ -7,12 +7,23 @@ var DetailError, LogChange;
 
 var dataUnit = {};
 
-exports.R_UNIT = function r_unit (socket,ID_User,Server_ID) {
+
+exports.Start = function start (io) {
+	io.on('connection', function(socket){
+		socket.on('S_UNIT', function (data){
+			// console.log('S_UNIT: '+data);
+			R_UNIT (socket,data.ID_User,data.Server_ID);
+		});
+	});
+}
+
+function R_UNIT (socket,ID_User,Server_ID) {
 	var stringQuery = "SELECT * FROM `s"+Server_ID+"_unit` ORDER BY `ID_User` ='"+ID_User+"'";
 	db_position.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('GetUnit.js: query '+stringQuery); functions.WriteLogError(DetailError,2);}
-		var currentTime = functions.GetTime();
+		
 		for (var i = 0; i < rows.length; i++) {
+			var currentTime = functions.GetTime();
 			if (rows[i].TimeMoveNextCell != null) {
 				rows[i]["TimeMoveNextCell"] = (new Date(functions.ExportTimeDatabase(rows[i].TimeMoveNextCell))-currentTime);		
 			}

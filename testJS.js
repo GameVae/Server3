@@ -919,14 +919,42 @@
 // }
 
 
-var testFunc = require('./Test/Test.js');
-testFunc.Inter1("stringPara");
-testFunc.Inter2("stringPara");
+// var testFunc = require('./Test/Test.js');
+// testFunc.Inter1("stringPara");
+// testFunc.Inter2("stringPara");
 
-test ("stringPara",2);
+// test ("stringPara",2);
 
-function test (stringPara,caseNumber) {
-	setTimeout(function (stringPara,caseNumber) {
-		testFunc.ClearInterval("stringPara",caseNumber)
-	}, 5000, stringPara,caseNumber)
+// function test (stringPara,caseNumber) {
+// 	setTimeout(function (stringPara,caseNumber) {
+// 		testFunc.ClearInterval("stringPara",caseNumber)
+// 	}, 5000, stringPara,caseNumber)
+// }
+
+var redis 				= require("redis"),
+client 					= redis.createClient();
+client.select(2);
+// sendSocketRedis (1)
+// function sendSocketRedis (Server_ID){
+// 	var stringHSocket = "s"+Server_ID+"_pos";
+// 	client.hgetall(stringHSocket,function (error,rows) {
+// 		// console.log(rows)
+// 		var result = rows;
+// 		delete result['488,81,0']
+
+// 		console.log(result)
+// 		// var result = JSON.parse(rows)
+// 		// console.log(result.length)
+// 	})
+
+// }
+
+// var socketList ={ '42': '2aLIKO05-D06zHPUAAAJ' }
+
+// // console.log(socketList)
+// console.log(Object.keys(socketList)[0]);
+// console.log(Object.values(socketList)[0])
+testSocket (null,1)
+function testSocket (socket,ID_User) {
+	if (socket==null) {console.log('here')}
 }
