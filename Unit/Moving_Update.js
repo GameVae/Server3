@@ -71,7 +71,8 @@ function getDataUpdate (serverInt,data){
 		}
 	}
 	updateData.ListMove = ListMove;
-	updateDatabase (updateData)
+	move.MoveCalc(null,updateData);
+	updateDatabase (updateData);
 	// console.log(updateData)
 }
 function updateDatabase (data) {

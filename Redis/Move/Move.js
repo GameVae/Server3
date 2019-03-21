@@ -25,14 +25,6 @@ var DetailError, logChangeDetail;
 exports.MoveCalc = function moveCalc (socket,data) {
 	moveCalc2 (socket,data)
 }
-// exports.MoveUpdate = function moveUpdate (data) {
-// 	var stringHkey = "s"+data.Server_ID+"_unit";
-// 	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-// 	clearMoveTimeout(stringKey);
-// 	positionRemove.PostionRemove(data);
-// 	// setTimerUpdateDatabase (data,stringKey);
-// 	setTimerUpdateDatabase(data,stringKey);
-// }
 
 var S_MOVE_data = { Server_ID: 1,
 	ID: 10,
@@ -52,7 +44,6 @@ function moveCalc2 (socket,data) {
 	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	clearMoveTimeout(stringKey);
 	positionRemove.PostionRemove(data);
-	// setTimerUpdateDatabase (data,stringKey);
 	setTimerUpdateDatabase2 (socket,data,stringKey);
 }
 
@@ -73,7 +64,7 @@ function setTimerUpdateDatabase2 (socket,data,stringKey) {
 			}else{
 				updateData.Position_Cell = data.Next_Cell;
 				updateData.Next_Cell = data.ListMove[0].Next_Cell;
-				updateData.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;					
+				updateData.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
 				updateData.ListMove.shift();
 				// console.log(updateData.ListMove)
 				updateDatabase (updateData);
@@ -83,7 +74,17 @@ function setTimerUpdateDatabase2 (socket,data,stringKey) {
 			checkPosition (updateData,function (returnBool) {				
 				if (returnBool) {
 					// console.log(returnBool)
-					move_GetNewPos.SendGetNewPos(socket,updateData);
+					if (socket!=null) {move_GetNewPos.SendGetNewPos(socket,updateData);}
+					else{
+						var express			= require('express');
+						var app				= express();
+						var server			= require('http').createServer(app);
+						var io 				= require('socket.io').listen(server);
+
+						app.set('port', process.env.PORT);
+						console.log('get new pos with no socket');
+						move_GetNewPos.SendGetNewPos(io.socket,updateData);
+					}	
 				}else{
 					var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET"+
 					" `Position_Cell`='"+data.Next_Cell
@@ -91,7 +92,7 @@ function setTimerUpdateDatabase2 (socket,data,stringKey) {
 					"WHERE `ID`='"+data.ID+"'";
 					db_position.query(stringUpdate,function (error,result) {
 						if (!!error){DetailError = ('Move.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,2);}
-						logChangeDetail =("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
+						logChangeDetail = ("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
 					});
 					updateData.Position_Cell = data.Next_Cell;
 					positionAdd.AddPosition(updateData);
