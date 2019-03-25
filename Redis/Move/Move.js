@@ -22,8 +22,8 @@ var DictTimeMoveAttack = {};
 var currentTime,stringData;
 var DetailError, logChangeDetail;
 
-exports.MoveCalc = function moveCalc (socket,data) {
-	moveCalc2 (socket,data)
+exports.MoveCalc = function moveCalc (io,socket,data) {
+	moveCalc2 (io,socket,data)
 }
 
 var S_MOVE_data = { Server_ID: 1,
@@ -38,18 +38,22 @@ var S_MOVE_data = { Server_ID: 1,
 	ListMove: [] }
 //
 // moveCalc2 (S_MOVE_data)
-function moveCalc2 (socket,data) {
+function moveCalc2 (io,socket,data) {
 	// console.log(data)
 	var stringHkey = "s"+data.Server_ID+"_unit";
 	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	clearMoveTimeout(stringKey);
 	positionRemove.PostionRemove(data);
-	setTimerUpdateDatabase2 (socket,data,stringKey);
+	setTimerUpdateDatabase2 (io,socket,data,stringKey);
 }
 
-function setTimerUpdateDatabase2 (socket,data,stringKey) {
+
+
+
+function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 	// console.log(data.TimeMoveNextCell)
 	//console.log(data)
+	
 	var	timeOut = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();		
 	// console.log(timeOut);
 	DictMoveTimeOut[stringKey] = setTimeout(function (stringKey) {
@@ -68,22 +72,24 @@ function setTimerUpdateDatabase2 (socket,data,stringKey) {
 				updateData.ListMove.shift();
 				// console.log(updateData.ListMove)
 				updateDatabase (updateData);
-				setTimerUpdateDatabase2 (socket,updateData,stringKey);
+				setTimerUpdateDatabase2 (io,socket,updateData,stringKey);
 			}
 		}else{	
 			checkPosition (updateData,function (returnBool) {				
 				if (returnBool) {
 					// console.log(returnBool)
-					if (socket!=null) {move_GetNewPos.SendGetNewPos(socket,updateData);}
+					
+					if (io!=null) {move_GetNewPos.SendGetNewPos(io,updateData);}
 					else{
-						var express			= require('express');
-						var app				= express();
-						var server			= require('http').createServer(app);
-						var io 				= require('socket.io').listen(server);
+						var index = require('./../../index');
+						// var express			= require('express');
+						// var app				= express();
+						// var server			= require('http').createServer(app);
+						// var io 				= require('socket.io').listen(server);
 
-						app.set('port', process.env.PORT);
+						// app.set('port', process.env.PORT);
 						console.log('get new pos with no socket');
-						move_GetNewPos.SendGetNewPos(io.socket,updateData);
+						move_GetNewPos.SendGetNewPos(index.IO,updateData);
 					}	
 				}else{
 					var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET"+
@@ -106,8 +112,10 @@ function setTimerUpdateDatabase2 (socket,data,stringKey) {
 
 function checkPosition (data,returnBool) {
 	var checkBool = false;
-	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE "+
-	"`Status`='"+functions.UnitStatus.Standby
+	console.log('checkPosition')
+	console.log(data)
+	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE "
+	+"`Status`='"+functions.UnitStatus.Standby
 	+"' AND `Position_Cell`='"+data.End_Cell
 	+"' AND `ID`<>'"+data.ID+"'";
 	db_position.query(stringQuery,function (error,rows) {
@@ -115,8 +123,8 @@ function checkPosition (data,returnBool) {
 		returnBool(checkBool);
 	});
 }
-
-
+// var index = require('./../../index');
+// console.log(index.Test('hi'))
 function updateDatabase (data) {
 	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
 	+"`Position_Cell`='"+data.Position_Cell+"',"
@@ -133,6 +141,51 @@ function updateDatabase (data) {
 		logChangeDetail =("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
 	});
 }
+
+function updateRedisData (stringKey,updateData,Position_Cell) {
+	var stringHkey = "s"+updateData.Server_ID+"_unit";
+	client.hget(stringHkey,stringKey,function (error,rows) {
+		var result = JSON.parse(rows);
+		// console.log(result.Position_Cell)
+		// console.log(data.Position_Cell)
+		// console.log('updateRedisData')
+		// console.log(updateData,Position_Cell,rows)
+		if (result.Position_Cell!=Position_Cell) {
+			DetailError = ('Move.js: updateRedisData: position unit: '+stringKey); functions.WriteLogError(DetailError,2);
+		}else{
+			result.Position_Cell = updateData.Position_Cell;
+			result.Next_Cell = updateData.Next_Cell;
+			result.End_Cell = updateData.End_Cell;
+			result.TimeMoveNextCell = updateData.TimeMoveNextCell;
+			result.TimeFinishMove = updateData.TimeFinishMove;
+			result.ListMove = updateData.ListMove;
+			result.Status = updateData.Status;
+			//console.log(result);
+			client.hset(stringHkey,stringKey,JSON.stringify(result));			
+		}
+	});
+}
+
+function clearMoveTimeout (stringData) {
+	clearTimeout(DictMoveTimeOut[stringData]);
+	delete DictMoveTimeOut[stringData];
+}
+exports.ClearMoveTimeout = function clearTimeout (stringData) {
+	clearMoveTimeout (stringData);
+}
+
+
+// moveCalc3 (S_MOVE_data)
+function moveCalc3 (socket,data) {
+	// console.log(data)
+	// var stringHkey = "s"+data.Server_ID+"_unit";
+	// var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	// clearMoveTimeout(stringKey);
+	// positionRemove.PostionRemove(data);
+	// setTimerUpdateDatabase2 (socket,data,stringKey);
+
+}
+
 function setTimerMoveAttack (data,stringData) {
 	clearTimeout(DictTimeMoveAttack[stringData]);
 	delete DictTimeMoveAttack[stringData];
@@ -209,36 +262,4 @@ function getAttackData (data,ID_Player) {
 		}
 	}))
 	)
-}
-
-function updateRedisData (stringKey,updateData,Position_Cell) {
-	var stringHkey = "s"+updateData.Server_ID+"_unit";
-	client.hget(stringHkey,stringKey,function (error,rows) {
-		var result = JSON.parse(rows);
-		// console.log(result.Position_Cell)
-		// console.log(data.Position_Cell)
-		// console.log('updateRedisData')
-		// console.log(updateData,Position_Cell,rows)
-		if (result.Position_Cell!=Position_Cell) {
-			DetailError = ('Move.js: updateRedisData: position unit: '+stringKey); functions.WriteLogError(DetailError,2);
-		}else{
-			result.Position_Cell = updateData.Position_Cell;
-			result.Next_Cell = updateData.Next_Cell;
-			result.End_Cell = updateData.End_Cell;
-			result.TimeMoveNextCell = updateData.TimeMoveNextCell;
-			result.TimeFinishMove = updateData.TimeFinishMove;
-			result.ListMove = updateData.ListMove;
-			result.Status = updateData.Status;
-			//console.log(result);f
-			client.hset(stringHkey,stringKey,JSON.stringify(result));			
-		}
-	});
-}
-
-function clearMoveTimeout (stringData) {
-	clearTimeout(DictMoveTimeOut[stringData]);
-	delete DictMoveTimeOut[stringData];
-}
-exports.ClearMoveTimeout = function clearTimeout (stringData) {
-	clearMoveTimeout (stringData);
 }

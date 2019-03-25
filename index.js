@@ -4,11 +4,14 @@ var app				= express();
 var server			= require('http').createServer(app);
 var io 				= require('socket.io').listen(server);
 
+exports.IO = io;
 var redisFunc 		= require('./Redis.js');
 redisFunc.UpdateUnitData(1);
 
 var functions 		= require('./Util/Functions.js');
-
+exports.Test = function test (argument) {
+	console.log(argument);
+}
 
 var db_server_task 	= require('./Util/Database/Db_server_task.js');
 

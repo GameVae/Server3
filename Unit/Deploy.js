@@ -16,6 +16,10 @@ var DetailError, LogChange;
 var dbDefend,dbUpgrade;
 var Promise = require('promise');
 
+var redis 				= require("redis"),
+client 					= redis.createClient();
+client.select(functions.RedisData.TestUnit);
+
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_DEPLOY', function (data){
@@ -38,13 +42,13 @@ exports.Start =  function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_DEPLOY', function (data){
 			//console.log('socketID: '+socket.id);
-			S_DEPLOY (socket,data);
+			S_DEPLOY (io,socket,data);
 		});
 	});
 }
 
 // S_DEPLOY (dataDeploy)
-function S_DEPLOY (socket,data) {
+function S_DEPLOY (io,socket,data) {
 	switch (parseInt(data.Server_ID)) {
 		case 1:
 		dbDefend = db_s1_base_defend;
@@ -59,7 +63,7 @@ function S_DEPLOY (socket,data) {
 	checkUnitAvailable (dbDefend,data,function (checkBool) {
 		//console.log(checkBool)
 		if (checkBool) {
-			sendUnitToMap (socket,dbDefend,dbUpgrade,data);
+			sendUnitToMap (io,socket,dbDefend,dbUpgrade,data);
 		}else{
 			DetailError = ('Deploy.js: checkUnitAvailable_ID_User: '+ data.ID_User
 				+"_Quality:_"+data.Quality
@@ -69,7 +73,7 @@ function S_DEPLOY (socket,data) {
 	});
 }
 
-function sendUnitToMap (socket,dbDefend,dbUpgrade,data) {
+function sendUnitToMap (io,socket,dbDefend,dbUpgrade,data) {
 	getBasePosition (data,function (resultPostion) {	
 		checkPosition (data,resultPostion,function (checkBool) {
 			if (checkBool) {
@@ -79,7 +83,7 @@ function sendUnitToMap (socket,dbDefend,dbUpgrade,data) {
 					data["Health"]= returnValue.Health;
 					data["Attack"]= returnValue.Attack;
 					data["Defend"]= returnValue.Defend;
-					insertPosition (socket,data,resultPostion);
+					insertPosition (io,socket,data,resultPostion);
 					updateBaseDefend (dbDefend,data);					
 				});	
 			}else {
@@ -134,17 +138,17 @@ function updateBaseDefend (dbDefend,data) {
 
 function checkPosition (data,Cellposition,resultCheck) {
 	var returnBool =true;
-	var stringCheck = "SELECT * FROM `s1_unit` WHERE `Position_Cell`='"+Cellposition+"'";
+	var stringCheck = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `Position_Cell`='"+Cellposition+"'";
 	//console.log(stringCheck);
 	db_position.query(stringCheck,function (error,rows) {
 		if (rows.length>0) {returnBool = false;}
 		resultCheck(returnBool);
 	});
 }
-function insertPosition (socket,data,Cellposition) {
+function insertPosition (io,socket,data,Cellposition) {
 	// console.log(data);
 	// console.log(Cellposition);
-	var stringInsert = "INSERT INTO `s1_unit`(`ID_Unit`, `Level`, `ID_User`, `BaseNumber`, `Quality`,`Hea_cur`,`Health`,`Attack`,`Defend`, `Position_Cell`) VALUES ('"
+	var stringInsert = "INSERT INTO `s"+data.Server_ID+"_unit`(`ID_Unit`, `Level`, `ID_User`, `BaseNumber`, `Quality`,`Hea_cur`,`Health`,`Attack`,`Defend`, `Position_Cell`) VALUES ('"
 	+data.ID_Unit+"','"
 	+data.Level+"','"
 	+data.ID_User+"','"
@@ -180,10 +184,32 @@ function insertPosition (socket,data,Cellposition) {
 			Attack_Unit_ID : null,
 			AttackedBool : 0,
 		}
-		socket.emit("R_DEPLOY",{R_DEPLOY: dataDeploy});
+
+		var stringHKey = "s"+data.Server_ID+"_socket";
+		client.hvals(stringHKey,function (error,rowSocket) {
+			for (var i = 0; i < rowSocket.length; i++) {
+				sendToClient (io,socket,rowSocket[i],dataDeploy)
+				// socket.broadcast.to(rowSocket[i]).emit('R_DEPLOY',{R_DEPLOY:dataDeploy});
+			}
+		})
+		// socket.emit("R_DEPLOY",{R_DEPLOY: dataDeploy});
 	});
 }
+function sendToClient (io,socket,socketID,dataDeploy) {
+		// socket.broadcast.to(socketID).emit('R_DEPLOY',{R_DEPLOY:dataDeploy});
+		io.to(socketID).emit('R_DEPLOY',{R_DEPLOY:dataDeploy});
+}
+// test (1)
+// function test (Server_ID) {
+// 	var stringHKey = "s"+Server_ID+"_pos";
+// 	client.hvals(stringHKey,function (error,rowSocket) {
+// 		console.log(rowSocket.length)
+// 		for (var i = 0; i < rowSocket.length; i++) {
+// 			socket.broadcast.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
+// 		}
 
+// 	})
+// }
 function getBasePosition (data, returnResult) {
 	var stringBase = "SELECT `Position_Cell` FROM `s"+data.Server_ID+"_position` WHERE `ID_Type`= '"+data.ID_User+"_0_"+data.BaseNumber+"'"
 	db_position.query(stringBase,function (error,rows) {

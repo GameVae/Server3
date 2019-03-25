@@ -13,35 +13,53 @@ var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
+
+// var dataMove =  { S_MOVE:
+//    { Server_ID: 1,
+//      ID: 16,
+//      ID_Unit: 16,
+//      ID_User: 42,
+//      Position_Cell: '4,4,0',
+//      Next_Cell: '5,3,0',
+//      End_Cell: '8,3,0',
+//      TimeMoveNextCell: 2524,
+//      TimeFinishMove: 10924,
+//      ListMove: [ [Object], [Object], [Object] ] } }
+// //
+// console.log(dataMove.S_MOVE.Server_ID)
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){
 			// socket.broadcast.emit('R_MOVE',{R_MOVE:data});
-			stringKeyMove = "s"+data.Server_ID+"_move";
+			
+			stringKeyMove = "s"+data.S_MOVE.Server_ID+"_move";
+			console.log(stringKeyMove,data)
 			client.set(stringKeyMove,JSON.stringify(data.S_MOVE));
 			// moveUnit.ClearMoveTimeout(stringData)		
-			R_MOVE (socket,data.S_MOVE.ID_User,data.S_MOVE.Server_ID);	
-			S_MOVE (socket,data.S_MOVE);
-			
+			R_MOVE (io,socket,data.S_MOVE.ID_User,data.S_MOVE.Server_ID);	
+			S_MOVE (io,socket,data.S_MOVE);			
 		});
 	});
 }
 
-function R_MOVE (socket,ID_User,Server_ID) {
+function R_MOVE (io,socket,ID_User,Server_ID) {
 	var stringHSocket = "s"+Server_ID+"_socket";
 	client.hgetall(stringHSocket,function (error,rows) {
-		var result = rows;
-		delete result[ID_User]
-		if (Object.values(result).length>0) {
-			for (var i = 0; i < Object.values(result).length; i++) {	
-				sendToClient (socket,Object.values(result)[i])
+		if (rows!=undefined) {
+			var result = rows;
+			// delete result[ID_User];
+			if (Object.values(result).length>0) {
+				for (var i = 0; i < Object.values(result).length; i++) {						
+					sendToClient (io,Object.values(result)[i])
+				}
 			}
-		}
-	})
+		}		
+	});
 }
-function sendToClient (socket,socketID) {
+
+function sendToClient (io,socketID) {
 	client.get(stringKeyMove,function (error,rowData) {
-		socket.broadcast.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
+		io.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
 	})
 }
 
@@ -51,7 +69,9 @@ var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":52,"Position_Cel
 
 // S_MOVE ('socket',S_MOVE_data)
 
-function S_MOVE (socket,data) {
+function S_MOVE (io,socket,data) {
+	console.log(functions.GetTime());
+	console.log(data);
 	currentTime = functions.GetTime();
 	data.TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(currentTime + data.TimeMoveNextCell).toISOString());
 	data.TimeFinishMove = functions.ImportTimeToDatabase(new Date(currentTime + data.TimeFinishMove).toISOString());
@@ -62,7 +82,7 @@ function S_MOVE (socket,data) {
 		//console.log(ListMove[i].TimeMoveNextCell)
 	}
 	// console.log(data);
-	moveUnit.MoveCalc (socket,data);
+	moveUnit.MoveCalc (io,socket,data);
 	updateDataBase (data);
 }
 
@@ -79,7 +99,7 @@ function updateDataBase (data) {
 
 	db_position.query(stringUpdate,function (error,result) {
 		if (!!error) {console.log(error);}
-		var stringQuery = "SELECT * FROM `s1_unit` WHERE `ID`='"+data.ID+"'";
+		var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
 		db_position.query(stringQuery,function (error,rows) {
 			updateRedisData (data,rows);
 		});
@@ -88,7 +108,7 @@ function updateDataBase (data) {
 }
 
 function updateRedisData (data,rowsData) {
-	var stringHkey ="s1_unit";
+	var stringHkey ="s"+data.Server_ID+"_unit";
 	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	client.hset(stringHkey,stringKey,JSON.stringify(rowsData))
 }
