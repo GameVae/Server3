@@ -125,7 +125,6 @@ function getUnitLevel (data,dbUpgrade,returnResult) {
 		returnResult(dataReturn);
 	})
 	));
-	
 }
 
 

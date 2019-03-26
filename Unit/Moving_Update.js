@@ -17,7 +17,7 @@ var currentTime,offlineTime,calcTime;
 exports.UpdateDataBase = function updateDataBase (serverInt) {
 	updateDataBase2 (serverInt);
 }
-//updateDataBase2 (1)
+updateDataBase2 (1)
 function updateDataBase2 (serverInt) {
 	var stringQuery = "SELECT * FROM `s"+serverInt+"_unit` WHERE `TimeFinishMove`<> 'Null'";
 	db_position.query(stringQuery,function (error,rows) {
@@ -54,11 +54,31 @@ function updateDataBase2 (serverInt) {
 // 	Attack_Unit_ID: null,
 // 	AttackedBool: 0 }
 //
+var S_MOVE_data = {
+	ID: 14,
+	ID_Unit: 16,
+	ID_User: 43,
+	BaseNumber: 1,
+	Level: 2,
+	Quality: 1,
+	Hea_cur: 5.45,
+	Health: 5.45,
+	Attack: 2.3,
+	Defend: 1.15,
+	Position_Cell: '298,1,0',
+	Next_Cell: '298,2,0',
+	End_Cell: '304,3,0',
+	TimeMoveNextCell: '2019-03-19T23:22:21',
+	TimeFinishMove: '2019-03-19T23:22:54',
+	ListMove: '[]',
+	Status: 1,
+	Attack_Base_ID: null,
+	Attack_Unit_ID: null,
+	AttackedBool: 0 }
+//
 // getDataUpdate (1,S_MOVE_data)
 
-function getDataUpdate (serverInt,data){
-	
-	
+function getDataUpdate (serverInt,data){		
 	// console.log(updateData)
 	// updateCalcTime(data)
 	data.Server_ID = serverInt;
@@ -72,38 +92,17 @@ function getDataUpdate (serverInt,data){
 	updateData.TimeMoveNextCell = TimeMoveNextCell;
 	
 	var ListMove = JSON.parse(updateData.ListMove)
-	if (ListMove!=null) {
+	if (updateData.ListMove.length>0) {
 		for (var i = 0; i < ListMove.length; i++) {
 			ListMove[i].TimeMoveNextCell = TimeMoveNextCell + functions.ExportTimeDatabase(ListMove[i].TimeMoveNextCell) - functions.ExportTimeDatabase(updateData.TimeMoveNextCell);
 		}
 	}
 	updateData.ListMove = ListMove;
-	updateCalcTime(updateData);
+	// console.log(updateData)
+	// updateCalcTime(updateData);
 	updateDatabase(updateData);
 
-
-	move.MoveCalc(null,null,updateData);	
-}
-function updateCalcTime(data){
-	console.log(data)
-	// var updateData = data;
-	// // console.log(data)
-	// updateData.Server_ID = serverInt;
-	// currentTime = functions.GetTime();
-	// var TimeMoveNextCell = functions.TimeMove.Diagonal*0.5;
-	// updateData.TimeFinishMove = TimeMoveNextCell + functions.ExportTimeDatabase(data.TimeFinishMove) - functions.ExportTimeDatabase(data.TimeMoveNextCell)
-	// updateData.TimeMoveNextCell = TimeMoveNextCell;
-	
-	// var ListMove = JSON.parse(updateData.ListMove)
-	// if (ListMove!=null) {
-	// 	for (var i = 0; i < ListMove.length; i++) {
-	// 		ListMove[i].TimeMoveNextCell = TimeMoveNextCell + functions.ExportTimeDatabase(ListMove[i].TimeMoveNextCell) - functions.ExportTimeDatabase(updateData.TimeMoveNextCell);
-	// 	}
-	// }
-	// updateData.ListMove = ListMove;
-
-	// console.log(data)
-	
+	// move.MoveCalc(null,null,updateData);	
 }
 
 function updateDatabase (data) {
@@ -142,65 +141,9 @@ function updateDatabase (data) {
 		+"`Status`='"+functions.UnitStatus.Move+
 		"' WHERE `ID`='"+updateData.ID+"'";
 	}
-	console.log(stringUpdate);
-	// db_position.query(stringUpdate,function (error,result) {
-	// 	if (!!error){DetailError = ('Moving_Update.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,2);}
-	// 	logChangeDetail = ("Moving_Update.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
-	// });
+	// console.log(stringUpdate);
+	db_position.query(stringUpdate,function (error,result) {
+		if (!!error){DetailError = ('Moving_Update.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,2);}
+		logChangeDetail = ("Moving_Update.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
+	});
 }
-
-// function moveCalc2 (socket,data) {
-// 	// console.log(data)
-// 	var stringHkey = "s"+data.Server_ID+"_unit";
-// 	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-// 	clearMoveTimeout(stringKey);
-// 	positionRemove.PostionRemove(data);
-// 	// setTimerUpdateDatabase (data,stringKey);
-// 	setTimerUpdateDatabase2 (socket,data,stringKey);
-// }
-
-// function setTimerUpdateDatabase2 (socket,data,stringKey) {
-// 	// console.log(data.TimeMoveNextCell)
-// 	var timeOut = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();	
-// 	// console.log(timeOut);
-// 	DictMoveTimeOut[stringKey] = setTimeout(function (stringKey) {
-// 		var updateData = data;
-// 		var Position_Cell = data.Position_Cell;
-// 		// console.log(updateData.Next_Cell,data.ListMove[0].Position_Cell)
-// 		if (data.ListMove.length>0) {
-// 			if (updateData.Next_Cell != data.ListMove[0].Position_Cell) {
-// 				DetailError = ('Move.js: setTimerUpdateDatabase: '+stringKey); functions.WriteLogError(DetailError,3);
-// 				// console.log(updateData)
-// 				// console.log(updateData.Next_Cell,data.ListMove[0].Position_Cell)
-// 			}else{
-// 				updateData.Position_Cell = data.Next_Cell;
-// 				updateData.Next_Cell = data.ListMove[0].Next_Cell;
-// 				updateData.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;					
-// 				updateData.ListMove.shift();
-// 				// console.log(updateData.ListMove)
-// 				updateDatabase (updateData);
-// 				setTimerUpdateDatabase2 (updateData,stringKey);
-// 			}
-// 		}else{	
-// 			checkPosition (updateData,function (returnBool) {				
-// 				if (returnBool) {
-// 					// console.log(returnBool)
-// 					move_GetNewPos.SendGetNewPos(socket,updateData);
-// 				}else{
-// 					var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET"+
-// 					" `Position_Cell`='"+data.Next_Cell
-// 					+"',`Next_Cell`= NULL,`End_Cell`=NULL,`TimeMoveNextCell`=NULL,`TimeFinishMove`=NULL,`ListMove`=NULL,`Status`='"+functions.UnitStatus.Standby+"' "+
-// 					"WHERE `ID`='"+data.ID+"'";
-// 					db_position.query(stringUpdate,function (error,result) {
-// 						if (!!error){DetailError = ('Move.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,3);}
-// 						logChangeDetail =("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,3);
-// 					});
-// 					updateData.Position_Cell = data.Next_Cell;
-// 					positionAdd.AddPosition(updateData);
-// 				}
-// 			})						
-// 		}
-// 		//console.log(updateData)
-// 		// updateRedisData (stringKey,updateData,Position_Cell);
-// 	}, timeOut, stringKey);
-// }

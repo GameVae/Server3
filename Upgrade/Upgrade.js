@@ -57,9 +57,9 @@ function S_UPGRADE (data) {
 	var stringQuery ="SELECT * FROM `s"+data.ID_Server+"_base_info`.`"+data.ID_User+"` INNER JOIN `s"+data.ID_Server
 	+"_base_upgrade`.`"+data.ID_User+"_"+data.BaseNumber+"` WHERE `BaseNumber`='"+data.BaseNumber
 	+"' AND `s"+data.ID_Server+"_base_upgrade`.`"+data.ID_User+"_"+data.BaseNumber+"`.`ID`="+data.ID_Upgrade+";"
-	
+	// console.log(stringQuery);
 	dbBase.query(stringQuery,function (error,rows) {
-		if (!!error){DetailError = ('Upgrade.js: query S_UPGRADE'+stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){DetailError = ('Upgrade.js: query S_UPGRADE: '+stringQuery); functions.WriteLogError(DetailError,2);}
 		if (parseInt(data.UpgradeType)==1 && rows[0].UpgradeTime==null) {
 			if (data.Level==rows[0].Level||data.Level==0) {
 				materialCalc (dbBase,data,rows[0]);

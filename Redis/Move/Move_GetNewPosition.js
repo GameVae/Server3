@@ -57,7 +57,7 @@ function checkSocket (io,socketID,data) {
 	var stringQuery = "SELECT `Socket` FROM `user_info` WHERE `Socket`='"+socketID+"'";
 	db_all_users.query(stringQuery,function (error,rows) {
 		if (rows.length>0) {			
-			sendToClient (io,rowsSocket[0],data);
+			sendToClient (io,rows[0],data);
 		}else{
 			redisRemoveSocket (io,data);
 		}
