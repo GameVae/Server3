@@ -9,10 +9,12 @@ var functions 		= require('./../Util/Functions.js');
 var DetailError;
 var currentTime;
 var stringKeyMove;
+
 var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
+var Promise = require('promise');
 
 // var dataMove =  { S_MOVE:
 //    { Server_ID: 1,
@@ -27,13 +29,14 @@ client.select(functions.RedisData.TestUnit);
 //      ListMove: [ [Object], [Object], [Object] ] } }
 // //
 // console.log(dataMove.S_MOVE.Server_ID)
+
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){
 			// socket.broadcast.emit('R_MOVE',{R_MOVE:data});
 			
 			stringKeyMove = "s"+data.S_MOVE.Server_ID+"_move";
-			console.log(stringKeyMove,data)
+			// console.log(stringKeyMove,data)
 			client.set(stringKeyMove,JSON.stringify(data.S_MOVE));
 			// moveUnit.ClearMoveTimeout(stringData)		
 			R_MOVE (io,socket,data.S_MOVE.ID_User,data.S_MOVE.Server_ID);	
@@ -70,8 +73,8 @@ var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":52,"Position_Cel
 // S_MOVE ('socket',S_MOVE_data)
 
 function S_MOVE (io,socket,data) {
-	console.log(functions.GetTime());
-	console.log(data);
+	// console.log(functions.GetTime());
+	// console.log(data);
 	currentTime = functions.GetTime();
 	data.TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(currentTime + data.TimeMoveNextCell).toISOString());
 	data.TimeFinishMove = functions.ImportTimeToDatabase(new Date(currentTime + data.TimeFinishMove).toISOString());
@@ -87,24 +90,77 @@ function S_MOVE (io,socket,data) {
 }
 
 function updateDataBase (data) {
-	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-	+"`Position_Cell`='"+data.Position_Cell+"',"
-	+"`Next_Cell`='"+data.Next_Cell+"',"
-	+"`End_Cell`='"+data.End_Cell+"',"
-	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-	+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-	+"`Status`='"+functions.UnitStatus.Move+
-	"' WHERE `ID`='"+data.ID+"'";
+	var stringUpdate;
+	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
+	db_position.query(stringQuery,function (error,rows) {
+		if (rows[0].Attack_Unit_ID!=null) {
 
-	db_position.query(stringUpdate,function (error,result) {
-		if (!!error) {console.log(error);}
-		var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
-		db_position.query(stringQuery,function (error,rows) {
-			updateRedisData (data,rows);
+			updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0])
+
+			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+			+"`Position_Cell`='"+data.Position_Cell+"',"
+			+"`Next_Cell`='"+data.Next_Cell+"',"
+			+"`End_Cell`='"+data.End_Cell+"',"
+			+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+			+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+			+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+			+"`Status`='"+functions.UnitStatus.Move+
+			+"`Attack_Unit_ID`= NULL"+
+			" WHERE `ID`='"+data.ID+"'";
+
+		}else {
+			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+			+"`Position_Cell`='"+data.Position_Cell+"',"
+			+"`Next_Cell`='"+data.Next_Cell+"',"
+			+"`End_Cell`='"+data.End_Cell+"',"
+			+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+			+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+			+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+			+"`Status`='"+functions.UnitStatus.Move+
+			"' WHERE `ID`='"+data.ID+"'";
+		}
+
+		db_position.query(stringUpdate,function (error,result) {
+			if (!!error) {console.log(error);}
+			var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
+			db_position.query(stringQuery,function (error,rowsUpdate) {
+				updateRedisData (data,rowsUpdate[0]);
+			});
 		});
-	});
 
+	});
+}
+
+function updateRedisAttack (Server_ID,ID_Defend,dataAttack) {
+	var dataDefend ={};
+	var ID_Attack = Server_ID+"_"+dataAttack.ID_Unit+"_"+dataAttack.ID_User+"_"+dataAttack.ID;
+	new Promise((resolve,reject)=>{
+		var stringQuery = "SELECT `ID_Unit`,`ID_User` FROM `s"+Server_ID+"_unit` WHERE `ID` ='"+ID_Defend+"'";
+		db_position.query(stringQuery,function (error,rows) {
+			dataDefend = rows[0];
+		});
+	}).then(()=>new Promise((resolve,reject)=>{
+		var stringHAttack = "s"+Server_ID+"_attack";
+		var stringKeyDefend = Server_ID+"_"+dataDefend.ID_Unit+"_"+dataDefend.ID_User+"_"+ID_Defend;
+		client.hexists(stringHAttack,stringKeyDefend,function (error,result) {
+			if (result==1) {
+				client.hget(stringHAttack,stringKeyDefend,function (error,rows) {
+					var resultAttack = JSON.parse(rows).split("/").filter(String);
+					if (resultAttack.includes(ID_Attack)) {
+						removeValue (stringHAttack,stringKeyDefend,rows,ID_Attack);
+					}
+				});
+			}
+		})
+	}));
+}
+
+function removeValue (stringHkey,stringKey,rows,ID_Key) {
+	var stringReplace = rows.replace(ID_Key+"/","");
+	client.hset(stringHkey,stringKey,stringReplace);
+	if (stringReplace.length==0) {
+		client.hdel(stringHkey,stringKey);
+	}
 }
 
 function updateRedisData (data,rowsData) {
@@ -112,3 +168,26 @@ function updateRedisData (data,rowsData) {
 	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	client.hset(stringHkey,stringKey,JSON.stringify(rowsData))
 }
+
+// function updateDataBase (data) {
+
+// 	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+// 	+"`Position_Cell`='"+data.Position_Cell+"',"
+// 	+"`Next_Cell`='"+data.Next_Cell+"',"
+// 	+"`End_Cell`='"+data.End_Cell+"',"
+// 	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+// 	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+// 	+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+// 	+"`Status`='"+functions.UnitStatus.Move+
+// 	"' WHERE `ID`='"+data.ID+"'";
+
+// 	db_position.query(stringUpdate,function (error,result) {
+// 		if (!!error) {console.log(error);}
+// 		var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
+// 		db_position.query(stringQuery,function (error,rows) {
+// 			updateRedisData (data,rows[0]);
+// 		});
+// 	});
+
+// }
+

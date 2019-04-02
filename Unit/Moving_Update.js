@@ -17,60 +17,45 @@ var currentTime,offlineTime,calcTime;
 exports.UpdateDataBase = function updateDataBase (serverInt) {
 	updateDataBase2 (serverInt);
 }
-updateDataBase2 (1)
+// updateDataBase2 (1)
 function updateDataBase2 (serverInt) {
 	var stringQuery = "SELECT * FROM `s"+serverInt+"_unit` WHERE `TimeFinishMove`<> 'Null'";
+	
 	db_position.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('Moving_Update.js: updateDataBase TimeFinishMove: '+stringQuery); functions.WriteLogError(DetailError,2);}
 		if (rows.length>0) {
 			for (var i = 0; i < rows.length; i++) {
+				// updateData = rows[i];
+				// rows[i].TimeFinishMove = new Date(functions.ExportTimeDatabase(rows[i].TimeFinishMove));
+				// rows[i].TimeMoveNextCell = new Date( functions.ExportTimeDatabase(rows[i].TimeMoveNextCell));
+
 				// console.log('moving update unit')
+				// getDataUpdate (serverInt,updateData);
 				getDataUpdate (serverInt,rows[i]);
+				// console.log(updateData)
 			}
 		}
 	});
 
 }
 
-// var S_MOVE_data = {
-// 	ID: 14,
-// 	ID_Unit: 16,
-// 	ID_User: 43,
-// 	BaseNumber: 1,
-// 	Level: 2,
-// 	Quality: 1,
-// 	Hea_cur: 5.45,
-// 	Health: 5.45,
-// 	Attack: 2.3,
-// 	Defend: 1.15,
-// 	Position_Cell: '298,1,0',
-// 	Next_Cell: '298,2,0',
-// 	End_Cell: '304,3,0',
-// 	TimeMoveNextCell: '2019-03-19T23:22:21',
-// 	TimeFinishMove: '2019-03-19T23:22:54',
-// 	ListMove: '[{"Position_Cell":"298,2,0","Next_Cell":"299,3,0","TimeMoveNextCell":"2019-03-20T06:22:26.902"},{"Position_Cell":"299,3,0","Next_Cell":"300,3,0","TimeMoveNextCell":"2019-03-20T06:22:32.502"},{"Position_Cell":"300,3,0","Next_Cell":"301,3,0","TimeMoveNextCell":"2019-03-20T06:22:38.102"},{"Position_Cell":"301,3,0","Next_Cell":"302,3,0","TimeMoveNextCell":"2019-03-20T06:22:43.702"},{"Position_Cell":"302,3,0","Next_Cell":"303,3,0","TimeMoveNextCell":"2019-03-20T06:22:49.302"},{"Position_Cell":"303,3,0","Next_Cell":"304,3,0","TimeMoveNextCell":"2019-03-20T06:22:54.902"}]',
-// 	Status: 1,
-// 	Attack_Base_ID: null,
-// 	Attack_Unit_ID: null,
-// 	AttackedBool: 0 }
-//
 var S_MOVE_data = {
-	ID: 14,
+	ID: 17,
 	ID_Unit: 16,
-	ID_User: 43,
+	ID_User: 42,
 	BaseNumber: 1,
 	Level: 2,
-	Quality: 1,
+	Quality: 3,
 	Hea_cur: 5.45,
 	Health: 5.45,
 	Attack: 2.3,
 	Defend: 1.15,
-	Position_Cell: '298,1,0',
-	Next_Cell: '298,2,0',
-	End_Cell: '304,3,0',
-	TimeMoveNextCell: '2019-03-19T23:22:21',
-	TimeFinishMove: '2019-03-19T23:22:54',
-	ListMove: '[]',
+	Position_Cell: '4,4,0',
+	Next_Cell: '5,5,0',
+	End_Cell: '12,12,0',
+	TimeMoveNextCell: '2019-04-01T07:06:13.000Z',
+	TimeFinishMove: '2019-04-01T07:06:42.000Z',
+	ListMove: '[{"Position_Cell":"5,5,0","Next_Cell":"5,6,0","TimeMoveNextCell":"2019-04-01T07:06:16.021"},{"Position_Cell":"5,6,0","Next_Cell":"6,7,0","TimeMoveNextCell":"2019-04-01T07:06:18.545"},{"Position_Cell":"6,7,0","Next_Cell":"6,8,0","TimeMoveNextCell":"2019-04-01T07:06:21.068"},{"Position_Cell":"6,8,0","Next_Cell":"7,9,0","TimeMoveNextCell":"2019-04-01T07:06:23.592"},{"Position_Cell":"7,9,0","Next_Cell":"7,10,0","TimeMoveNextCell":"2019-04-01T07:06:26.116"},{"Position_Cell":"7,10,0","Next_Cell":"8,11,0","TimeMoveNextCell":"2019-04-01T07:06:28.640"},{"Position_Cell":"8,11,0","Next_Cell":"9,11,0","TimeMoveNextCell":"2019-04-01T07:06:31.440"},{"Position_Cell":"9,11,0","Next_Cell":"10,11,0","TimeMoveNextCell":"2019-04-01T07:06:34.240"},{"Position_Cell":"10,11,0","Next_Cell":"11,11,0","TimeMoveNextCell":"2019-04-01T07:06:37.040"},{"Position_Cell":"11,11,0","Next_Cell":"11,12,0","TimeMoveNextCell":"2019-04-01T07:06:39.564"},{"Position_Cell":"11,12,0","Next_Cell":"12,12,0","TimeMoveNextCell":"2019-04-01T07:06:42.364"}]',
 	Status: 1,
 	Attack_Base_ID: null,
 	Attack_Unit_ID: null,
@@ -79,45 +64,59 @@ var S_MOVE_data = {
 // getDataUpdate (1,S_MOVE_data)
 
 function getDataUpdate (serverInt,data){		
-	// console.log(updateData)
-	// updateCalcTime(data)
-	data.Server_ID = serverInt;
-
-	var updateData = data;
 	// console.log(data)
-	updateData.Server_ID = serverInt;
 	currentTime = functions.GetTime();
-	var TimeMoveNextCell = functions.TimeMove.Diagonal*0.5;
-	updateData.TimeFinishMove = TimeMoveNextCell + functions.ExportTimeDatabase(data.TimeFinishMove) - functions.ExportTimeDatabase(data.TimeMoveNextCell)
-	updateData.TimeMoveNextCell = TimeMoveNextCell;
 	
-	var ListMove = JSON.parse(updateData.ListMove)
+	var updateData = Object.create(data);
+	updateData.Server_ID = serverInt;
+	updateData.ID=data.ID;
+	updateData.ID_Unit=data.ID_Unit;
+	updateData.ID_User=data.ID_User;
+	updateData.BaseNumber=data.BaseNumber;
+	updateData.Level=data.Level;
+	updateData.Quality=data.Quality;
+	updateData.Hea_cur=data.Hea_cur;
+	updateData.Health=data.Health;
+	updateData.Attack=data.Attack;
+	updateData.Defend=data.Defend;
+	updateData.Position_Cell=data.Position_Cell;
+	updateData.Next_Cell=data.Next_Cell;
+	updateData.End_Cell=data.End_Cell;
+	
+	var TimeMoveNextCell = functions.TimeMove.Diagonal*0.5;
+	updateData.TimeMoveNextCell = TimeMoveNextCell;
+
+	updateData.TimeFinishMove = TimeMoveNextCell + functions.ExportTimeDatabase(data.TimeFinishMove) - functions.ExportTimeDatabase(data.TimeMoveNextCell)	
+
+	var ListMove = JSON.parse(data.ListMove);
+
 	if (updateData.ListMove.length>0) {
 		for (var i = 0; i < ListMove.length; i++) {
-			ListMove[i].TimeMoveNextCell = TimeMoveNextCell + functions.ExportTimeDatabase(ListMove[i].TimeMoveNextCell) - functions.ExportTimeDatabase(updateData.TimeMoveNextCell);
+			ListMove[i].TimeMoveNextCell = TimeMoveNextCell + functions.ExportTimeDatabase(ListMove[i].TimeMoveNextCell) - functions.ExportTimeDatabase(data.TimeMoveNextCell);
 		}
 	}
-	updateData.ListMove = ListMove;
-	// console.log(updateData)
-	// updateCalcTime(updateData);
+	updateData.ListMove = ListMove;	
+	// console.log(updateData);
 	updateDatabase(updateData);
-
-	// move.MoveCalc(null,null,updateData);	
+	move.MoveCalc(null,null,updateData);	
 }
 
 function updateDatabase (data) {
 	var updateData = data;
+	// console.log(updateData)
+	// console.log(data.TimeMoveNextCell)
+	// console.log(currentTime)
 	updateData.TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(data.TimeMoveNextCell + currentTime).toISOString())
 	updateData.TimeFinishMove = functions.ImportTimeToDatabase(new Date(data.TimeFinishMove + currentTime).toISOString())
 	
 	var ListMove = data.ListMove;
+	
 	if (ListMove.length>0) {
 		for (var i = 0; i < ListMove.length; i++) {
 			ListMove[i].TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(ListMove[i].TimeMoveNextCell + currentTime).toISOString())
 		}
 	}
-	updateData.ListMove = ListMove;
-	//console.log(updateData)
+	// console.log(updateData)
 	
 	var stringUpdate;
 	if (updateData.ListMove.length==0) {

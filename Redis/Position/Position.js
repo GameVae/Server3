@@ -17,7 +17,10 @@ exports.AddPosition = function addPosition (data) {
 }
 function getPosition_test (server_ID) {
 	//deleteHashKey (server_ID);
-	var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"'";
+	new Promise((resolve,reject)=>{
+		deleteHashKey (server_ID,resolve);
+	}).then(()=>{
+		var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"'";
 	//console.log(stringQuery)
 	db_position.query(stringQuery,function (error,rows) {
 		/*lấy vị trí => lấy theo ID_Unit tính range*/
@@ -25,12 +28,15 @@ function getPosition_test (server_ID) {
 			getRangeUnit (rows[i],server_ID);
 		}
 	});
+})
+	
 }
 
-function deleteHashKey (server_ID) {
+function deleteHashKey (server_ID,resolve) {
 	var stringHkey = "s"+server_ID+"_pos";
 	client.del(stringHkey,function (error,rows) {
 		//console.log(rows)
+		resolve();
 	});
 }
 
@@ -42,7 +48,7 @@ function getRangeUnit (row,server_ID) {
 }
 
 function unitRange1 (row,server_ID) {
-	var posCenter = row.Position_Cell;;
+	var posCenter = row.Position_Cell;
 	var posX = parseInt(posCenter.split(",")[0]);
 	var posY = parseInt(posCenter.split(",")[1]);
 
@@ -123,7 +129,7 @@ function removeValue (stringHkey,stringKey,ID_Key) {
 }
 
 function unitRange2 (row,server_ID) {
-	var posCenter = row.Position_Cell;;
+	var posCenter = row.Position_Cell;
 	var posX = parseInt(posCenter.split(",")[0]);
 	var posY = parseInt(posCenter.split(",")[1]);
 
@@ -208,7 +214,7 @@ function unitRange2 (row,server_ID) {
 }
 
 function unitRange3 (row,server_ID) {
-	var posCenter = row.Position_Cell;;
+	var posCenter = row.Position_Cell;
 	var posX = parseInt(posCenter.split(",")[0]);
 	var posY = parseInt(posCenter.split(",")[1]);
 

@@ -1,0 +1,12 @@
+
+ logChangeDetail: 2019-03-29T00:59:00.513Z: Upgrade.js: stringUpdateBase UPDATE `43_1` SET `Level`=`Level`+1 WHERE `ID`= '15'
+ logChangeDetail: 2019-03-29T00:59:00.514Z: Upgrade.js: stringClearBase UPDATE `43` SET `UpgradeWait_ID`=NULL,`UpgradeWait_Might`=NULL,`UpgradeTime`=NULL WHERE `BaseNumber`='1'
+ logChangeDetail: 2019-03-29T00:59:00.516Z: Upgrade.js: stringUpdateGameInfo UPDATE `game_info_s1` SET `Might`=`Might`+128 WHERE `ID_User`='43'
+ logChangeDetail: 2019-03-29T00:59:01.637Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-03-29T00:59:01.639Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-03-29T00:59:01.642Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-03-29T00:59:01.644Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-03-29T01:37:24.611Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-29T01:48:43.957Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-29T01:53:54.400Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-03-29T01:58:03.094Z: Login.js: queryUserNamePass: ndinhtoan45

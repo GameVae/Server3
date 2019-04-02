@@ -1,6 +1,7 @@
 var armyData 		= require("./Redis/Data/ArmyData.js");
 var unitData 		= require("./Redis/Unit/Unit.js");
-var positionData 	= require("./Redis/Position/Position.js");
+
+
 
 var functions 		= require('./Util/Functions.js');
 // var Promise 		= require('promise');
@@ -8,6 +9,9 @@ var functions 		= require('./Util/Functions.js');
 var redis = require("redis"),
 client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
+
+var positionData 	= require("./Redis/Position/Position.js");
+positionData.GetPosition(1);
 
 // // if you'd like to select database 3, instead of 0 (default), call
 // // client.select(3, function() { /* ... */ });
@@ -26,6 +30,10 @@ client.select(functions.RedisData.TestUnit);
 // //unitData.UpdateData(client)
 
 exports.UpdateUnitData = function updateUnitData (server_ID) {
+	unitData.GetUnitData(client,server_ID)
+}
+updateUnitData (client,1)
+function updateUnitData (client,server_ID) {
 	unitData.GetUnitData(client,server_ID)
 }
 // // getRedisData (1);

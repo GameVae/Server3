@@ -47,20 +47,17 @@ function moveCalc2 (io,socket,data) {
 	setTimerUpdateDatabase2 (io,socket,data,stringKey);
 }
 
-
-
-
 function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 	// console.log(data.TimeMoveNextCell)
-	//console.log(data)
-	
 	var	timeOut = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();		
-	// console.log(timeOut);
+	console.log(timeOut);
 	DictMoveTimeOut[stringKey] = setTimeout(function (stringKey) {
 		var updateData = data;
+		// console.log(data)
 		var Position_Cell = data.Position_Cell;
 		// console.log(updateData.Next_Cell,data.ListMove[0].Position_Cell)
 		if (data.ListMove.length>0) {
+			// console.log(updateData)
 			if (updateData.Next_Cell!=data.ListMove[0].Position_Cell) {
 				DetailError = ('Move.js: setTimerUpdateDatabase: '+stringKey); functions.WriteLogError(DetailError,2);
 				// console.log(updateData)
@@ -106,7 +103,7 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 			})						
 		}
 		//console.log(updateData)
-		// updateRedisData (stringKey,updateData,Position_Cell);
+		updateRedisData (stringKey,updateData,Position_Cell);
 	}, timeOut, stringKey);
 }
 
@@ -174,22 +171,11 @@ exports.ClearMoveTimeout = function clearTimeout (stringData) {
 	clearMoveTimeout (stringData);
 }
 
-
-// moveCalc3 (S_MOVE_data)
-function moveCalc3 (socket,data) {
-	// console.log(data)
-	// var stringHkey = "s"+data.Server_ID+"_unit";
-	// var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	// clearMoveTimeout(stringKey);
-	// positionRemove.PostionRemove(data);
-	// setTimerUpdateDatabase2 (socket,data,stringKey);
-
-}
-
 function setTimerMoveAttack (data,stringData) {
-	clearTimeout(DictTimeMoveAttack[stringData]);
-	delete DictTimeMoveAttack[stringData];
-	if (data.TimeMoveNextCell!=null) {checkTimeMoveNextCell (data,stringData);}
+	// clearTimeout(DictTimeMoveAttack[stringData]);
+	// delete DictTimeMoveAttack[stringData];
+	// if (data.TimeMoveNextCell!=null) {checkTimeMoveNextCell (data,stringData);}
+	
 }
 function checkTimeMoveNextCell (data,stringKey) {
 	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();

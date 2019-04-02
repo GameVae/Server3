@@ -931,9 +931,7 @@
 // 	}, 5000, stringPara,caseNumber)
 // }
 
-var redis 				= require("redis"),
-client 					= redis.createClient();
-client.select(2);
+
 // sendSocketRedis (1)
 // function sendSocketRedis (Server_ID){
 // 	var stringHSocket = "s"+Server_ID+"_pos";
@@ -954,7 +952,25 @@ client.select(2);
 // // console.log(socketList)
 // console.log(Object.keys(socketList)[0]);
 // console.log(Object.values(socketList)[0])
-testSocket (null,1)
-function testSocket (socket,ID_User) {
-	if (socket==null) {console.log('here')}
+
+var redis 				= require("redis"),
+client 					= redis.createClient();
+client.select(2);
+var stringHUnit,stringHAttack;
+
+var dataAttack = [ '1_16_9_9', '1_16_9_10' ]
+test ()
+function test () {
+	stringHAttack = "s1_attack";
+	stringHUnit = "s1_unit";
+	var stringDefend = "1_16_42_25";
+	client.hget(stringHAttack,stringDefend,function (error,rows) {
+		if (!!error) {console.log(error);}
+		var result = rows.split("/").filter(String);
+		// console.log(result)
+		for (var i = 0; i < result.length; i++) {
+			result[i]
+		}
+	});
 }
+

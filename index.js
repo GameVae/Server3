@@ -61,8 +61,8 @@ var sendUnit				= require('./Unit/Deploy.js');
 
 var moveUnit 				= require('./Unit/Moving.js');
 
-// var moving_Update 			= require('./Unit/Moving_Update.js');
-// moving_Update.UpdateDataBase(1);
+var moving_Update 			= require('./Unit/Moving_Update.js');
+moving_Update.UpdateDataBase(1);
 
 
 var guild_UpdateDatabase 	= require('./Guild/Guild_UpdateDatabase.js');

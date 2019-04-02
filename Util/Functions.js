@@ -19,8 +19,8 @@ exports.RedisData ={
 }
 
 var Vectorcity = 2;
-var StraightLine = 2*1400;
-var DiagonalLine = 2*1262;
+var StraightLine = Vectorcity*1400;
+var DiagonalLine = Vectorcity*1262;
 // var StraightTime = 1400;
 // var DiagonalTime = 1262;
 var StraightTime = StraightLine / Vectorcity;
