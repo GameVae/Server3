@@ -101,8 +101,16 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 						logChangeDetail = ("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
 					});
 					updateData.Position_Cell = data.Next_Cell;
+					updateData.Next_Cell = null;
+					updateData.End_Cell = null;
+					updateData.ListMove = null;
+					updateData.TimeMoveNextCell = null;
+					updateData.TimeFinishMove = null;
+					updateData.Status = 6;
+
 					positionAdd.AddPosition(updateData);
 				}
+				updateRedisData (stringKey,updateData,Position_Cell);
 			})						
 		}
 		//console.log(updateData)
@@ -112,8 +120,8 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 
 function checkPosition (data,returnBool) {
 	var checkBool = false;
-	console.log('checkPosition')
-	console.log(data)
+	// console.log('checkPosition')
+	// console.log(data)
 	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE "
 	+"`Status`='"+functions.UnitStatus.Standby
 	+"' AND `Position_Cell`='"+data.End_Cell
@@ -133,6 +141,8 @@ function updateDatabase (data) {
 	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
 	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
 	+"`ListMove`='"+JSON.stringify(data.ListMove)+"',"
+	+"`Attack_Base_ID`= NULL,"
+	+"`Attack_Unit_ID`= NULL,"
 	+"`Status`='"+functions.UnitStatus.Move+
 	"' WHERE `ID`='"+data.ID+"'";
 	//console.log(stringUpdate);
@@ -184,36 +194,36 @@ function clearMoveTimeMoveAttack (stringData) {
 	clearTimeout(DictTimeMoveAttack[stringData]);
 	delete DictTimeMoveAttack[stringData];
 }
-function checkTimeMoveNextCell (data,stringKey) {
-	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
-	var Position_Cell_X = data.Position_Cell.split(',')[0];
-	var Position_Cell_Y = data.Position_Cell.split(',')[1];
-	var Next_Cell_X = data.Next_Cell.split(',')[0];
-	var Next_Cell_Y = data.Next_Cell.split(',')[1];
-	var caseReturn = 1;
-	var timeCheck = 0;
+// function checkTimeMoveNextCell (data,stringKey) {
+// 	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
+// 	var Position_Cell_X = data.Position_Cell.split(',')[0];
+// 	var Position_Cell_Y = data.Position_Cell.split(',')[1];
+// 	var Next_Cell_X = data.Next_Cell.split(',')[0];
+// 	var Next_Cell_Y = data.Next_Cell.split(',')[1];
+// 	var caseReturn = 1;
+// 	var timeCheck = 0;
 
-	if (Position_Cell_X!=Next_Cell_X&&Position_Cell_Y!=Next_Cell_Y) {caseReturn = 2};
-	switch (caseReturn) {
-		case 1:
-		timeCheck = functions.TimeMove.Straight*0.5;
-		break;
-		case 2:
-		timeCheck = functions.TimeMove.Diagonal*0.5;
-		break;
-	}
+// 	if (Position_Cell_X!=Next_Cell_X&&Position_Cell_Y!=Next_Cell_Y) {caseReturn = 2};
+// 	switch (caseReturn) {
+// 		case 1:
+// 		timeCheck = functions.TimeMove.Straight*0.5;
+// 		break;
+// 		case 2:
+// 		timeCheck = functions.TimeMove.Diagonal*0.5;
+// 		break;
+// 	}
 
-	var timeMove = 0;
-	var stringPos = data.Position_Cell;
-	if (data.TimeMoveNextCell>timeCheck) {
-		timeMove = data.TimeMoveNextCell - timeCheck;
-		stringPos = data.Next_Cell;
-	}
+// 	var timeMove = 0;
+// 	var stringPos = data.Position_Cell;
+// 	if (data.TimeMoveNextCell>timeCheck) {
+// 		timeMove = data.TimeMoveNextCell - timeCheck;
+// 		stringPos = data.Next_Cell;
+// 	}
 
-	// DictTimeMoveAttack[stringKey] = setTimeout(function (data,stringPos) {
-	// 	checkPostionAttackUnit (data,stringPos);
-	// }, timeMove, data,stringPos);
-}
+// 	// DictTimeMoveAttack[stringKey] = setTimeout(function (data,stringPos) {
+// 	// 	checkPostionAttackUnit (data,stringPos);
+// 	// }, timeMove, data,stringPos);
+// }
 //checkPostionAttackUnit (S_MOVE_data,'489,82,0',)
 function checkPostionAttackUnit (data,stringPos) {
 	//attackFunc
@@ -253,6 +263,8 @@ function getAttackData (data,ID_Player) {
 			var ID_Defend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 			attackFunc.SetAttackData(data.Server_ID,ID_Defend,ID_Player);
 		}
-	}))
+	}).then(()=>new Promise((resolve,reject)=>{
+		// attackFunc.AttackInterval(data.Server_ID,ID_Defend);
+	})))
 	)
 }

@@ -33,8 +33,7 @@ var Promise = require('promise');
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){
-			// socket.broadcast.emit('R_MOVE',{R_MOVE:data});
-			
+			// socket.broadcast.emit('R_MOVE',{R_MOVE:data});			
 			stringKeyMove = "s"+data.S_MOVE.Server_ID+"_move";
 			// console.log(stringKeyMove,data)
 			client.set(stringKeyMove,JSON.stringify(data.S_MOVE));
@@ -92,9 +91,9 @@ function updateDataBase (data) {
 	var stringUpdate;
 	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
 	db_position.query(stringQuery,function (error,rows) {
+		if (!!error){DetailError = ('Unit_Moving.js: query '+stringQuery); functions.WriteLogError(DetailError,2);}
 		if (rows[0].Attack_Unit_ID!=null) {
-
-			updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0])
+			updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0]);
 
 			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
 			+"`Position_Cell`='"+data.Position_Cell+"',"
@@ -156,6 +155,7 @@ function updateRedisAttack (Server_ID,ID_Defend,dataAttack) {
 
 function removeValue (stringHkey,stringKey,rows,ID_Key) {
 	var stringReplace = rows.replace(ID_Key+"/","");
+
 	client.hset(stringHkey,stringKey,stringReplace);
 	if (stringReplace.length==0) {
 		client.hdel(stringHkey,stringKey);
@@ -195,6 +195,4 @@ var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":52,"Position_Cel
 // 			updateRedisData (data,rows[0]);
 // 		});
 // 	});
-
 // }
-

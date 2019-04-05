@@ -8,6 +8,8 @@ var attackFunc 		= require('./../Redis/Attack/Attack.js');
 var friendData 		= require('./../Redis/Friend/FriendData.js');
 var guildData 		= require('./../Redis/Guild/GuildData.js');
 
+var positionAdd		= require('./../Redis/Position/Position.js');
+
 var functions 		= require('./../Util/Functions.js');
 
 var DetailError;
@@ -23,11 +25,13 @@ var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
+
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_ATTACK', function (data){
 			// console.log('S_UNIT: '+data);
 			S_ATTACK (io,data);
+			updateRedis (data);
 			updateDatabase (data);
 		});
 	});
@@ -47,10 +51,13 @@ var dataAttack = {
 	Position_Cell_Attacker: '4,4,0',
 }
 
-
+function updateRedis (data) {
+	// var stringHPos = "s"+data.Server_ID+"_pos";
+	positionAdd.AddPosition (data);
+}
 
 // S_ATTACK ('io',dataAttack);
-updateDatabase (dataAttack)
+// updateDatabase (dataAttack)
 function updateDatabase (data) {
 	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
 	+"`Status`='"+functions.UnitStatus.Attack_Unit

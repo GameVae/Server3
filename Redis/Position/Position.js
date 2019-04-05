@@ -9,6 +9,9 @@ var redis = require('redis');
 var client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
+// exports.Test = function Test (server_ID){
+// 	console.log(server_ID);
+// }
 exports.GetPosition = function getPosition (server_ID){
 	getPosition_test (server_ID);
 }
@@ -102,6 +105,7 @@ function unitRange1 (row,server_ID) {
 		stringKey[4] = (posX) +","+(posY+1)+",0";
 		stringKey[5] = (posX) +","+(posY-1)+",0";
 		stringKey[6] = (posX+1) +","+(posY)+",0";
+		
 	}
 	// console.log(stringKey)
 	for (var i = 0; i < stringKey.length; i++) {
