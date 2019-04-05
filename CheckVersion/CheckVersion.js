@@ -20,6 +20,9 @@ function S_CHECK_VERSION(socket) {
 			version = rows[0].Content;
 			if (data.Version!=version) {			
 				R_CHECK_VERSION(socket,version);
+			}else{
+				var dataSend={Data: "",Version:version}
+				socket.emit("R_CHECK_VERSION",dataSend);
 			}
 		});	
 	});

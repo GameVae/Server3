@@ -50,8 +50,9 @@ exports.SetAttackData = function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 	stringHUnit = "s"+Server_ID+"_unit";
 	client.hexists(stringHAttack,ID_Defend,function (error,resultBool) {
 		if (resultBool==1) {
-			client.hget(stringHUnit,ID_Defend,function (error,result) {
-				if (!result.includes(ID_Attack)) {
+			client.hget(stringHAttack,ID_Defend,function (error,result) {
+				var resultID = result.split("/").filter(String)
+				if (!resultID.includes(ID_Attack)) {
 					checkAttacking (Server_ID,ID_Defend,ID_Attack,function (returnBool) {
 						// console.log("returnBool: "+returnBool);
 						if (returnBool) {addValue (stringHAttack,ID_Defend,result,ID_Attack);}

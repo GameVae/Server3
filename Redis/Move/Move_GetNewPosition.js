@@ -9,6 +9,7 @@ var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
+var DictTimeInterval = {};
 // var data = { Server_ID: 1,
 // 	ID: 10,
 // 	ID_Unit: 16,
@@ -33,16 +34,31 @@ function sendGetNewPos2(io,data) {
 	var stringHkey = "s"+data.Server_ID+"_socket";
 	client.hvals(stringHkey,function (error,rowsSocket) {
 		if (rowsSocket.length>0) {
+			clearTimeout(DictTimeInterval['sendNewPos']);
+			delete DictTimeInterval['sendNewPos'];
 			checkSocket (io,rowsSocket[0],data);
 			// sendToClient (io,rowsSocket[0],data);
 		}else{
 			console.log("all user offline");
+			DictTimeInterval['sendNewPos'] = setInterval(function (io,data) {
+				sendGetNewPos2(io,data);
+			}, 1000, io,data)
 		}
 	});	
 }
+// { Server_ID: 1,
+//   ID: 17,
+//   ID_Unit: 16,
+//   ID_User: 42,
+//   Position_Cell: '26,6,0',
+//   Next_Cell: '25,6,0',
+//   End_Cell: '25,6,0',
+//   TimeMoveNextCell: '2019-04-04T03:32:39.639',
+//   TimeFinishMove: '2019-04-04T03:32:39.639',
+//   ListMove: [] }
 
 function sendToClient (io,socketID,data) {
-	// console.log(io,socketID,data)
+	console.log(io,socketID,data)
 	//send cho client qua cong S_MOVE;
 	// io.to(socketID).emit('R_DEPLOY',{R_DEPLOY:dataDeploy});
 	var dataSend = {
@@ -54,10 +70,10 @@ function sendToClient (io,socketID,data) {
 }
 
 function checkSocket (io,socketID,data) {
-	var stringQuery = "SELECT `Socket` FROM `user_info` WHERE `Socket`='"+socketID+"'";
+	var stringQuery = "SELECT `Socket`,`ID_User` FROM `user_info` WHERE `Socket`='"+socketID+"'";
 	db_all_users.query(stringQuery,function (error,rows) {
-		if (rows.length>0) {			
-			sendToClient (io,rows[0],data);
+		if (rows.length>0 && data.ID_User!=rows[0].ID_User) {			
+			sendToClient (io,rows[0].Socket,data);
 		}else{
 			redisRemoveSocket (io,data);
 		}

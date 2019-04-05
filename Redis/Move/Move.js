@@ -1,8 +1,10 @@
 'use strict';
+
+var index 					= require('./../../index');
 var move_GetNewPos 			= require('./Move_GetNewPosition.js');
 
 var db_position				= require('./../../Util/Database/Db_position.js');
-// var attackFunc 				= require('./../Attack/Attack.js');
+var attackFunc 				= require('./../Attack/Attack.js');
 var guildData				= require('./../Guild/GuildData.js');
 var friendData				= require('./../Friend/FriendData.js');
 var positionAdd 			= require('./../Position/Position.js');
@@ -50,7 +52,7 @@ function moveCalc2 (io,socket,data) {
 function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 	// console.log(data.TimeMoveNextCell)
 	var	timeOut = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();		
-	console.log(timeOut);
+	// console.log(timeOut);
 	DictMoveTimeOut[stringKey] = setTimeout(function (stringKey) {
 		var updateData = data;
 		// console.log(data)
@@ -78,7 +80,7 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 					
 					if (io!=null) {move_GetNewPos.SendGetNewPos(io,updateData);}
 					else{
-						var index = require('./../../index');
+						
 						// var express			= require('express');
 						// var app				= express();
 						// var server			= require('http').createServer(app);
@@ -86,6 +88,7 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 
 						// app.set('port', process.env.PORT);
 						console.log('get new pos with no socket');
+						// console.log(index.IO);
 						move_GetNewPos.SendGetNewPos(index.IO,updateData);
 					}	
 				}else{
@@ -172,10 +175,14 @@ exports.ClearMoveTimeout = function clearTimeout (stringData) {
 }
 
 function setTimerMoveAttack (data,stringData) {
-	// clearTimeout(DictTimeMoveAttack[stringData]);
-	// delete DictTimeMoveAttack[stringData];
 	// if (data.TimeMoveNextCell!=null) {checkTimeMoveNextCell (data,stringData);}
-	
+}
+exports.ClearMoveTimeMoveAttack = function clearMoveTimeMoveAttack2 (stringData) {
+	clearMoveTimeMoveAttack (stringData);
+}
+function clearMoveTimeMoveAttack (stringData) {
+	clearTimeout(DictTimeMoveAttack[stringData]);
+	delete DictTimeMoveAttack[stringData];
 }
 function checkTimeMoveNextCell (data,stringKey) {
 	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();

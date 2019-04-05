@@ -4,14 +4,43 @@ var unitData 		= require("./Redis/Unit/Unit.js");
 
 
 var functions 		= require('./Util/Functions.js');
-// var Promise 		= require('promise');
+var Promise 		= require('promise');
 
 var redis = require("redis"),
 client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
 var positionData 	= require("./Redis/Position/Position.js");
-positionData.GetPosition(1);
+// positionData.DeletePosKey(1)
+getUnitDataPos (1)
+function getUnitDataPos (server_ID) {
+	new Promise((resolve,reject)=>{
+		positionData.DeletePosKey(server_ID);
+		resolve();
+	}).then(()=>new Promise((resolve,reject)=>{
+		for (var i = 0; i < 36; i++) {
+			positionData.GetPosition(server_ID);
+		}		
+	}))
+}
+// updateUnitData (client,1)
+exports.UpdateUnitData = function updateUnitData (server_ID) {
+	unitData.GetUnitData(client,server_ID)
+}
+// function updateUnitData (client,server_ID) {
+// 	unitData.GetUnitData(client,server_ID)
+// }
+
+// getPositionData (1);
+// function getPositionData (server_ID) {
+// 	positionData.DeletePosKey(server_ID);
+
+// 	setTimeout(function (argument) {
+// 		positionData.GetPosition(server_ID);
+// 	}, 1000,server_ID)
+// }
+
+
 
 // // if you'd like to select database 3, instead of 0 (default), call
 // // client.select(3, function() { /* ... */ });
@@ -29,13 +58,9 @@ positionData.GetPosition(1);
 
 // //unitData.UpdateData(client)
 
-exports.UpdateUnitData = function updateUnitData (server_ID) {
-	unitData.GetUnitData(client,server_ID)
-}
-updateUnitData (client,1)
-function updateUnitData (client,server_ID) {
-	unitData.GetUnitData(client,server_ID)
-}
+
+
+
 // // getRedisData (1);
 
 // function getRedisData (server_ID) {
@@ -59,7 +84,7 @@ function updateUnitData (client,server_ID) {
 // // 	client.hvals(stringHkey,function (error,rows) {
 // // 		// console.log(rows)
 // // 		var result = JSON.parse(rows)
-		
+
 // // 		// for (var i = 0; i < result.length; i++) {
 // // 		// 	if (result[i].Position_Cell==Position&&result[i].Status ==0) {
 // // 		// 		checkBool = true;

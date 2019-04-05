@@ -1,0 +1,2 @@
+
+ logChangeDetail: 2019-04-04T10:00:07.761Z: Login.js: queryUserNamePass: ndinhtoan45
