@@ -11,7 +11,7 @@ var DetailError,logChangeDetail;
 
 var Promise = require('promise')
 
-var DetailError;
+var DetailError,LogChange;
 var currentTime,offlineTime,calcTime;
 // move.Test(2)
 exports.UpdateDataBase = function updateDataBase (serverInt) {
@@ -143,6 +143,6 @@ function updateDatabase (data) {
 	// console.log(stringUpdate);
 	db_position.query(stringUpdate,function (error,result) {
 		if (!!error){DetailError = ('Moving_Update.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,2);}
-		logChangeDetail = ("Moving_Update.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
+		LogChange = ("Moving_Update.js: updateDatabase "+stringUpdate); functions.LogChange(LogChange,2);
 	});
 }

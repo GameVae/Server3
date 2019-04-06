@@ -28,6 +28,7 @@ function getPosition_test (server_ID) {
 			getRangeUnit (rows[i],server_ID);
 		}
 	});
+
 	// var dataRows=[];
 	// var stringKeyUnit=[];
 	// new Promise((resolve,reject)=>{
@@ -36,7 +37,6 @@ function getPosition_test (server_ID) {
 	// 		lấy vị trí => lấy theo ID_Unit tính range
 	// 		dataRows =rows;
 	// 		resolve();
-
 	// 	});
 	// }).then(()=>new Promise((resolve,reject)=>{
 	// 	for (var i = 0; i < dataRows.length; i++) {

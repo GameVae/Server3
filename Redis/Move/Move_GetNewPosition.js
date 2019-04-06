@@ -3,11 +3,13 @@ var db_all_users			= require('./../../Util/Database/Db_all_user.js');
 var db_position				= require('./../../Util/Database/Db_position.js');
 
 var functions 				= require('./../../Util/Functions.js');
-var DetailError, logChangeDetail;
+var DetailError, LogChange;
 
 var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(functions.RedisData.TestUnit);
+
+var index 					= require('./../../index.js');
 
 var DictTimeInterval = {};
 // var data = { Server_ID: 1,
@@ -34,15 +36,20 @@ function sendGetNewPos2(io,data) {
 	var stringHkey = "s"+data.Server_ID+"_socket";
 	client.hvals(stringHkey,function (error,rowsSocket) {
 		if (rowsSocket.length>0) {
-			clearTimeout(DictTimeInterval['sendNewPos']);
+			// console.log("user socket");
+			clearTimeout((DictTimeInterval['sendNewPos']);
 			delete DictTimeInterval['sendNewPos'];
+
 			checkSocket (io,rowsSocket[0],data);
 			// sendToClient (io,rowsSocket[0],data);
 		}else{
 			console.log("all user offline");
-			DictTimeInterval['sendNewPos'] = setInterval(function (io,data) {
-				sendGetNewPos2(io,data);
-			}, 1000, io,data)
+			sendGetNewPos2(io,data)
+			// sendGetNewPos2(index.IO,data);		
+			// DictTimeInterval['sendNewPos'] = setInterval(function (io,data) {
+			// 	console.log(rowsSocket[0])
+			// 	sendGetNewPos2(index.IO,data);				
+			// }, 1000, index.IO,data)
 		}
 	});	
 }
@@ -72,6 +79,8 @@ function sendToClient (io,socketID,data) {
 function checkSocket (io,socketID,data) {
 	var stringQuery = "SELECT `Socket`,`ID_User` FROM `user_info` WHERE `Socket`='"+socketID+"'";
 	db_all_users.query(stringQuery,function (error,rows) {
+		if (!!error){DetailError = ('Move_GetNewPosition.js: checkSocket '+stringQuery); functions.WriteLogError(DetailError,2);}
+		
 		if (rows.length>0 && data.ID_User!=rows[0].ID_User) {			
 			sendToClient (io,rows[0].Socket,data);
 		}else{

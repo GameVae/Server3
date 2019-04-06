@@ -194,37 +194,7 @@ function clearMoveTimeMoveAttack (stringData) {
 	clearTimeout(DictTimeMoveAttack[stringData]);
 	delete DictTimeMoveAttack[stringData];
 }
-// function checkTimeMoveNextCell (data,stringKey) {
-// 	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
-// 	var Position_Cell_X = data.Position_Cell.split(',')[0];
-// 	var Position_Cell_Y = data.Position_Cell.split(',')[1];
-// 	var Next_Cell_X = data.Next_Cell.split(',')[0];
-// 	var Next_Cell_Y = data.Next_Cell.split(',')[1];
-// 	var caseReturn = 1;
-// 	var timeCheck = 0;
 
-// 	if (Position_Cell_X!=Next_Cell_X&&Position_Cell_Y!=Next_Cell_Y) {caseReturn = 2};
-// 	switch (caseReturn) {
-// 		case 1:
-// 		timeCheck = functions.TimeMove.Straight*0.5;
-// 		break;
-// 		case 2:
-// 		timeCheck = functions.TimeMove.Diagonal*0.5;
-// 		break;
-// 	}
-
-// 	var timeMove = 0;
-// 	var stringPos = data.Position_Cell;
-// 	if (data.TimeMoveNextCell>timeCheck) {
-// 		timeMove = data.TimeMoveNextCell - timeCheck;
-// 		stringPos = data.Next_Cell;
-// 	}
-
-// 	// DictTimeMoveAttack[stringKey] = setTimeout(function (data,stringPos) {
-// 	// 	checkPostionAttackUnit (data,stringPos);
-// 	// }, timeMove, data,stringPos);
-// }
-//checkPostionAttackUnit (S_MOVE_data,'489,82,0',)
 function checkPostionAttackUnit (data,stringPos) {
 	//attackFunc
 	var stringHkey = "s"+data.Server_ID+"_pos";
@@ -268,3 +238,34 @@ function getAttackData (data,ID_Player) {
 	})))
 	)
 }
+// function checkTimeMoveNextCell (data,stringKey) {
+// 	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
+// 	var Position_Cell_X = data.Position_Cell.split(',')[0];
+// 	var Position_Cell_Y = data.Position_Cell.split(',')[1];
+// 	var Next_Cell_X = data.Next_Cell.split(',')[0];
+// 	var Next_Cell_Y = data.Next_Cell.split(',')[1];
+// 	var caseReturn = 1;
+// 	var timeCheck = 0;
+
+// 	if (Position_Cell_X!=Next_Cell_X&&Position_Cell_Y!=Next_Cell_Y) {caseReturn = 2};
+// 	switch (caseReturn) {
+// 		case 1:
+// 		timeCheck = functions.TimeMove.Straight*0.5;
+// 		break;
+// 		case 2:
+// 		timeCheck = functions.TimeMove.Diagonal*0.5;
+// 		break;
+// 	}
+
+// 	var timeMove = 0;
+// 	var stringPos = data.Position_Cell;
+// 	if (data.TimeMoveNextCell>timeCheck) {
+// 		timeMove = data.TimeMoveNextCell - timeCheck;
+// 		stringPos = data.Next_Cell;
+// 	}
+
+// 	// DictTimeMoveAttack[stringKey] = setTimeout(function (data,stringPos) {
+// 	// 	checkPostionAttackUnit (data,stringPos);
+// 	// }, timeMove, data,stringPos);
+// }
+//checkPostionAttackUnit (S_MOVE_data,'489,82,0',)

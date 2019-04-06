@@ -60,7 +60,7 @@ var getUnit 				= require('./Login/Login/GetUnit.js');
 var sendUnit				= require('./Unit/Deploy.js');
 
 var moveUnit 				= require('./Unit/Moving.js');
-var moveUnit_Attack			= require('./Unit/Moving_Attack.js');
+// var moveUnit_Attack			= require('./Unit/Moving_Attack.js');
 
 var moving_Update 			= require('./Unit/Moving_Update.js');
 moving_Update.UpdateDataBase(1);
@@ -84,7 +84,7 @@ if (app.get('port') === process.env.PORT)
 	info.Start(io);
 	sendUnit.Start(io);
 	moveUnit.Start(io);
-	moveUnit_Attack.Start(io);
+	// moveUnit_Attack.Start(io);
 	getUnit.Start(io);
 }
 

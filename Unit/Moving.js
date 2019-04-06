@@ -6,7 +6,7 @@ var moveUnit 		= require('./../Redis/Move/Move.js');
 
 var functions 		= require('./../Util/Functions.js');
 
-var DetailError;
+var DetailError,LogChange;
 var currentTime;
 var stringKeyMove;
 
@@ -119,7 +119,9 @@ function updateDataBase (data) {
 		}
 
 		db_position.query(stringUpdate,function (error,result) {
-			if (!!error) {console.log(error);}
+			if (!!error){DetailError = ('Unit_Moving.js: query '+stringUpdate); functions.WriteLogError(DetailError,2);}
+			LogChange='Unit_Moving.js: updateDataBase: '+stringUpdate;functions.LogChange(LogChange,2);
+			
 			var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
 			db_position.query(stringQuery,function (error,rowsUpdate) {
 				updateRedisData (data,rowsUpdate[0]);

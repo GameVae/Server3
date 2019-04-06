@@ -10,7 +10,7 @@ var friendData				= require('./../Redis/Friend/FriendData.js');
 
 var attackFunc 				= require('./../Redis/Attack/Attack.js');
 
-var DetailError;
+var DetailError,LogChange;
 var currentTime;
 var stringKeyMove;
 
