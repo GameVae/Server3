@@ -11,7 +11,7 @@ client.select(functions.RedisData.TestUnit);
 
 var index 					= require('./../../index.js');
 
-var DictTimeInterval = {};
+var DictTimeOut = {};
 // var data = { Server_ID: 1,
 // 	ID: 10,
 // 	ID_Unit: 16,
@@ -37,19 +37,19 @@ function sendGetNewPos2(io,data) {
 	client.hvals(stringHkey,function (error,rowsSocket) {
 		if (rowsSocket.length>0) {
 			// console.log("user socket");
-			clearTimeout((DictTimeInterval['sendNewPos']);
-			delete DictTimeInterval['sendNewPos'];
+			clearTimeout((DictTimeOut['sendNewPos']));
+			delete DictTimeOut['sendNewPos'];
 
 			checkSocket (io,rowsSocket[0],data);
 			// sendToClient (io,rowsSocket[0],data);
 		}else{
 			console.log("all user offline");
-			sendGetNewPos2(io,data)
+			// sendGetNewPos2(io,data)
 			// sendGetNewPos2(index.IO,data);		
-			// DictTimeInterval['sendNewPos'] = setInterval(function (io,data) {
-			// 	console.log(rowsSocket[0])
-			// 	sendGetNewPos2(index.IO,data);				
-			// }, 1000, index.IO,data)
+			DictTimeOut['sendNewPos'] = setTimeout(function (io,data) {
+				// console.log(rowsSocket[0])
+				sendGetNewPos2(io,data);
+			}, 1000, io,data);
 		}
 	});	
 }

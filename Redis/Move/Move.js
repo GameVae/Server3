@@ -1,6 +1,6 @@
 'use strict';
 
-var index 					= require('./../../index');
+var GetIO 					= require('./../../GetIO.js');
 var move_GetNewPos 			= require('./Move_GetNewPosition.js');
 
 var db_position				= require('./../../Util/Database/Db_position.js');
@@ -89,7 +89,7 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 						// app.set('port', process.env.PORT);
 						console.log('get new pos with no socket');
 						// console.log(index.IO);
-						move_GetNewPos.SendGetNewPos(index.IO,updateData);
+						move_GetNewPos.SendGetNewPos(GetIO.IO,updateData);
 					}	
 				}else{
 					var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET"+
@@ -180,6 +180,7 @@ function clearMoveTimeout (stringData) {
 	clearTimeout(DictMoveTimeOut[stringData]);
 	delete DictMoveTimeOut[stringData];
 }
+
 exports.ClearMoveTimeout = function clearTimeout (stringData) {
 	clearMoveTimeout (stringData);
 }
@@ -187,6 +188,7 @@ exports.ClearMoveTimeout = function clearTimeout (stringData) {
 function setTimerMoveAttack (data,stringData) {
 	// if (data.TimeMoveNextCell!=null) {checkTimeMoveNextCell (data,stringData);}
 }
+
 exports.ClearMoveTimeMoveAttack = function clearMoveTimeMoveAttack2 (stringData) {
 	clearMoveTimeMoveAttack (stringData);
 }

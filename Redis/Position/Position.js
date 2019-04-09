@@ -122,7 +122,7 @@ function checkValue (stringHkey,stringKey,ID_Key) {
 		if (resultBool==1) {
 			client.hget(stringHkey,stringKey,function (error,rows) {
 				// console.log(rows)
-				var result = rows.split("/");
+				var result = rows.split("/").filter(String);
 				if (!result.includes(ID_Key)) {
 					// console.log(rows,ID_Key)
 					addValue (stringHkey,stringKey,rows,ID_Key);

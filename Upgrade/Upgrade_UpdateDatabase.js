@@ -21,7 +21,7 @@ var dataUpgrade={};
 var DictTimeOut={};
 
 exports.UpdateDatabase = function updateDatabase (serverInt) {
-
+// console.log('serverInt: '+serverInt)
 	var database = "s"+serverInt+"_base_info";
 	var stringQuery = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='"+database+"' AND TABLE_NAME<>'"+database+"'";
 
@@ -43,7 +43,6 @@ exports.UpdateDatabase = function updateDatabase (serverInt) {
 				queryTimeData(serverInt,dbBase,dbUpgrade,rows[i].TABLE_NAME);		
 			}
 		}
-
 	});
 }
 

@@ -1,4 +1,5 @@
 'use strict';
+var GetIO 					= require('./../../GetIO.js');
 var db_position				= require('./../../Util/Database/Db_position.js');
 // var db_all_user				= require('./../../Util/Database/Db_all_user.js');
 
@@ -11,6 +12,8 @@ client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
 var counter = 1.2;
+var DictTimeOut ={};
+var DictTimeInterval = {};
 // var dataA ={
 // 	"ID":9,"ID_Unit":16,"Level":1,"ID_User":9,"BaseNumber":1,"Quality":3,"Hea_cur":5.2,"Health":5.2,"Attack":2.15,"Defend":1.1,"Position_Cell":"489,80,0","Next_Cell":null,"End_Cell":null,"TimeMoveNextCell":null,"ListMove":null,"Status":0,"Attack_Base_ID":null,"Attack_Unit_ID":null,"Attacked_ID":0
 // }
@@ -24,13 +27,13 @@ var counter = 1.2;
 // });
 
 //AttackCalc (dataA,dataB)
-var attack = ["1_16_9_9","1_16_9_10"];
-//var attack = "1_16_9_8"
-var defend = "1_16_9_11";
-var DictTimeInterval = {};
-// exports.Test = function test (argument) {
-// 	console.log(argument)
-// }
+// var attack = ["1_16_9_9","1_16_9_10"];
+// //var attack = "1_16_9_8"
+// var defend = "1_16_9_11";
+
+exports.Test = function test (argument) {
+	console.log(argument)
+}
 var S_MOVE_data = { Server_ID: 1,
 	ID: 13,
 	ID_Unit: 16,
@@ -120,6 +123,7 @@ function getAttackCalc (server_ID,dataAttack,dataDefend) {
 	var Attack = 0, Hea_Lost = 0;
 	var CounterMul = [];
 	// console.log(dataAttack,dataDefend)
+	
 	new Promise((resolve,reject)=>{
 		client.hget(stringHUnit,dataDefend,function (error,rows) {
 			var result = JSON.parse(rows);
@@ -172,25 +176,57 @@ function getAttackCalc (server_ID,dataAttack,dataDefend) {
 			client.hdel(stringHAttack,dataDefend);
 			client.hdel(stringHUnit,dataDefend);
 			updateAttackData (dataAttack);
+
 		}else{
 			client.hset(stringHUnit,dataDefend,JSON.stringify(def));
-		}		
+
+		}	
+		checkSocketClient (GetIO.IO,dataDefend);
 		updateDataBase(server_ID,def);
 	})
 	);
 }
 
+function checkSocketClient (io,dataDefend) {
+	var stringHSocket = "s"+dataDefend.Server_ID+"_socket";
+
+	client.hvals(stringHSocket,function (error,rowsSocket) {
+		if (rowsSocket.length>0) {
+			clearTimeout((DictTimeOut['sendNewPos']));
+			delete DictTimeOut['sendNewPos'];
+			for (var i = 0; i < rowsSocket.length; i++) {
+				sendToClient (io,rowsSocket[i],dataDefend);
+			}
+		}else{
+			// không cần send thông tin
+			console.log("all user offline");
+
+			// sendGetNewPos2(io,data)
+			// sendGetNewPos2(index.IO,data);		
+			// DictTimeOut['sendNewPos'] = setTimeout(function (io,data) {
+			// 	// console.log(rowsSocket[0])
+			// 	sendToClient (io,dataDefend)
+			// }, 1000, io,dataDefend);
+		}
+	});	
+	// socket.emit("R_ATTACK",{R_ATTACK: Unit})
+}
+
+function sendToClient (io,socketID,dataDefend) {
+	io.to(socketID).emit('R_ATTACK',{R_ATTACK:dataDefend});
+}
+
 function updateDataBase (server_ID,dataUpdate) {
 	var stringUpdate;
-	var Unit = {
-		ID : dataUpdate.ID,
-		ID_Unit : dataUpdate.ID_Unit,
-		Level : dataUpdate.Level,
-		ID_User : dataUpdate.ID_User,
-		BaseNumber : dataUpdate.BaseNumber,
-		Quality : dataUpdate.Quality,
-		Hea_cur : dataUpdate.Hea_cur,
-	}
+	// var Unit = {
+	// 	ID : dataUpdate.ID,
+	// 	ID_Unit : dataUpdate.ID_Unit,
+	// 	Level : dataUpdate.Level,
+	// 	ID_User : dataUpdate.ID_User,
+	// 	BaseNumber : dataUpdate.BaseNumber,
+	// 	Quality : dataUpdate.Quality,
+	// 	Hea_cur : dataUpdate.Hea_cur,
+	// }
 	if (dataUpdate.Quality==0) {
 		stringUpdate = "DELETE FROM `s"+server_ID+"_unit` WHERE `ID`='"+dataUpdate.ID+"'";
 		
@@ -202,16 +238,14 @@ function updateDataBase (server_ID,dataUpdate) {
 		// LogChange		
 	}
 	console.log(stringUpdate)	
-	// sendToClient ()
+	
 	db_position.query(stringUpdate,function (error,result) {
 		if (!!error) {console.log(error);}
 	});
 }
 
 
-function sendToClient () {
-	// socket.emit("R_ATTACK",{R_ATTACK: Unit})
-}
+
 
 function checkCounter (dataAtt,dataDef) {
 	var counterAB=1;
@@ -240,8 +274,11 @@ function returnCaseUnit (dataUnit) {
 }
 
 exports.AttackInterval = function attackInterval (Server_ID,ID_User_Defend) {
+
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
+	// console.log(ID_User_Defend)
+
 	DictTimeInterval[ID_User_Defend] = setInterval(function (ID_User_Defend) {
 		client.hexists(stringHAttack,ID_User_Defend,function (error,rows) {
 			if (rows==0) {
@@ -251,7 +288,10 @@ exports.AttackInterval = function attackInterval (Server_ID,ID_User_Defend) {
 				clearInterval(ID_User_Defend);
 				delete DictTimeInterval[ID_User_Defend];
 			}else{
-				getAttackCalc (Server_ID,dataAttack,dataDefend);
+				client.hget(stringHAttack,ID_User_Defend,function (error,rows) {			
+					var dataAttack = rows.split("/").filter(String);
+					getAttackCalc (Server_ID,dataAttack,ID_User_Defend);			
+				});					
 			}
 		})
 	}, 1000, ID_User_Defend)

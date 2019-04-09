@@ -1,0 +1,17 @@
+
+ logChangeDetail: 2019-04-08T02:12:51.044Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-04-08T02:12:51.052Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-04-08T02:12:51.046Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-04-08T02:12:51.049Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-04-08T03:18:30.518Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-08T03:18:37.721Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-08T03:18:56.773Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-08T03:19:02.976Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-08T03:19:09.355Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-08T03:20:57.320Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-08T09:50:33.970Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-08T09:51:03.179Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-08T09:53:37.090Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-08T09:55:47.035Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-08T09:56:26.174Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-08T09:57:46.380Z: Login.js: queryUserNamePass: ndinhtoan45

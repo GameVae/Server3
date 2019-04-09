@@ -4,11 +4,14 @@ var app				= express();
 var server			= require('http').createServer(app);
 var io 				= require('socket.io').listen(server);
 
-exports.IO = io;
+
+module.exports.IO = io;
+
 var redisFunc 		= require('./Redis.js');
 redisFunc.UpdateUnitData(1);
 
 var functions 		= require('./Util/Functions.js');
+
 exports.Test = function test (argument) {
 	console.log(argument);
 }
@@ -19,7 +22,10 @@ server.listen(process.env.PORT);
 io.sockets.setMaxListeners(0);
 app.set('port', process.env.PORT);
 
+
 console.log(functions.GetTimeNow()+": "+app.get('port'));
+
+
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -65,9 +71,11 @@ var moveUnit 				= require('./Unit/Moving.js');
 var moving_Update 			= require('./Unit/Moving_Update.js');
 moving_Update.UpdateDataBase(1);
 
+// var updateAttack 			= require('./Redis/Attack/Attack_Update.js');
+// updateAttack.UpdateDataBase(1);
 
 var guild_UpdateDatabase 	= require('./Guild/Guild_UpdateDatabase.js');
-guild_UpdateDatabase.UpdateDatabase(); 
+guild_UpdateDatabase.UpdateDatabase();
 
 if (app.get('port') === process.env.PORT)
 {	

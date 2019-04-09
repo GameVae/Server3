@@ -22,7 +22,8 @@ var Promise = require('promise');
 
 var stringUnitMoving;
 var DictTimeMoveAttack ={};
-var moveUnit 		= require('./../Redis/Move/Move.js');
+
+// var moveUnit 		= require('./../Redis/Move/Move.js');
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
@@ -68,7 +69,7 @@ var S_MOVE_data = { Server_ID: 1,
 	Next_Cell: '304,3,0',
 	TimeMoveNextCell: '2019-04-05T06:58:24.014' } ] }
 //
-S_MOVE (S_MOVE_data)
+// S_MOVE (S_MOVE_data)
 
 function S_MOVE (data) {
 	// console.log(data);
@@ -108,6 +109,7 @@ function checkTimeMoveAttack (data) {
 		}
 		if (data.TimeMoveNextCell>timeCheck) {
 			timeMove = data.TimeMoveNextCell - timeCheck;
+			// timeMove = data.TimeMoveNextCell + 100;
 			stringPos = data.Next_Cell;
 		}else{
 			timeMove = data.TimeMoveNextCell
@@ -118,7 +120,9 @@ function checkTimeMoveAttack (data) {
 			//lay thong tin data?
 			var stringHUnit = "s"+data.Server_ID+"_unit";
 			client.hget(stringHUnit,stringUnitMoving,function (error,rows) {
-				var resultData = JSON.parse(rows)
+				// var resultData = JSON.parse(rows)
+				var resultData = convertTimeMove (JSON.parse(rows))
+
 				checkTimeMoveAttack (resultData)
 				checkCurrentPosition (resultData,stringPos);
 			});
@@ -128,7 +132,28 @@ function checkTimeMoveAttack (data) {
 		clearMoveTimeout (stringPos);
 	}	
 }
+// convertTimeMove (S_MOVE_data)
+function convertTimeMove (data) {
+	var returnData=data;
+	currentTime = functions.GetTime();
+	if (returnData.TimeMoveNextCell!=null) {
+		returnData.TimeMoveNextCell = functions.ExportTimeDatabase(returnData.TimeMoveNextCell) - currentTime;
+	}
+	if (returnData.TimeFinishMove!=null) {
+		returnData.TimeFinishMove = functions.ExportTimeDatabase(returnData.TimeFinishMove) - currentTime;
+	}
+	var ListMove = returnData.ListMove;
 
+	if (ListMove!=null) {
+		for (var i = 0; i < ListMove.length; i++) {
+			ListMove[i].TimeMoveNextCell = functions.ExportTimeDatabase(ListMove[i].TimeMoveNextCell) - currentTime;
+		}
+	}
+
+	// console.log(returnData)
+
+	return returnData;
+}
 function clearMoveTimeout (stringData) {
 	clearTimeout(DictTimeMoveAttack[stringData]);
 	delete DictTimeMoveAttack[stringData];
