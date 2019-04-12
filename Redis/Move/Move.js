@@ -1,6 +1,6 @@
 'use strict';
 
-var GetIO 					= require('./../../GetIO.js');
+// var GetIO 					= require('./../../GetIO.js');
 var move_GetNewPos 			= require('./Move_GetNewPosition.js');
 
 var db_position				= require('./../../Util/Database/Db_position.js');
@@ -8,6 +8,7 @@ var attackFunc 				= require('./../Attack/Attack.js');
 var guildData				= require('./../Guild/GuildData.js');
 var friendData				= require('./../Friend/FriendData.js');
 var positionAdd 			= require('./../Position/Position.js');
+var positionCheck 			= require('./../Position/Position_Check.js');
 var positionRemove 			= require('./../Position/Position_Remove.js');
 
 //var redisFunc 				=  require('./../../Redis.js');
@@ -24,6 +25,7 @@ var DictTimeMoveAttack = {};
 var currentTime,stringData;
 var DetailError, logChangeDetail;
 
+var stringHkey,stringKey;
 exports.MoveCalc = function moveCalc (io,socket,data) {
 	moveCalc2 (io,socket,data)
 }
@@ -42,8 +44,8 @@ var S_MOVE_data = { Server_ID: 1,
 // moveCalc2 (S_MOVE_data)
 function moveCalc2 (io,socket,data) {
 	// console.log(data)
-	var stringHkey = "s"+data.Server_ID+"_unit";
-	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	stringHkey = "s"+data.Server_ID+"_unit";
+	stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	clearMoveTimeout(stringKey);
 	positionRemove.PostionRemove(data);
 	setTimerUpdateDatabase2 (io,socket,data,stringKey);
@@ -76,11 +78,9 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 		}else{	
 			checkPosition (updateData,function (returnBool) {				
 				if (returnBool) {
-					// console.log(returnBool)
-					
+					// console.log(returnBool)					
 					if (io!=null) {move_GetNewPos.SendGetNewPos(io,updateData);}
-					else{
-						
+					else{						
 						// var express			= require('express');
 						// var app				= express();
 						// var server			= require('http').createServer(app);
@@ -89,7 +89,8 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 						// app.set('port', process.env.PORT);
 						console.log('get new pos with no socket');
 						// console.log(index.IO);
-						move_GetNewPos.SendGetNewPos(GetIO.IO,updateData);
+						move_GetNewPos.SendGetNewPos(io,updateData);
+						// move_GetNewPos.SendGetNewPos(GetIO.IO,updateData);
 					}	
 				}else{
 					var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET"+
@@ -107,8 +108,10 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 					updateData.TimeMoveNextCell = null;
 					updateData.TimeFinishMove = null;
 					updateData.Status = 6;
-
+					
 					positionAdd.AddPosition(updateData);
+					checkAttackData (data);
+
 				}
 				updateRedisData (stringKey,updateData,Position_Cell);
 			})						
@@ -116,6 +119,61 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 		//console.log(updateData)
 		updateRedisData (stringKey,updateData,Position_Cell);
 	}, timeOut, stringKey);
+}
+
+function checkAttackData (data) {
+	stringHkey = "s"+data.Server_ID+"_unit";
+	stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	client.hget(stringHkey,stringKey,function (error,rows) {
+		var result = JSON.parse(rows);
+		if(result.Attack_Unit_ID!=null){
+			checkPositionAttackUnit (data,stringKey);
+		}
+	});
+}
+//send move add unit
+function checkPositionAttackUnit (data,stringKey) {
+	var returnArrayPos=[];
+	var posDefend;
+	var boolAttack = false;
+	var stringKeyDefend = data.Attack_Unit_ID;
+	new Promise((resolve,reject)=>{
+		positionCheck.GetPosition(data,stringKey,function (returnPosArray) {
+			returnArrayPos =returnPosArray;
+			resolve();
+		});
+	}).then(()=>new Promise((resolve,reject)=>{
+		console.log(returnArrayPos);
+		client.hget(stringHkey,stringKDefend,function (error,rows) {
+			var result = JSON.parse(rows)
+			posDefend = result.Position_Cell;
+			resolve();
+		});
+	}).then(()=>new Promise((resolve,reject)=>{
+		console.log(returnArrayPos,posDefend)
+		if (returnArrayPos.includes(posDefend)) {
+			boolAttack= true;
+			attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKey);			
+		}else{
+			//remove unit database
+			var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET `Attack_Unit_ID`=NULL WHERE `ID`='"+data.ID+"'";
+			db_position.query(stringUpdate,function (error,result) {
+				if (!!error){DetailError = ('Move.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,2);}
+				logChangeDetail =("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
+			});
+			client.hget(stringHkey,stringKey,function (error,rows) {
+				var result = JSON.parse(rows);
+				result.Attack_Unit_ID = 'null';
+				client.hset(stringHkey,stringKey,JSON.stringify(result));
+			})
+		}
+		resolve();
+	}).then(()=>new Promise((resolve,reject)=>{
+		if (boolAttack==true) {
+			attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend);
+		}	
+	})))
+	)
 }
 
 function checkPosition (data,returnBool) {

@@ -40,7 +40,7 @@ exports.CheckSameGuildID = function checkSameGuildID (ID_User1,ID_User2,returnBo
 	// console.log(ID_User1,ID_User2)
 	client.hmget(stringHkey,ID_User1,ID_User2, function (error,rows) {
 		// console.log(rows)
-		if (rows[0]==rows[1]) {checkBool = true;}
+		if (rows[0]==rows[1]&&rows[0]!=null) {checkBool = true;}
 		// var boolCheck = rows.every((val,i,arr)=> val===rows[0])
 		returnBool(checkBool);
 	})
@@ -56,14 +56,14 @@ exports.RemoveValueGuild = function removeValueGuild (stringID_User) {
 	client.hdel(stringHkey,stringID_User);
 }
 
-// test ()
-// function test () {
+// function checkSameGuildID (ID_User1,ID_User2,returnBool) {
+// 	var checkBool = false;
 // 	var stringHkey = "all_guilds";
-// 	var string1 ="9";
-// 	var string2 = "42";
-// 	var boolCheck = false;
-// 	client.hmget(stringHkey,string1,string2,function (error,rows) {
-// 		// console.log(rows);
-// 		console.log(rows.every(v=>v===rows[0]))
-// 	});
+// 	// console.log(ID_User1,ID_User2)
+// 	client.hmget(stringHkey,ID_User1,ID_User2, function (error,rows) {
+	
+// 		if (rows[0]==rows[1]&&rows[0]!=null) {checkBool = true;}
+// 		// var boolCheck = rows.every((val,i,arr)=> val===rows[0])
+// 		returnBool(checkBool);
+// 	})
 // }

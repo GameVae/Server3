@@ -23,7 +23,7 @@ var Promise = require('promise');
 var stringUnitMoving;
 var DictTimeMoveAttack ={};
 
-// var moveUnit 		= require('./../Redis/Move/Move.js');
+
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
@@ -233,7 +233,7 @@ function getAttackData (data,ID_Player) {
 			}
 		}).then(()=>new Promise((resolve,reject)=>{
 			// console.log(ID_Defend);
-			// attackFunc.AttackInterval(data.Server_ID,ID_Defend);
+			attackFunc.AttackInterval(data.Server_ID,ID_Defend);
 		}))
 		)
 		)

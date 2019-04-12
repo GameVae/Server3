@@ -2,7 +2,7 @@
 
 // var db_all_user		= require('./../Util/Database/Db_all_user.js');
 var db_position		= require('./../Util/Database/Db_position.js');
-var moveUnit 		= require('./../Redis/Move/Move.js');
+// var moveUnit 		= require('./../Redis/Move/Move.js');
 
 var attackFunc 		= require('./../Redis/Attack/Attack.js');
 var friendData 		= require('./../Redis/Friend/FriendData.js');
@@ -25,7 +25,16 @@ var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-
+var dataAttack = {
+	Server_ID: '1',
+	ID_Attack: '16',
+	ID_Unit_Attack: '16',
+	ID_User_Attack: '42',
+	ID_Defend: '12',
+	ID_Unit_Defend: '16',
+	ID_User_Defend: '9',
+	Position_Cell_Attacker: '12,11,0' }
+//
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_ATTACK', function (data){
@@ -37,19 +46,11 @@ exports.Start = function start (io) {
 	});
 }
 
-var dataAttack = {
-	Server_ID: 1,
-
-	ID_Attack: 11,
-	ID_Unit_Attack: 16,
-	ID_User_Attack: 9,
-
-	ID_Defend: 25,
-	ID_Unit_Defend: 16,	
-	ID_User_Defend: 42,	
-
-	Position_Cell_Attacker: '4,4,0',
+function checkDefendCanAttack (data) {
+	
 }
+
+
 
 function updateRedis (data) {
 	// var stringHPos = "s"+data.Server_ID+"_pos";
@@ -59,9 +60,10 @@ function updateRedis (data) {
 // S_ATTACK ('io',dataAttack);
 // updateDatabase (dataAttack)
 function updateDatabase (data) {
+	var Attack_Unit_ID = data.Server_ID+"_"+data.ID_Unit_Defend+"_"+data.ID_User_Defend+"_"+data.ID_Defend;
 	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
 	+"`Status`='"+functions.UnitStatus.Attack_Unit
-	+"',`Attack_Unit_ID`='"+data.ID_Defend
+	+"',`Attack_Unit_ID`='"+Attack_Unit_ID
 	+"' WHERE `ID`='"+data.ID_Attack+"'";
 	db_position.query(stringUpdate,function (error,result) {
 		if (!!error) {console.log(error);}
@@ -70,12 +72,14 @@ function updateDatabase (data) {
 	+"`Status`='"+functions.UnitStatus.Attacked
 	+"',`AttackedBool`='1'"
 	+" WHERE `ID`='"+data.ID_Defend+"'";
+	// console.log(data);
 	db_position.query(stringUpdateDefend,function (error,result) {
 		if (!!error) {console.log(error);}
 	})
 }
-
+// S_ATTACK (null,dataAttack)
 function S_ATTACK (io,data) {
+	// console.log(data);
 	if (data.ID_User_Attack!=data.ID_User_Defend) {
 		stringHAttack = "s"+data.Server_ID+"_attack";
 		stringKeyAttack = data.Server_ID+"_"+data.ID_Unit_Attack+"_"+data.ID_User_Attack+"_"+data.ID_Attack;
@@ -100,12 +104,21 @@ function S_ATTACK (io,data) {
 			resolve();
 		}
 	}).then(()=>{
-		// (Server_ID,ID_User_Defend)
-		attackFunc.AttackInterval(data.Server_ID,stringKeyDefend)
+
+		attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend)
 		//attackInterval (data.ID_User_Defend)
 	})
 	))
 	}else{
 		console.log('same user')
 	}
+}
+
+function checkUnitDefend (stringKeyDefend) {
+	client.hexists(stringHAttack,stringKeyDefend,function (error,rows) {
+		if (rows.length>0) {}else{
+
+		}
+
+	})
 }

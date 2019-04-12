@@ -1,5 +1,5 @@
 'use strict';
-var GetIO 					= require('./../../GetIO.js');
+// var GetIO 					= require('./../../GetIO.js');
 var db_position				= require('./../../Util/Database/Db_position.js');
 // var db_all_user				= require('./../../Util/Database/Db_all_user.js');
 
@@ -51,22 +51,27 @@ var stringHAttack,stringHUnit;
 exports.SetAttackData = function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
+	// console.log(Server_ID,ID_Defend,ID_Attack)
 	client.hexists(stringHAttack,ID_Defend,function (error,resultBool) {
+		// console.log(resultBool)
 		if (resultBool==1) {
 			client.hget(stringHAttack,ID_Defend,function (error,result) {
 				var resultID = result.split("/").filter(String)
+				console.log("resultID: "+resultID);
 				if (!resultID.includes(ID_Attack)) {
 					checkAttacking (Server_ID,ID_Defend,ID_Attack,function (returnBool) {
-						// console.log("returnBool: "+returnBool);
-						if (returnBool) {addValue (stringHAttack,ID_Defend,result,ID_Attack);}
+						console.log("returnBool: "+returnBool);
+						if (returnBool==false) {addValue (stringHAttack,ID_Defend,result,ID_Attack);}
 					});
 				}
 			});
 		}else{
-			checkAttacking (Server_ID,ID_Defend,ID_Attack,function (returnBool) {
-				// console.log("returnBool: "+returnBool);
-				if (returnBool) {addValue (stringHAttack,ID_Defend,"",ID_Attack);}
-			});
+			addValue (stringHAttack,ID_Defend,"",ID_Attack)
+			// checkAttacking (Server_ID,ID_Defend,ID_Attack,function (returnBool) {
+			// 	console.log("returnBool: "+returnBool);
+			// 	if (returnBool==false) {addValue (stringHAttack,ID_Defend,"",ID_Attack);}
+				
+			// });
 		}
 	})
 }
@@ -117,7 +122,7 @@ function checkUnitDef (server_ID,dataAttack,dataDefend) {
 	});
 }
 
-function getAttackCalc (server_ID,dataAttack,dataDefend) {
+function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 	var stringHUnit = "s"+server_ID+"_unit";
 	var def = {};
 	var Attack = 0, Hea_Lost = 0;
@@ -161,7 +166,7 @@ function getAttackCalc (server_ID,dataAttack,dataDefend) {
 					resultAttack.Attack_Unit_ID = null;
 					var stringAttack = server_ID+"_"+resultAttack.ID_Unit+"_"+resultAttack.ID_User+"_"+resultAttack.ID;
 					// console.log(stringAttack);
-					client.hset(stringHkey,stringAttack,JSON.stringify(resultAttack));
+					client.hset(stringHUnit,stringAttack,JSON.stringify(resultAttack));
 					//update database
 				}
 			}
@@ -181,39 +186,53 @@ function getAttackCalc (server_ID,dataAttack,dataDefend) {
 			client.hset(stringHUnit,dataDefend,JSON.stringify(def));
 
 		}	
-		checkSocketClient (GetIO.IO,dataDefend);
+		checkSocketClient (io,dataDefend,def);
 		updateDataBase(server_ID,def);
 	})
 	);
 }
 
-function checkSocketClient (io,dataDefend) {
-	var stringHSocket = "s"+dataDefend.Server_ID+"_socket";
-
+function checkSocketClient (io,dataDefend,def) {
+	var Server_ID = dataDefend.split("_")[0]
+	var stringHSocket = "s"+Server_ID+"_socket";
+	// console.log('stringHSocket:'+stringHSocket)
+	
 	client.hvals(stringHSocket,function (error,rowsSocket) {
-		if (rowsSocket.length>0) {
-			clearTimeout((DictTimeOut['sendNewPos']));
-			delete DictTimeOut['sendNewPos'];
-			for (var i = 0; i < rowsSocket.length; i++) {
-				sendToClient (io,rowsSocket[i],dataDefend);
-			}
-		}else{
-			// không cần send thông tin
-			console.log("all user offline");
+		
+		// console.log(io,rowsSocket,dataDefend)
 
-			// sendGetNewPos2(io,data)
-			// sendGetNewPos2(index.IO,data);		
-			// DictTimeOut['sendNewPos'] = setTimeout(function (io,data) {
-			// 	// console.log(rowsSocket[0])
-			// 	sendToClient (io,dataDefend)
-			// }, 1000, io,dataDefend);
+		for (var i = 0; i < rowsSocket.length; i++) {
+			sendToClient (io,rowsSocket[i],def);
 		}
+			// if (io==null) {
+			// 	sendToClient (GetIO.IO,rowsSocket[i],dataDefend);
+			// }else{
+			// 	sendToClient (io,rowsSocket[i],dataDefend);
+			// }
+
+			
+		// }
+		// if (rowsSocket.length>0) {
+		// 	for (var i = 0; i < rowsSocket.length; i++) {
+		// 		sendToClient (io,rowsSocket[i],dataDefend);
+		// 	}
+		// }else{
+		// 	// không cần send thông tin
+		// 	console.log("all user offline");
+
+		// 	// sendGetNewPos2(io,data)
+		// 	// sendGetNewPos2(index.IO,data);		
+		// 	// DictTimeOut['sendNewPos'] = setTimeout(function (io,data) {
+		// 	// 	// console.log(rowsSocket[0])
+		// 	// 	sendToClient (io,dataDefend)
+		// 	// }, 1000, io,dataDefend);
+		// }
 	});	
 	// socket.emit("R_ATTACK",{R_ATTACK: Unit})
 }
 
-function sendToClient (io,socketID,dataDefend) {
-	io.to(socketID).emit('R_ATTACK',{R_ATTACK:dataDefend});
+function sendToClient (io,socketID,def) {
+	io.to(socketID).emit('R_ATTACK',{R_ATTACK:def});
 }
 
 function updateDataBase (server_ID,dataUpdate) {
@@ -237,15 +256,12 @@ function updateDataBase (server_ID,dataUpdate) {
 
 		// LogChange		
 	}
-	console.log(stringUpdate)	
+	// console.log(stringUpdate)	
 	
 	db_position.query(stringUpdate,function (error,result) {
 		if (!!error) {console.log(error);}
 	});
 }
-
-
-
 
 function checkCounter (dataAtt,dataDef) {
 	var counterAB=1;
@@ -273,7 +289,7 @@ function returnCaseUnit (dataUnit) {
 	return returnCase;
 }
 
-exports.AttackInterval = function attackInterval (Server_ID,ID_User_Defend) {
+exports.AttackInterval = function attackInterval (io,Server_ID,ID_User_Defend) {
 
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
@@ -290,7 +306,7 @@ exports.AttackInterval = function attackInterval (Server_ID,ID_User_Defend) {
 			}else{
 				client.hget(stringHAttack,ID_User_Defend,function (error,rows) {			
 					var dataAttack = rows.split("/").filter(String);
-					getAttackCalc (Server_ID,dataAttack,ID_User_Defend);			
+					getAttackCalc (io,Server_ID,dataAttack,ID_User_Defend);			
 				});					
 			}
 		})

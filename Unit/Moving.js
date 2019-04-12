@@ -36,8 +36,7 @@ exports.Start = function start (io) {
 			// socket.broadcast.emit('R_MOVE',{R_MOVE:data});			
 			stringKeyMove = "s"+data.S_MOVE.Server_ID+"_move";
 			// console.log(stringKeyMove,data)
-			client.set(stringKeyMove,JSON.stringify(data.S_MOVE));
-			// moveUnit.ClearMoveTimeout(stringData)		
+			client.set(stringKeyMove,JSON.stringify(data.S_MOVE));		
 			R_MOVE (io,socket,data.S_MOVE.ID_User,data.S_MOVE.Server_ID);	
 			S_MOVE (io,socket,data.S_MOVE);			
 		});
@@ -65,11 +64,6 @@ function sendToClient (io,socketID) {
 	})
 }
 
-// var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":42,"Position_Cell":"11,12,0","Next_Cell":"10,11,0","End_Cell":"10,9,0","TimeMoveNextCell":1262,"TimeFinishMove":3786,"ListMove":[{"CurrentCell":"10,11,0","NextCell":"10,10,0","TimeMoveNextCell":"1262"},{"CurrentCell":"10,10,0","NextCell":"10,9,0","TimeMoveNextCell":"2324"}]}
-// var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":42,"Position_Cell":"7,7,0","Next_Cell":"10,12,0","End_Cell":"10,12,0","TimeMoveNextCell":1400,"TimeFinishMove":1400,"ListMove":[]}
-
-// S_MOVE ('socket',S_MOVE_data)
-
 function S_MOVE (io,socket,data) {
 	// console.log(functions.GetTime());
 	// console.log(data);
@@ -94,29 +88,45 @@ function updateDataBase (data) {
 		if (!!error){DetailError = ('Unit_Moving.js: query '+stringQuery); functions.WriteLogError(DetailError,2);}
 		if (rows[0].Attack_Unit_ID!=null) {
 			updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0]);
-
-			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-			+"`Position_Cell`='"+data.Position_Cell+"',"
-			+"`Next_Cell`='"+data.Next_Cell+"',"
-			+"`End_Cell`='"+data.End_Cell+"',"
-			+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-			+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-			+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-			+"`Status`='"+functions.UnitStatus.Move+
-			+"`Attack_Unit_ID`= NULL"+
-			" WHERE `ID`='"+data.ID+"'";
-
-		}else {
-			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-			+"`Position_Cell`='"+data.Position_Cell+"',"
-			+"`Next_Cell`='"+data.Next_Cell+"',"
-			+"`End_Cell`='"+data.End_Cell+"',"
-			+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-			+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-			+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-			+"`Status`='"+functions.UnitStatus.Move+
-			"' WHERE `ID`='"+data.ID+"'";
 		}
+		
+		// if (rows[0].Attack_Unit_ID!=null) {
+		// 	// console.log(data,rows[0].Attack_Unit_ID,rows[0])
+		// 	updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0]);
+
+		// 	stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+		// 	+"`Position_Cell`='"+data.Position_Cell+"',"
+		// 	+"`Next_Cell`='"+data.Next_Cell+"',"
+		// 	+"`End_Cell`='"+data.End_Cell+"',"
+		// 	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+		// 	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+		// 	+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+		// 	+"`Status`='"+functions.UnitStatus.Move+"',"
+		// 	+"`Attack_Unit_ID`= NULL"+
+		// 	" WHERE `ID`='"+data.ID+"'";
+
+		// }else {
+		// 	stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+		// 	+"`Position_Cell`='"+data.Position_Cell+"',"
+		// 	+"`Next_Cell`='"+data.Next_Cell+"',"
+		// 	+"`End_Cell`='"+data.End_Cell+"',"
+		// 	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+		// 	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+		// 	+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+		// 	+"`Status`='"+functions.UnitStatus.Move+
+		// 	"' WHERE `ID`='"+data.ID+"'";
+		// }
+
+		stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+		+"`Position_Cell`='"+data.Position_Cell+"',"
+		+"`Next_Cell`='"+data.Next_Cell+"',"
+		+"`End_Cell`='"+data.End_Cell+"',"
+		+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+		+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+		+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+		+"`Status`='"+functions.UnitStatus.Move+
+		"' WHERE `ID`='"+data.ID+"'";
+		console.log(stringUpdate);
 
 		db_position.query(stringUpdate,function (error,result) {
 			if (!!error){DetailError = ('Unit_Moving.js: query '+stringUpdate); functions.WriteLogError(DetailError,2);}
@@ -131,28 +141,73 @@ function updateDataBase (data) {
 	});
 }
 
+// var rowData ={
+//   ID: 16,
+//   ID_Unit: 16,
+//   ID_User: 42,
+//   BaseNumber: 1,
+//   Level: 2,
+//   Quality: 1,
+//   Hea_cur: 5.45,
+//   Health: 5.45,
+//   Attack: 2.3,
+//   Defend: 1.15,
+//   Position_Cell: '12,8,0',
+//   Next_Cell: null,
+//   End_Cell: null,
+//   TimeMoveNextCell: null,
+//   TimeFinishMove: null,
+//   ListMove: null,
+//   Status: 2,
+//   Attack_Base_ID: null,
+//   Attack_Unit_ID: 12,
+//   AttackedBool: 0 }
+// updateRedisAttack (1,12,rowData);
+
 function updateRedisAttack (Server_ID,ID_Defend,dataAttack) {
 	var dataDefend ={};
 	var ID_Attack = Server_ID+"_"+dataAttack.ID_Unit+"_"+dataAttack.ID_User+"_"+dataAttack.ID;
-	new Promise((resolve,reject)=>{
-		var stringQuery = "SELECT `ID_Unit`,`ID_User` FROM `s"+Server_ID+"_unit` WHERE `ID` ='"+ID_Defend+"'";
-		db_position.query(stringQuery,function (error,rows) {
-			dataDefend = rows[0];
-		});
-	}).then(()=>new Promise((resolve,reject)=>{
-		var stringHAttack = "s"+Server_ID+"_attack";
-		var stringKeyDefend = Server_ID+"_"+dataDefend.ID_Unit+"_"+dataDefend.ID_User+"_"+ID_Defend;
-		client.hexists(stringHAttack,stringKeyDefend,function (error,result) {
-			if (result==1) {
-				client.hget(stringHAttack,stringKeyDefend,function (error,rows) {
-					var resultAttack = JSON.parse(rows).split("/").filter(String);
-					if (resultAttack.includes(ID_Attack)) {
-						removeValue (stringHAttack,stringKeyDefend,rows,ID_Attack);
-					}
-				});
-			}
-		})
-	}));
+	// var ID_Attack = dataAttack.Attack_Unit_ID;
+	var stringHAttack = "s"+Server_ID+"_attack";
+	var stringKeyDefend = ID_Defend;
+	// var stringKeyDefend = Server_ID+"_"+dataDefend.ID_Unit+"_"+dataDefend.ID_User+"_"+ID_Defend;
+
+	client.hexists(stringHAttack,stringKeyDefend,function (error,result) {
+		if (result==1) {
+			client.hget(stringHAttack,stringKeyDefend,function (error,rows) {
+				var resultAttack = rows.split("/").filter(String);
+				if (resultAttack.includes(ID_Attack)) {
+					removeValue (stringHAttack,stringKeyDefend,rows,ID_Attack);
+				}
+				resolve();
+			});
+		}
+	})
+
+	// new Promise((resolve,reject)=>{
+	// 	var stringQuery = "SELECT `ID_Unit`,`ID_User` FROM `s"+Server_ID+"_unit` WHERE `ID` ='"+ID_Defend+"'";
+	// 	db_position.query(stringQuery,function (error,rows) {
+			
+	// 		dataDefend = rows[0];
+	// 		resolve();
+	// 	});
+	// }).then(()=>new Promise((resolve,reject)=>{
+		
+	// 	var stringHAttack = "s"+Server_ID+"_attack";
+	// 	var stringKeyDefend = Server_ID+"_"+dataDefend.ID_Unit+"_"+dataDefend.ID_User+"_"+ID_Defend;
+	// 	client.hexists(stringHAttack,stringKeyDefend,function (error,result) {
+	// 		if (result==1) {
+	// 			client.hget(stringHAttack,stringKeyDefend,function (error,rows) {
+	// 				var resultAttack = rows.split("/").filter(String);
+	// 				if (resultAttack.includes(ID_Attack)) {
+	// 					removeValue (stringHAttack,stringKeyDefend,rows,ID_Attack);
+	// 				}
+	// 				resolve();
+	// 			});
+	// 		}
+	// 	})
+	// }));
+
 }
 
 function removeValue (stringHkey,stringKey,rows,ID_Key) {

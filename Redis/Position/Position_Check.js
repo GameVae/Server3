@@ -9,12 +9,80 @@ var redis = require('redis');
 var client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-// exports.GetPosition = function getPosition (server_ID){
-// 	getPosition_test (server_ID);
-// }
-// exports.AddPosition = function addPosition (data) {
-// 	getRangeUnit (data,data.Server_ID)
-// }
+exports.GetPosition = function getPosition (data,stringKeyCheck,returnPosArray){
+	getPosition_test (data,stringKeyDefend,function (returnArrayPos) {
+		returnPosArray(returnArrayPos);
+	});
+}
+
+function getPosition_test (data,stringKeyCheck,returnArrayPos) {
+	var ID_Unit = stringKeyDefend.split("_")[1]
+	var server_ID = stringKeyDefend.split("_")[0];
+	var stringHUnit = "s"+server_ID+"_unit";
+	client.hget(stringHUnit, stringKeyDefend,function (error,rowsUnit) {
+		var row = JSON.parse(rowsUnit);
+		if (ID_Unit>15&&ID_Unit<20) {unitRange1 (rowsUnit,server_ID,function (returnArray) {
+			returnArrayPos(returnArray);
+		});}
+	})
+	
+	if (ID_Unit>20&&ID_Unit<25) {unitRange2 (stringKeyDefend,server_ID);}
+	if (ID_Unit>25&&ID_Unit<30) {unitRange1 (stringKeyDefend,server_ID);}
+	if (ID_Unit>30&&ID_Unit<35) {unitRange3 (stringKeyDefend,server_ID);}
+}
+
+function unitRange1 (row,server_ID,returnArray) {
+	// console.log(row,server_ID)
+	var posCenter = row.Position_Cell;
+	var posX = parseInt(posCenter.split(",")[0]);
+	var posY = parseInt(posCenter.split(",")[1]);
+
+	var stringHkey = "s"+server_ID+"_pos";
+	var stringKey=[];
+	var ID_Key = server_ID+"_"+row.ID_Unit+"_"+row.ID_User+"_"+row.ID;
+	
+	stringKey[0] = row.Position_Cell;
+	
+	if (posY%2==0) {
+		//even
+		// new Vector3Int(-1, 0, 0),
+		// new Vector3Int( 0,-1, 0),
+		// new Vector3Int( 0, 1, 0),
+		// new Vector3Int( 1,-1, 0),
+		// new Vector3Int( 1, 1, 0),
+		// new Vector3Int( 1, 0, 0),
+		stringKey[1] = (posX-1)+","+(posY)+",0";
+		stringKey[2] = (posX)+","+(posY-1)+",0";
+		stringKey[3] = (posX)+","+(posY+1)+",0";
+		stringKey[4] = (posX+1)+","+(posY-1)+",0";
+		stringKey[5] = (posX+1)+","+(posY+1)+",0";
+		stringKey[6] = (posX+1)+","+(posY)+",0";
+	}else{
+		//odd
+		// new Vector3Int(-1, 0, 0),
+		// new Vector3Int(-1,-1, 0),
+		// new Vector3Int(-1, 1, 0),
+		// new Vector3Int( 0, 1, 0),
+		// new Vector3Int( 0,-1, 0),
+		// new Vector3Int( 1, 0, 0),
+		stringKey[1] = (posX-1) +","+posY+",0";
+		stringKey[2] = (posX-1) +","+(posY-1)+",0";
+		stringKey[3] = (posX-1) +","+(posY+1)+",0";
+		stringKey[4] = (posX) +","+(posY+1)+",0";
+		stringKey[5] = (posX) +","+(posY-1)+",0";
+		stringKey[6] = (posX+1) +","+(posY)+",0";
+		
+	}
+
+
+	// console.log(stringKey)
+	returnArray(stringKey)
+
+	// for (var i = 0; i < stringKey.length; i++) {
+	// 	checkValue (stringHkey,stringKey[i],ID_Key);
+	// }
+}
+
 
 // function getPosition_test (server_ID) {
 // 	// var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"'";
@@ -402,22 +470,22 @@ client.select(functions.RedisData.TestUnit);
 // 	}
 // }
 
-getPosition_test (1);
+// getPosition_test (1);
 
-function getPosition_test (server_ID) {
-	var data =[]
-	new Promise((resolve,reject)=>{
-		var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"'";
-		db_position.query(stringQuery,function (error,rows) {
-			// console.log(rows.length)
-			data=rows;
-			resolve()
-		});
-	}).then(()=>new Promise((resolve,reject)=>{
-		
-		console.log(data.length)
+// function getPosition_test (server_ID) {
+// 	var data =[]
+// 	new Promise((resolve,reject)=>{
+// 		var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"'";
+// 		db_position.query(stringQuery,function (error,rows) {
+// 			// console.log(rows.length)
+// 			data=rows;
+// 			resolve()
+// 		});
+// 	}).then(()=>new Promise((resolve,reject)=>{
 
-	})
-	)
-	
-}
+// 		console.log(data.length)
+
+// 	})
+// 	)
+
+// }
