@@ -1,6 +1,6 @@
 'use strict';
 
-var db_position				= require('./../../Util/Database/Db_position.js');
+// var db_position				= require('./../../Util/Database/Db_position.js');
 
 var functions 				= require('./../../Util/Functions.js');
 var Promise 				= require('promise');
@@ -9,37 +9,44 @@ var redis = require('redis');
 var client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-exports.GetPosition = function getPosition (data,stringKeyCheck,returnPosArray){
-	getPosition_test (data,stringKeyDefend,function (returnArrayPos) {
+exports.GetPosition = function getPosition (stringKeyCheck,returnPosArray){
+	getPosition_test (stringKeyCheck,function (returnArrayPos) {
 		returnPosArray(returnArrayPos);
 	});
 }
 
-function getPosition_test (data,stringKeyCheck,returnArrayPos) {
-	var ID_Unit = stringKeyDefend.split("_")[1]
-	var server_ID = stringKeyDefend.split("_")[0];
+function getPosition_test (stringKeyCheck,returnArrayPos) {
+	var ID_Unit = stringKeyCheck.split("_")[1]
+	var server_ID = stringKeyCheck.split("_")[0];
 	var stringHUnit = "s"+server_ID+"_unit";
-	client.hget(stringHUnit, stringKeyDefend,function (error,rowsUnit) {
+	client.hget(stringHUnit, stringKeyCheck,function (error,rowsUnit) {
 		var row = JSON.parse(rowsUnit);
-		if (ID_Unit>15&&ID_Unit<20) {unitRange1 (rowsUnit,server_ID,function (returnArray) {
+		
+		if (ID_Unit>15&&ID_Unit<20) {unitRange1 (row,function (returnArray) {
 			returnArrayPos(returnArray);
 		});}
+		if (ID_Unit>20&&ID_Unit<25) {unitRange2 (row,function (returnArray) {
+			returnArrayPos(returnArray);
+		});}
+		if (ID_Unit>25&&ID_Unit<30) {unitRange1 (row,function (returnArray) {
+			returnArrayPos(returnArray);
+		});}
+		if (ID_Unit>30&&ID_Unit<35) {unitRange3 (row,function (returnArray) {
+			returnArrayPos(returnArray);
+		});}	
 	})
-	
-	if (ID_Unit>20&&ID_Unit<25) {unitRange2 (stringKeyDefend,server_ID);}
-	if (ID_Unit>25&&ID_Unit<30) {unitRange1 (stringKeyDefend,server_ID);}
-	if (ID_Unit>30&&ID_Unit<35) {unitRange3 (stringKeyDefend,server_ID);}
 }
 
-function unitRange1 (row,server_ID,returnArray) {
+function unitRange1 (row,returnArray) {
 	// console.log(row,server_ID)
 	var posCenter = row.Position_Cell;
 	var posX = parseInt(posCenter.split(",")[0]);
 	var posY = parseInt(posCenter.split(",")[1]);
-
-	var stringHkey = "s"+server_ID+"_pos";
 	var stringKey=[];
-	var ID_Key = server_ID+"_"+row.ID_Unit+"_"+row.ID_User+"_"+row.ID;
+
+	// var stringHkey = "s"+server_ID+"_pos";
+	
+	// var ID_Key = server_ID+"_"+row.ID_Unit+"_"+row.ID_User+"_"+row.ID;
 	
 	stringKey[0] = row.Position_Cell;
 	
@@ -73,8 +80,6 @@ function unitRange1 (row,server_ID,returnArray) {
 		stringKey[6] = (posX+1) +","+(posY)+",0";
 		
 	}
-
-
 	// console.log(stringKey)
 	returnArray(stringKey)
 

@@ -57,10 +57,10 @@ exports.SetAttackData = function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 		if (resultBool==1) {
 			client.hget(stringHAttack,ID_Defend,function (error,result) {
 				var resultID = result.split("/").filter(String)
-				console.log("resultID: "+resultID);
+				// console.log("resultID: "+resultID);
 				if (!resultID.includes(ID_Attack)) {
 					checkAttacking (Server_ID,ID_Defend,ID_Attack,function (returnBool) {
-						console.log("returnBool: "+returnBool);
+						// console.log("returnBool: "+returnBool);
 						if (returnBool==false) {addValue (stringHAttack,ID_Defend,result,ID_Attack);}
 					});
 				}
@@ -158,6 +158,14 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 				def.Hea_cur = parseFloat(def.Health - parseInt((Hea_Lost - def.Hea_cur)%def.Health)).toFixed(2);
 				def.Quality = def.Quality -(parseInt((Hea_Lost - def.Hea_cur)/def.Health) +1);
 			}
+
+			// console.log(def)
+
+			// if (def.ListMove.length>0) {
+			// 	def.ListMove = JSON.parse(def.ListMove);
+			// }
+			
+
 			if (def.Quality <= 0) {
 				def.Quality = 0;
 				for (var i = 0; i < rows.length; i++) {
@@ -176,15 +184,13 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 		});
 	}).then(()=>{
 		// console.log(stringHAttack,stringHUnit,dataDefend)
-		// console.log(def)
+		console.log(def)
 		if (def.Quality == 0) {
 			client.hdel(stringHAttack,dataDefend);
 			client.hdel(stringHUnit,dataDefend);
 			updateAttackData (dataAttack);
-
 		}else{
 			client.hset(stringHUnit,dataDefend,JSON.stringify(def));
-
 		}	
 		checkSocketClient (io,dataDefend,def);
 		updateDataBase(server_ID,def);
@@ -197,38 +203,14 @@ function checkSocketClient (io,dataDefend,def) {
 	var stringHSocket = "s"+Server_ID+"_socket";
 	// console.log('stringHSocket:'+stringHSocket)
 	
-	client.hvals(stringHSocket,function (error,rowsSocket) {
-		
+	client.hvals(stringHSocket,function (error,rowsSocket) {	
 		// console.log(io,rowsSocket,dataDefend)
-
 		for (var i = 0; i < rowsSocket.length; i++) {
 			sendToClient (io,rowsSocket[i],def);
 		}
-			// if (io==null) {
-			// 	sendToClient (GetIO.IO,rowsSocket[i],dataDefend);
-			// }else{
-			// 	sendToClient (io,rowsSocket[i],dataDefend);
-			// }
 
-			
-		// }
-		// if (rowsSocket.length>0) {
-		// 	for (var i = 0; i < rowsSocket.length; i++) {
-		// 		sendToClient (io,rowsSocket[i],dataDefend);
-		// 	}
-		// }else{
-		// 	// không cần send thông tin
-		// 	console.log("all user offline");
-
-		// 	// sendGetNewPos2(io,data)
-		// 	// sendGetNewPos2(index.IO,data);		
-		// 	// DictTimeOut['sendNewPos'] = setTimeout(function (io,data) {
-		// 	// 	// console.log(rowsSocket[0])
-		// 	// 	sendToClient (io,dataDefend)
-		// 	// }, 1000, io,dataDefend);
-		// }
 	});	
-	// socket.emit("R_ATTACK",{R_ATTACK: Unit})
+
 }
 
 function sendToClient (io,socketID,def) {
@@ -348,6 +330,7 @@ function checkDataAttack (dataCheck) {
 				+"`Status`='"+functions.UnitStatus.Standby
 				+"',`Attack_Unit_ID`= NULL"
 				+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
+
 				client.hget(stringHUnit,dataCheck,function (error,rows) {
 					if (!!error) {console.log(error);}
 					var result = JSON.parse(rows);
@@ -360,13 +343,15 @@ function checkDataAttack (dataCheck) {
 				+"`Status`='"+functions.UnitStatus.Attacked
 				+"',`Attack_Unit_ID`= NULL"
 				+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
-				checkAttackedUnit(dataCheck);
+				
+				// checkAttackedUnit(dataCheck);
 			}
 		}else {
 			stringUpdate = "UPDATE `s"+dataCheck.toString().split("_")[0]+"_unit` SET "
 			+"`Status`='"+functions.UnitStatus.Base
 			+"',`Attack_Unit_ID`= NULL"
 			+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
+
 			client.hget(stringHUnit,dataCheck,function (error,rows) {
 				if (!!error) {console.log(error);}
 				var result = JSON.parse(rows);
@@ -376,9 +361,9 @@ function checkDataAttack (dataCheck) {
 			});
 		}
 		// console.log(stringUpdate)
-		// db_position.query(stringUpdate,function(error,result){
-		// 	if (!!error) {console.log(error);}
-		// })
+		db_position.query(stringUpdate,function(error,result){
+			if (!!error) {console.log(error);}
+		})
 	})
 }
 // var data= [ { ID: 25,

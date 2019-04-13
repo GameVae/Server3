@@ -9,6 +9,7 @@ var friendData 		= require('./../Redis/Friend/FriendData.js');
 var guildData 		= require('./../Redis/Guild/GuildData.js');
 
 var positionAdd		= require('./../Redis/Position/Position.js');
+var positionCheck	= require('./../Redis/Position/Position_Check.js');
 
 var functions 		= require('./../Util/Functions.js');
 
@@ -18,6 +19,7 @@ var currentTime;
 var stringKeyMove;
 var stringHUnit,stringKey,
 stringHAttack, stringKeyAttack,stringKeyDefend;
+var Server_ID;
 
 var Promise 		= require('promise');
 
@@ -69,8 +71,7 @@ function updateDatabase (data) {
 		if (!!error) {console.log(error);}
 	})
 	var stringUpdateDefend = "UPDATE `s"+data.Server_ID+"_unit` SET "
-	+"`Status`='"+functions.UnitStatus.Attacked
-	+"',`AttackedBool`='1'"
+	+"`AttackedBool`='1'"
 	+" WHERE `ID`='"+data.ID_Defend+"'";
 	// console.log(data);
 	db_position.query(stringUpdateDefend,function (error,result) {
@@ -106,19 +107,54 @@ function S_ATTACK (io,data) {
 	}).then(()=>{
 
 		attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend)
-		//attackInterval (data.ID_User_Defend)
+		// console.log(stringKeyAttack,stringKeyDefend,data.Position_Cell_Attacker)
+		checkUnitDefend (io,stringKeyAttack,stringKeyDefend,data.Position_Cell_Attacker);
 	})
 	))
 	}else{
 		console.log('same user')
 	}
 }
-
-function checkUnitDefend (stringKeyDefend) {
-	client.hexists(stringHAttack,stringKeyDefend,function (error,rows) {
-		if (rows.length>0) {}else{
-
+//1_16_42_16 1_16_9_12 13,11,0
+// checkUnitDefend (null,'1_16_42_16','1_16_9_12','13,11,0');
+function checkUnitDefend (io,stringKeyAttack,stringKeyDefend,Position_Cell_Attacker) {
+	Server_ID = stringKeyDefend.split("_")[0]
+	stringHUnit = "s"+Server_ID+"_unit";
+	// console.log(stringHUnit,stringKeyDefend)
+	client.hget(stringHUnit,stringKeyDefend,function (error,rows) {
+		var result = JSON.parse(rows);
+		// console.log(result)
+		if (result.Status==functions.UnitStatus.Standby) {
+			counterUnitDefend(io,stringKeyAttack,stringKeyDefend,Position_Cell_Attacker);
 		}
-
 	})
+}
+
+function counterUnitDefend(io,stringKeyAttack,stringKeyDefend,Position_Cell_Attacker){
+	var posDefend=[];
+	var attackBool =false;
+	// console.log(stringKeyAttack,stringKeyDefend,Position_Cell_Attacker)
+	new Promise((resolve,reject)=>{
+		client.hget(stringHUnit,stringKeyDefend,function (error,rows) {
+			var result = JSON.parse(rows);
+			positionCheck.GetPosition(stringKeyDefend,function (returnPosArray) {
+				posDefend = returnPosArray;
+				resolve();
+			})
+		});
+	}).then(()=>new Promise((resolve,reject)=>{
+		// console.log(posDefend,Position_Cell_Attacker)
+		if (posDefend.includes(Position_Cell_Attacker)) {
+			attackBool = true;
+			attackFunc.SetAttackData(Server_ID,stringKeyAttack,stringKeyDefend);
+		}
+		resolve();
+	}).then(()=>new Promise((resolve,reject)=>{
+		// console.log(attackBool)
+		if (attackBool == true) {
+			attackFunc.AttackInterval(io,Server_ID,stringKeyAttack);
+		}	
+		resolve();
+	}))
+	)
 }

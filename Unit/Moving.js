@@ -104,7 +104,7 @@ function updateDataBase (data) {
 		// 	+"`Status`='"+functions.UnitStatus.Move+"',"
 		// 	+"`Attack_Unit_ID`= NULL"+
 		// 	" WHERE `ID`='"+data.ID+"'";
-
+// Attack_Unit_ID : Server_ID+"_"+dataDefend.ID_Unit+"_"+dataDefend.ID_User+"_"+ID_Defend
 		// }else {
 		// 	stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
 		// 	+"`Position_Cell`='"+data.Position_Cell+"',"
@@ -126,7 +126,7 @@ function updateDataBase (data) {
 		+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
 		+"`Status`='"+functions.UnitStatus.Move+
 		"' WHERE `ID`='"+data.ID+"'";
-		console.log(stringUpdate);
+		// console.log(stringUpdate);
 
 		db_position.query(stringUpdate,function (error,result) {
 			if (!!error){DetailError = ('Unit_Moving.js: query '+stringUpdate); functions.WriteLogError(DetailError,2);}
@@ -140,29 +140,11 @@ function updateDataBase (data) {
 
 	});
 }
-
-// var rowData ={
-//   ID: 16,
-//   ID_Unit: 16,
-//   ID_User: 42,
-//   BaseNumber: 1,
-//   Level: 2,
-//   Quality: 1,
-//   Hea_cur: 5.45,
-//   Health: 5.45,
-//   Attack: 2.3,
-//   Defend: 1.15,
-//   Position_Cell: '12,8,0',
-//   Next_Cell: null,
-//   End_Cell: null,
-//   TimeMoveNextCell: null,
-//   TimeFinishMove: null,
-//   ListMove: null,
-//   Status: 2,
-//   Attack_Base_ID: null,
-//   Attack_Unit_ID: 12,
-//   AttackedBool: 0 }
-// updateRedisAttack (1,12,rowData);
+function updateRedisData (data,rowsData) {
+	var stringHkey ="s"+data.Server_ID+"_unit";
+	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	client.hset(stringHkey,stringKey,JSON.stringify(rowsData))
+}
 
 function updateRedisAttack (Server_ID,ID_Defend,dataAttack) {
 	var dataDefend ={};
@@ -179,7 +161,7 @@ function updateRedisAttack (Server_ID,ID_Defend,dataAttack) {
 				if (resultAttack.includes(ID_Attack)) {
 					removeValue (stringHAttack,stringKeyDefend,rows,ID_Attack);
 				}
-				resolve();
+				
 			});
 		}
 	})
@@ -219,11 +201,7 @@ function removeValue (stringHkey,stringKey,rows,ID_Key) {
 	}
 }
 
-function updateRedisData (data,rowsData) {
-	var stringHkey ="s"+data.Server_ID+"_unit";
-	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	client.hset(stringHkey,stringKey,JSON.stringify(rowsData))
-}
+
 
 var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":52,"Position_Cell":"11,12,0","Next_Cell":"10,11,0","End_Cell":"10,9,0","TimeMoveNextCell":1262,"TimeFinishMove":3786,"ListMove":[{"CurrentCell":"10,11,0","NextCell":"10,10,0","TimeMoveNextCell":1262}]}
 

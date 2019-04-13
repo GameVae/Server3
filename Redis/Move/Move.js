@@ -73,6 +73,7 @@ function setTimerUpdateDatabase2 (io,socket,data,stringKey) {
 				updateData.ListMove.shift();
 				// console.log(updateData.ListMove)
 				updateDatabase (updateData);
+				// updateRedisData (stringKey,updateData,Position_Cell);
 				setTimerUpdateDatabase2 (io,socket,updateData,stringKey);
 			}
 		}else{	
@@ -153,14 +154,16 @@ function checkPositionAttackUnit (data,stringKey) {
 		console.log(returnArrayPos,posDefend)
 		if (returnArrayPos.includes(posDefend)) {
 			boolAttack= true;
-			attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKey);			
+			attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKey);
+
 		}else{
-			//remove unit database
-			var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET `Attack_Unit_ID`=NULL WHERE `ID`='"+data.ID+"'";
+			/*remove unit database*/
+			var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET `Attack_Unit_ID`= NULL WHERE `ID`='"+data.ID+"'";
 			db_position.query(stringUpdate,function (error,result) {
 				if (!!error){DetailError = ('Move.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,2);}
 				logChangeDetail =("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
 			});
+
 			client.hget(stringHkey,stringKey,function (error,rows) {
 				var result = JSON.parse(rows);
 				result.Attack_Unit_ID = 'null';
@@ -255,6 +258,7 @@ function clearMoveTimeMoveAttack (stringData) {
 	delete DictTimeMoveAttack[stringData];
 }
 
+// chua
 function checkPostionAttackUnit (data,stringPos) {
 	//attackFunc
 	var stringHkey = "s"+data.Server_ID+"_pos";
@@ -277,6 +281,7 @@ function checkPostionAttackUnit (data,stringPos) {
 function getAttackData (data,ID_Player) {
 	var checkBoolFriendData = false;
 	var checkBoolGuildData = false;
+	var ID_Defend;
 	new Promise((resolve,reject)=>{
 		friendData.CheckFriendData (data.ID_User,ID_Player.split("_")[2],function (returnBool) {
 			checkBoolFriendData =returnBool;
@@ -290,14 +295,16 @@ function getAttackData (data,ID_Player) {
 	}).then(()=>new Promise((resolve,reject)=>{
 		// console.log(checkBoolFriendData,checkBoolGuildData)
 		if (checkBoolFriendData==false&&checkBoolGuildData==false) {
-			var ID_Defend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+			// ID_Defend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+			ID_Defend = data.Attack_Unit_ID;
 			attackFunc.SetAttackData(data.Server_ID,ID_Defend,ID_Player);
 		}
 	}).then(()=>new Promise((resolve,reject)=>{
-		// attackFunc.AttackInterval(data.Server_ID,ID_Defend);
+		attackFunc.AttackInterval(data.Server_ID,ID_Defend);
 	})))
 	)
 }
+
 // function checkTimeMoveNextCell (data,stringKey) {
 // 	data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
 // 	var Position_Cell_X = data.Position_Cell.split(',')[0];

@@ -29,7 +29,7 @@ exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){			
 			// S_MOVE (io,socket,data.S_MOVE);		
-			S_MOVE (data.S_MOVE);		
+			S_MOVE_ATT (data.S_MOVE);		
 		});
 	});
 }
@@ -71,11 +71,11 @@ var S_MOVE_data = { Server_ID: 1,
 //
 // S_MOVE (S_MOVE_data)
 
-function S_MOVE (data) {
+function S_MOVE_ATT (data) {
 	// console.log(data);
 	//checkCurrentPosition (data,data.Position_Cell);
 
-	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	// stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	// clearMoveTimeout (stringUnitMoving);
 	checkTimeMoveAttack (data)
 
