@@ -8,7 +8,6 @@ var io 				= require('socket.io').listen(server);
 module.exports.IO = io;
 
 var redisFunc 		= require('./Redis.js');
-redisFunc.UpdateUnitData(1);
 
 var functions 		= require('./Util/Functions.js');
 

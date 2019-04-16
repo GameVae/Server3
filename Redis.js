@@ -13,6 +13,8 @@ client.select(functions.RedisData.TestUnit);
 var positionData 	= require("./Redis/Position/Position.js");
 // positionData.DeletePosKey(1)
 getUnitDataPos (1)
+unitData.GetUnitData(client,1)
+
 function getUnitDataPos (server_ID) {
 	new Promise((resolve,reject)=>{
 		positionData.DeletePosKey(server_ID);
@@ -23,10 +25,10 @@ function getUnitDataPos (server_ID) {
 		}		
 	}))
 }
-// updateUnitData (client,1)
-exports.UpdateUnitData = function updateUnitData (server_ID) {
-	unitData.GetUnitData(client,server_ID)
-}
+
+// exports.UpdateUnitData = function updateUnitData (server_ID) {
+// 	unitData.GetUnitData(client,server_ID)
+// }
 // function updateUnitData (client,server_ID) {
 // 	unitData.GetUnitData(client,server_ID)
 // }

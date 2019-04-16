@@ -18,18 +18,33 @@ exports.GetUnitData = function getUnitData (clientRedis,serverInt) {
 
 //getUnitInfo ('clientRedis',1);
 function getUnitInfo (clientRedis,serverInt) {
-	deleteHashKey (clientRedis,serverInt);
-	var stringUnit = "SELECT * FROM `s"+serverInt+"_unit`"
-	db_position.query(stringUnit,function (error,rows) {
+	//deleteHashKey (clientRedis,serverInt);
+	var stringQuery = "SELECT * FROM `s"+serverInt+"_unit`"
+	var stringHUnit = "s"+serverInt+"_unit"
+	db_position.query(stringQuery,function (error,rows) {
+		// console.log(rows.length);
 		for (var i = 0; i < rows.length; i++) {
 			var stringKey = serverInt+"_"+rows[i].ID_Unit+"_"+rows[i].ID_User+"_"+rows[i].ID;
 			//console.log(stringKey);
 			//clientRedis.set(stringKey,JSON.stringify(rows[i]))
-			clientRedis.hset("s"+serverInt+"_unit",stringKey,JSON.stringify(rows[i]))
+			updateRedisData (clientRedis,stringHUnit,stringKey,rows[i])
+			
 		}	
 	});
-}
 
+	// db_position.query(stringUnit,function (error,rows) {
+	// 	for (var i = 0; i < rows.length; i++) {
+	// 		var stringKey = serverInt+"_"+rows[i].ID_Unit+"_"+rows[i].ID_User+"_"+rows[i].ID;
+	// 		//console.log(stringKey);
+	// 		//clientRedis.set(stringKey,JSON.stringify(rows[i]))
+	// 		clientRedis.hset("s"+serverInt+"_unit",stringKey,JSON.stringify(rows[i]))
+	// 	}	
+	// });
+
+}
+function updateRedisData (clientRedis,stringHkey,stringKey,data) {
+	clientRedis.hset(stringHkey,stringKey,JSON.stringify(data))
+}
 function deleteHashKey (clientRedis,server_ID) {
 	var stringHkey = "s"+server_ID+"_unit";
 	clientRedis.del(stringHkey);

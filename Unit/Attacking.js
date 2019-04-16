@@ -116,11 +116,11 @@ function S_ATTACK (io,data) {
 	}
 }
 //1_16_42_16 1_16_9_12 13,11,0
-// checkUnitDefend (null,'1_16_42_16','1_16_9_12','13,11,0');
+// checkUnitDefend (null,'1_16_42_18','1_16_9_12','12,9,0');
 function checkUnitDefend (io,stringKeyAttack,stringKeyDefend,Position_Cell_Attacker) {
 	Server_ID = stringKeyDefend.split("_")[0]
 	stringHUnit = "s"+Server_ID+"_unit";
-	// console.log(stringHUnit,stringKeyDefend)
+	// console.log(stringHUnit,stringKeyAttack,stringKeyDefend)
 	client.hget(stringHUnit,stringKeyDefend,function (error,rows) {
 		var result = JSON.parse(rows);
 		// console.log(result)
@@ -152,9 +152,10 @@ function counterUnitDefend(io,stringKeyAttack,stringKeyDefend,Position_Cell_Atta
 	}).then(()=>new Promise((resolve,reject)=>{
 		// console.log(attackBool)
 		if (attackBool == true) {
+			// console.log(stringKeyAttack)
 			attackFunc.AttackInterval(io,Server_ID,stringKeyAttack);
 		}	
-		resolve();
+		// resolve();
 	}))
 	)
 }

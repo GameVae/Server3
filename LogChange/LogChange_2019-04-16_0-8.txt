@@ -1,0 +1,12 @@
+
+ logChangeDetail: 2019-04-16T01:11:32.116Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-04-16T01:11:32.121Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-04-16T01:11:32.123Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-04-16T01:11:32.118Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-04-16T01:33:24.544Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-16T01:34:39.852Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-16T01:35:24.391Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-16T01:39:13.843Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-16T01:43:50.088Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-16T01:45:32.386Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-04-16T01:46:49.077Z: Login.js: queryUserNamePass: ndinhtoan45
