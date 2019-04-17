@@ -115,7 +115,7 @@ function checkTimeMoveAttack (data) {
 			timeMove = data.TimeMoveNextCell
 			checkCurrentPosition (data,data.Position_Cell);
 		}
-		console.log(timeMove)
+		// console.log(timeMove)
 		DictTimeMoveAttack[stringUnitMoving] = setTimeout(function (data,stringPos) {
 			//lay thong tin data?
 			var stringHUnit = "s"+data.Server_ID+"_unit";
@@ -158,31 +158,6 @@ function clearMoveTimeout (stringData) {
 	clearTimeout(DictTimeMoveAttack[stringData]);
 	delete DictTimeMoveAttack[stringData];
 }
-
-// function setTimeInterval (data) {
-// 	DictTimeMoveAttack[stringKey] = setTimeout(function (data,stringPos) {
-// 		checkCurrentPosition (data,stringPos);
-// 	}, timeMove,data,stringPos)
-
-// }
-// function checkPostionAttackUnit (data,stringPos) {
-// 	//attackFunc
-// 	var stringHPos = "s"+data.Server_ID+"_pos";
-// 	client.hexists(stringHPos,stringPos,function (error,rows) {
-// 		var ID_Defend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-// 		if (rows==1) {
-// 			client.hget(stringHkey,stringPos,function (error,rowsPos){
-// 				if (!!error){DetailError = ('Move_Attack.js: checkPostionAttackUnit: '+stringPos); functions.WriteLogError(DetailError,2);}	
-// 				var unitResult = rowsPos.split("/").filter(String);
-// 				for (var i = 0; i < unitResult.length; i++) {
-// 					if (unitResult[i].split("_")[2]!=data.ID_User) {
-// 						getAttackData (data,unitResult[i]);
-// 					}			
-// 				}
-// 			});
-// 		}		
-// 	});
-// }
 
 function checkCurrentPosition (data,pos) {
 	var stringHPos = "s"+data.Server_ID+"_pos";
@@ -240,110 +215,3 @@ function getAttackData (data,ID_Player) {
 	}
 	
 }
-// function updateDataBase (data) {
-// 	var stringUpdate;
-// 	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
-// 	db_position.query(stringQuery,function (error,rows) {
-// 		if (rows[0].Attack_Unit_ID!=null) {
-
-// 			updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0])
-
-// 			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-// 			+"`Position_Cell`='"+data.Position_Cell+"',"
-// 			+"`Next_Cell`='"+data.Next_Cell+"',"
-// 			+"`End_Cell`='"+data.End_Cell+"',"
-// 			+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-// 			+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-// 			+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-// 			+"`Status`='"+functions.UnitStatus.Move+
-// 			+"`Attack_Unit_ID`= NULL"+
-// 			" WHERE `ID`='"+data.ID+"'";
-
-// 		}else {
-// 			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-// 			+"`Position_Cell`='"+data.Position_Cell+"',"
-// 			+"`Next_Cell`='"+data.Next_Cell+"',"
-// 			+"`End_Cell`='"+data.End_Cell+"',"
-// 			+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-// 			+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-// 			+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-// 			+"`Status`='"+functions.UnitStatus.Move+
-// 			"' WHERE `ID`='"+data.ID+"'";
-// 		}
-
-// 		db_position.query(stringUpdate,function (error,result) {
-// 			if (!!error) {console.log(error);}
-// 			var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
-// 			db_position.query(stringQuery,function (error,rowsUpdate) {
-// 				updateRedisData (data,rowsUpdate[0]);
-// 			});
-// 		});
-
-// 	});
-// }
-
-// function updateRedisAttack (Server_ID,ID_Defend,dataAttack) {
-// 	var dataDefend ={};
-// 	var ID_Attack = Server_ID+"_"+dataAttack.ID_Unit+"_"+dataAttack.ID_User+"_"+dataAttack.ID;
-// 	new Promise((resolve,reject)=>{
-// 		var stringQuery = "SELECT `ID_Unit`,`ID_User` FROM `s"+Server_ID+"_unit` WHERE `ID` ='"+ID_Defend+"'";
-// 		db_position.query(stringQuery,function (error,rows) {
-// 			dataDefend = rows[0];
-// 		});
-// 	}).then(()=>new Promise((resolve,reject)=>{
-// 		var stringHAttack = "s"+Server_ID+"_attack";
-// 		var stringKeyDefend = Server_ID+"_"+dataDefend.ID_Unit+"_"+dataDefend.ID_User+"_"+ID_Defend;
-// 		client.hexists(stringHAttack,stringKeyDefend,function (error,result) {
-// 			if (result==1) {
-// 				client.hget(stringHAttack,stringKeyDefend,function (error,rows) {
-// 					var resultAttack = JSON.parse(rows).split("/").filter(String);
-// 					if (resultAttack.includes(ID_Attack)) {
-// 						removeValue (stringHAttack,stringKeyDefend,rows,ID_Attack);
-// 					}
-// 				});
-// 			}
-// 		})
-// 	}));
-// }
-
-// function removeValue (stringHkey,stringKey,rows,ID_Key) {
-// 	var stringReplace = rows.replace(ID_Key+"/","");
-// 	client.hset(stringHkey,stringKey,stringReplace);
-// 	if (stringReplace.length==0) {
-// 		client.hdel(stringHkey,stringKey);
-// 	}
-// }
-
-// function updateRedisData (data,rowsData) {
-// 	var stringHkey ="s"+data.Server_ID+"_unit";
-// 	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-// 	client.hset(stringHkey,stringKey,JSON.stringify(rowsData))
-// }
-
-
-// checkAttackData (S_MOVE_data);
-// function checkAttackData (data) {
-// 	console.log(data)
-// 	// stringHAttack
-// 	// client.hexists()
-// }
-// function updateDataBase (data) {
-
-// 	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-// 	+"`Position_Cell`='"+data.Position_Cell+"',"
-// 	+"`Next_Cell`='"+data.Next_Cell+"',"
-// 	+"`End_Cell`='"+data.End_Cell+"',"
-// 	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-// 	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-// 	+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-// 	+"`Status`='"+functions.UnitStatus.Move+
-// 	"' WHERE `ID`='"+data.ID+"'";
-
-// 	db_position.query(stringUpdate,function (error,result) {
-// 		if (!!error) {console.log(error);}
-// 		var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
-// 		db_position.query(stringQuery,function (error,rows) {
-// 			updateRedisData (data,rows[0]);
-// 		});
-// 	});
-// }

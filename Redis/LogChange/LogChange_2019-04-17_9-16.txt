@@ -1,0 +1,15 @@
+
+ logChangeDetail: 2019-04-17T06:34:33.805Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T06:35:21.119Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T06:35:57.802Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T06:36:23.093Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T06:36:37.863Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T06:37:43.958Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T06:37:59.437Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T06:38:46.151Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T06:39:06.010Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T06:39:47.307Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T06:42:37.229Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T07:09:53.279Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T07:10:00.816Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-17T07:21:23.379Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null

@@ -248,9 +248,6 @@ exports.UpdateDatabase = function updateDatabase (serverInt) {
 	var tableQuery;
 	var stringQuery = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='"+database+"' AND TABLE_NAME <>'"+database+"'";
 	
-
-	
-	
 	dbBase.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('Training.js: queryTable UpdateDatabase ' + serverInt);functions.WriteLogError(DetailError,2);}
 		if (rows!=undefined) {
@@ -266,10 +263,10 @@ exports.UpdateDatabase = function updateDatabase (serverInt) {
 function checkTimeDataBase (serverInt,dbBase,dbDefend,tableQuery) {
 	
 	dbBase.query(tableQuery,function (error,rows) {
-		if (!!error){DetailError = ('Training.js: checkTimeDataBase ' + serverInt);functions.WriteLogError(DetailError,2);}
-		if (rows.length>0) {
+		if (!!error){DetailError = ('Training.js: checkTimeDataBase ' + serverInt+"_"+tableQuery);functions.WriteLogError(DetailError,2);}
+		
+			if (rows.length>0) {
 			
-
 			var currentTime = functions.GetTime();
 			var databaseTime = functions.ExportTimeDatabase(rows[0].TrainingTime);
 			var dataTr={
@@ -295,5 +292,7 @@ function checkTimeDataBase (serverInt,dbBase,dbDefend,tableQuery) {
 				delete DictTimeOut[stringTimeOut];
 			},trainTime, dataTr);
 		}
+		
+		
 	});
 }

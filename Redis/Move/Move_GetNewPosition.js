@@ -39,7 +39,6 @@ function sendGetNewPos2(io,data) {
 			// console.log("user socket");
 			clearTimeout((DictTimeOut['sendNewPos']));
 			delete DictTimeOut['sendNewPos'];
-
 			checkSocket (io,rowsSocket[0],data);
 			// sendToClient (io,rowsSocket[0],data);
 		}else{
@@ -65,7 +64,7 @@ function sendGetNewPos2(io,data) {
 //   ListMove: [] }
 
 function sendToClient (io,socketID,data) {
-	console.log(io,socketID,data)
+	// console.log(io,socketID,data)
 	//send cho client qua cong S_MOVE;
 	// io.to(socketID).emit('R_DEPLOY',{R_DEPLOY:dataDeploy});
 	var dataSend = {
@@ -80,12 +79,18 @@ function checkSocket (io,socketID,data) {
 	var stringQuery = "SELECT `Socket`,`ID_User` FROM `user_info` WHERE `Socket`='"+socketID+"'";
 	db_all_users.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('Move_GetNewPosition.js: checkSocket '+stringQuery); functions.WriteLogError(DetailError,2);}
-		
-		if (rows.length>0 && data.ID_User!=rows[0].ID_User) {			
-			sendToClient (io,rows[0].Socket,data);
+		if (rows.length>0) {
+		//user online			
 		}else{
 			redisRemoveSocket (io,data);
 		}
+
+		//sendToClient (io,rows[0].Socket,data);
+		// if (rows.length>0 && data.ID_User!=rows[0].ID_User) {			
+		// 	sendToClient (io,rows[0].Socket,data);
+		// }else{
+		// 	
+		// }
 	});
 }
 

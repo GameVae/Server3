@@ -48,7 +48,9 @@ exports.Start = function start (io) {
 	});
 }
 
-
+exports.Test = function (ar) {
+	console.log(ar);
+}
 
 function updateRedis (data) {
 	// var stringHPos = "s"+data.Server_ID+"_pos";
@@ -110,6 +112,10 @@ function S_ATTACK (io,data) {
 	}else{
 		console.log('same user')
 	}
+}
+
+exports.CheckUnitDefend = function (io,stringKeyAttack,stringKeyDefend,Position_Cell_Attacker) {
+	checkUnitDefend (io,stringKeyAttack,stringKeyDefend,Position_Cell_Attacker)
 }
 //1_16_42_16 1_16_9_12 13,11,0
 // checkUnitDefend (null,'1_16_42_18','1_16_9_12','12,9,0');

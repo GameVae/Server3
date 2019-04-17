@@ -133,7 +133,7 @@ function checkSocketClient (io,dataDefend,def) {
 	});	
 
 }
-
+getAttackCalc (null,1,['1_16_42_36'],'1_16_9_10')
 function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 	// console.log(dataAttack,dataDefend);
 	var stringHUnit = "s"+server_ID+"_unit";
@@ -161,9 +161,12 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 				}else{
 
 					Attack = Attack + 0;
-					removeRedisData (stringHAttack,dataDefend,dataAttack);
+					// console.log(dataAttack)
+					// console.log("rows: "+dataAttack[i])
+
+					removeRedisData (stringHAttack,dataDefend,dataAttack[i]);
 					// client.hdel(stringHAttack,dataAttack);
-					client.hdel(stringHUnit,dataAttack);
+					client.hdel(stringHUnit,dataAttack[i]);
 
 				}
 			}			
@@ -210,16 +213,17 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 	})
 	);
 }
-function removeRedisData (stringHkey,stringKey,ID_Attack) {
-	client.hexists(stringHkey,stringKey,function (error,rowsCheck) {
+
+function removeRedisData (stringHkey,stringKeyDefend,ID_Attack) {
+	client.hexists(stringHkey,stringKeyDefend,function (error,rowsCheck) {
 		if (rowsCheck==1) {
-			client.hget(stringHkey,stringKey,function (error,rows) {
+			client.hget(stringHkey,stringKeyDefend,function (error,rows) {
 				var result = rows.split("/").filter(String);
 				if (result.includes(ID_Attack)) {
 					var stringReplace = rows.replace(ID_Attack+"/","");
-					client.hset(stringHkey,stringKey,stringReplace);
+					client.hset(stringHkey,stringKeyDefend,stringReplace);
 					if (stringReplace.length==0) {
-						client.hdel(stringHkey,stringKey);
+						client.hdel(stringHkey,stringKeyDefend);
 					}
 				}
 			})
@@ -306,6 +310,7 @@ exports.AttackInterval = function attackInterval (io,Server_ID,ID_User_Defend) {
 			if (rows==0) {
 				clearInterval(DictTimeInterval[ID_User_Defend]);
 				delete DictTimeInterval[ID_User_Defend];
+
 			}	
 		});
 

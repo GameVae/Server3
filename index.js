@@ -49,7 +49,7 @@ var upgrade 				= require('./Upgrade/Upgrade.js');
 
 var Upgrade_UpdateDatabase	= require('./Upgrade/Upgrade_UpdateDatabase.js');
 Upgrade_UpdateDatabase.UpdateDatabase(1);
-//upgrade.UpdateDatabase(2);
+// upgrade.UpdateDatabase(2);
 var training				= require('./TrainingUnit/Training.js')
 training.UpdateDatabase(1);
 // training.UpdateDatabase(2);
@@ -101,7 +101,7 @@ if (app.get('port') === process.env.PORT)
 	attackingUnit.Start(io);
 	getUnit.Start(io);
 
-	attackingUpdate.updateAttack (io,1);
+	// attackingUpdate.UpdateAttack (io,1);
 }
 
 function checkConnect (connectCounter,io) {

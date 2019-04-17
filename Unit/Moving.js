@@ -124,6 +124,7 @@ function updateDataBase (data) {
 		+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
 		+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
 		+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+		+"`Attack_Unit_ID`='"+ data.Attack_Unit_ID +"',"
 		+"`Status`='"+functions.UnitStatus.Move+
 		"' WHERE `ID`='"+data.ID+"'";
 		// console.log(stringUpdate);
@@ -169,7 +170,7 @@ function updateRedisAttack (Server_ID,ID_Defend,dataAttack) {
 	// new Promise((resolve,reject)=>{
 	// 	var stringQuery = "SELECT `ID_Unit`,`ID_User` FROM `s"+Server_ID+"_unit` WHERE `ID` ='"+ID_Defend+"'";
 	// 	db_position.query(stringQuery,function (error,rows) {
-			
+
 	// 		dataDefend = rows[0];
 	// 		resolve();
 	// 	});
@@ -201,9 +202,6 @@ function removeValue (stringHkey,stringKey,rows,ID_Key) {
 	}
 }
 
-
-
-var S_MOVE_data = {"Server_ID":1,"ID":13,"ID_Unit":16,"ID_User":52,"Position_Cell":"11,12,0","Next_Cell":"10,11,0","End_Cell":"10,9,0","TimeMoveNextCell":1262,"TimeFinishMove":3786,"ListMove":[{"CurrentCell":"10,11,0","NextCell":"10,10,0","TimeMoveNextCell":1262}]}
 
 // checkAttackData (S_MOVE_data);
 // function checkAttackData (data) {
