@@ -14,6 +14,9 @@ client.select(functions.RedisData.TestUnit);
 var counter = 1.2;
 var DictTimeOut ={};
 var DictTimeInterval = {};
+
+var stringHAttack,stringHUnit;
+
 // var dataA ={
 // 	"ID":9,"ID_Unit":16,"Level":1,"ID_User":9,"BaseNumber":1,"Quality":3,"Hea_cur":5.2,"Health":5.2,"Attack":2.15,"Defend":1.1,"Position_Cell":"489,80,0","Next_Cell":null,"End_Cell":null,"TimeMoveNextCell":null,"ListMove":null,"Status":0,"Attack_Base_ID":null,"Attack_Unit_ID":null,"Attacked_ID":0
 // }
@@ -46,7 +49,7 @@ var S_MOVE_data = { Server_ID: 1,
 	ListMove:[ { CurrentCell: '10,11,0',	NextCell: '10,10,0',TimeMoveNextCell: '2019-03-05T01:25:19.686' } ] };
 //
 // setAttackData (1,'1_16_42_13','1_16_9_9')
-var stringHAttack,stringHUnit;
+
 
 exports.SetAttackData = function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 	stringHAttack = "s"+Server_ID+"_attack";
@@ -98,7 +101,7 @@ function checkAttacking (Server_ID,ID_Defend,ID_Attack,returnBool) {
 	client.hget(stringHkey,ID_Attack, function (error,rows) {
 		var result = JSON.parse(rows);
 		if (result.Status==functions.UnitStatus.Standby||
-			(result.Status==functions.UnitStatus.Attack_Unit && result.Attack_Unit_ID == ID_Defend)) 
+			(result.Status==functions.UnitStatus.Attack_Unit && result.Attack_Unit_ID == ID_Defend))
 		{
 			checkBool = true;
 		}
@@ -127,7 +130,6 @@ function checkSocketClient (io,dataDefend,def) {
 		for (var i = 0; i < rowsSocket.length; i++) {
 			sendToClient (io,rowsSocket[i],def);
 		}
-
 	});	
 
 }

@@ -66,6 +66,8 @@ var sendUnit				= require('./Unit/Deploy.js');
 
 var moveUnit 				= require('./Unit/Moving.js');
 
+var attackingUpdate 		= require('./Unit/Attacking _Update.js');
+
 var attackingUnit			= require('./Unit/Attacking.js');
 
 // var moveUnit_Attack			= require('./Unit/Moving_Attack.js');
@@ -95,8 +97,11 @@ if (app.get('port') === process.env.PORT)
 	sendUnit.Start(io);
 	moveUnit.Start(io);
 	// moveUnit_Attack.Start(io);
+
 	attackingUnit.Start(io);
 	getUnit.Start(io);
+
+	attackingUpdate.updateAttack (io,1);
 }
 
 function checkConnect (connectCounter,io) {

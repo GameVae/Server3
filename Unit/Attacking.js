@@ -48,10 +48,6 @@ exports.Start = function start (io) {
 	});
 }
 
-function checkDefendCanAttack (data) {
-	
-}
-
 
 
 function updateRedis (data) {
