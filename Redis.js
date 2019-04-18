@@ -1,7 +1,7 @@
 var armyData 		= require("./Redis/Data/ArmyData.js");
 var unitData 		= require("./Redis/Unit/Unit.js");
 
-
+var db_training 	= require("./Util/Database/Db_training.js");
 
 var functions 		= require('./Util/Functions.js');
 var Promise 		= require('promise');
@@ -11,9 +11,11 @@ client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
 var positionData 	= require("./Redis/Position/Position.js");
+
 // positionData.DeletePosKey(1)
-getUnitDataPos (1)
-unitData.GetUnitData(client,1)
+getUnitDataPos (1);
+unitData.GetUnitData(client,1);
+getUnitMight (client);
 
 function getUnitDataPos (server_ID) {
 	new Promise((resolve,reject)=>{
@@ -22,8 +24,20 @@ function getUnitDataPos (server_ID) {
 	}).then(()=>new Promise((resolve,reject)=>{
 		for (var i = 0; i < 36; i++) {
 			positionData.GetPosition(server_ID);
-		}		
+		}
 	}))
+}
+
+
+function getUnitMight (client) {
+	var stringQuery = "SELECT * FROM `unit`";
+	var stringHkey = "unit_Might";
+	db_training.query(stringQuery,function (error,rows) {
+		for (var i = 0; i < rows.length; i++) {
+			var stringKUnit = rows[i].ID_Unit;
+			client.hset(stringHkey,stringKUnit,JSON.stringify(rows[i]));
+		}
+	});
 }
 
 // exports.UpdateUnitData = function updateUnitData (server_ID) {

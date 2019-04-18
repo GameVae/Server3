@@ -86,6 +86,7 @@ function updateDataBase (data) {
 	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
 	db_position.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('Unit_Moving.js: query '+stringQuery); functions.WriteLogError(DetailError,2);}
+		// console.log("Attack_Unit_ID_Moving: "+rows[0].Attack_Unit_ID)
 		if (rows[0].Attack_Unit_ID!=null) {
 			updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0]);
 		}

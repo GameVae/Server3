@@ -1,11 +1,11 @@
 'use strict';
 // var GetIO 					= require('./../../GetIO.js');
+var getInfo 				= require("./../../Info/GetInfo.js")
 var db_position				= require('./../../Util/Database/Db_position.js');
 // var db_all_user				= require('./../../Util/Database/Db_all_user.js');
 
 var functions 				= require('./../../Util/Functions.js');
 var Promise 				= require('promise');
-
 
 var redis = require("redis"),
 client = redis.createClient();
@@ -37,6 +37,7 @@ var stringHAttack,stringHUnit;
 exports.Test = function test (argument) {
 	console.log(argument)
 }
+
 var S_MOVE_data = { Server_ID: 1,
 	ID: 13,
 	ID_Unit: 16,
@@ -69,7 +70,7 @@ exports.SetAttackData = function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 				}
 			});
 		}else{
-			addValue (stringHAttack,ID_Defend,"",ID_Attack)
+			addValue (stringHAttack,ID_Defend,"",ID_Attack);
 			// checkAttacking (Server_ID,ID_Defend,ID_Attack,function (returnBool) {
 			// 	console.log("returnBool: "+returnBool);
 			// 	if (returnBool==false) {addValue (stringHAttack,ID_Defend,"",ID_Attack);}
@@ -80,11 +81,6 @@ exports.SetAttackData = function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 
 function addValue (stringHkey,ID_Defend,data,ID_Attack) {
 	client.hset(stringHkey,ID_Defend,data+ID_Attack+"/");
-	
-	// console.log(stringHkey,ID_Defend,data,ID_Attack)
-	// client.hset(stringHkey,ID_Defend,data+ID_Attack+"/",function (error,rows) {
-	// 	//run interval
-	// });
 }
 
 // checkAttacking (1,'1_16_9_10',function (returnBool) {
@@ -133,7 +129,7 @@ function checkSocketClient (io,dataDefend,def) {
 	});	
 
 }
-getAttackCalc (null,1,['1_16_42_36'],'1_16_9_10')
+// getAttackCalc (null,1,['1_16_42_36'],'1_16_9_10')
 function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 	// console.log(dataAttack,dataDefend);
 	var stringHUnit = "s"+server_ID+"_unit";
@@ -141,6 +137,8 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 	var def = {};
 	var Attack = 0, Hea_Lost = 0;
 	var CounterMul = [];
+	var QualityLost = 0;
+	var tempObj={};
 	// console.log(dataAttack,dataDefend)
 	
 	new Promise((resolve,reject)=>{
@@ -159,15 +157,8 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 					// console.log(result)			
 					Attack = Attack + (result.Attack * (result.Quality/def.Quality)*CounterMul[i]);
 				}else{
-
 					Attack = Attack + 0;
-					// console.log(dataAttack)
-					// console.log("rows: "+dataAttack[i])
-
 					removeRedisData (stringHAttack,dataDefend,dataAttack[i]);
-					// client.hdel(stringHAttack,dataAttack);
-					client.hdel(stringHUnit,dataAttack[i]);
-
 				}
 			}			
 			Hea_Lost = parseFloat(Attack - def.Defend).toFixed(2);
@@ -178,6 +169,8 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			}
 			else if (Hea_Lost >= def.Hea_cur) {
 				def.Hea_cur = parseFloat(def.Health - parseInt((Hea_Lost - def.Hea_cur)%def.Health)).toFixed(2);
+				QualityLost = parseInt((Hea_Lost - def.Hea_cur)/def.Health);
+
 				def.Quality = def.Quality -(parseInt((Hea_Lost - def.Hea_cur)/def.Health) +1);
 			}
 
@@ -195,7 +188,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			// console.log(def)
 			resolve();
 		});
-	}).then(()=>{
+	}).then(()=> new Promise((resolve,reject)=>{
 		checkSocketClient (io,dataDefend,def);
 		updateDataBase(server_ID,def);
 		
@@ -210,8 +203,20 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			clearInterval(DictTimeInterval[ID_User_Defend]);
 			delete DictTimeInterval[ID_User_Defend];
 		}
-	})
+		resolve();
+	}).then(()=>new Promise((resolve,reject)=>{
+		console.log("QualityLost: "+QualityLost);
+		if (QualityLost>0) {
+			updateMight_Kill (QualityLost,dataAttack,dataDefend);
+		}
+	}))
+	)
 	);
+}
+
+
+function updateMight_Kill (QualityLost,dataAttack,dataDefend) {
+	getInfo.UpdateMight_Kill(QualityLost,dataAttack,dataDefend);
 }
 
 function removeRedisData (stringHkey,stringKeyDefend,ID_Attack) {
@@ -261,7 +266,6 @@ function updateDataBase (server_ID,dataUpdate) {
 		// LogChange		
 	}else{
 		stringUpdate = "DELETE FROM `s"+server_ID+"_unit` WHERE `ID`='"+dataUpdate.ID+"'";
-
 		// LogChange		
 	}
 

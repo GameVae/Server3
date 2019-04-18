@@ -265,7 +265,7 @@ function checkTimeDataBase (serverInt,dbBase,dbDefend,tableQuery) {
 	dbBase.query(tableQuery,function (error,rows) {
 		if (!!error){DetailError = ('Training.js: checkTimeDataBase ' + serverInt+"_"+tableQuery);functions.WriteLogError(DetailError,2);}
 		
-			if (rows.length>0) {
+		if (rows.length>0) {
 			
 			var currentTime = functions.GetTime();
 			var databaseTime = functions.ExportTimeDatabase(rows[0].TrainingTime);
@@ -291,8 +291,7 @@ function checkTimeDataBase (serverInt,dbBase,dbDefend,tableQuery) {
 				clearBaseInfo(dbBase,dataTr);
 				delete DictTimeOut[stringTimeOut];
 			},trainTime, dataTr);
-		}
-		
-		
+		}		
 	});
 }
+

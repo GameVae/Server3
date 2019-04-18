@@ -144,7 +144,8 @@ function checkAttackData (io,data) {
 
 	client.hget(stringHkey,stringKey,function (error,rows) {
 		var result = JSON.parse(rows);
-		if(result.Attack_Unit_ID!=null){
+		// console.log("result.Attack_Unit_ID:"+result.Attack_Unit_ID)
+		if(result.Attack_Unit_ID!="NULL"){
 			// console.log(data,stringKey)
 			checkPositionAttackUnit (io,data,stringKey);
 		}
