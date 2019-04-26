@@ -17,8 +17,9 @@ exports.Start = function start (io) {
 		socket.on('S_CREATE_GUILD', function (data){
 			createGuild.S_CREATE_GUILD(socket,data);
 		});
+
 		socket.on('S_APPLY_GUILD', function (data){
-			applyGuild.S_APPLY_GUILD(socket,data);
+			applyGuild.S_APPLY_GUILD(io,data);
 		});
 		socket.on('S_ACCEPT_APPLY',function (data) {
 			applyGuild.S_ACCEPT_APPLY(socket,data);
@@ -26,6 +27,7 @@ exports.Start = function start (io) {
 		socket.on('S_REJECT_APPLY',function (data) {
 			applyGuild.S_REJECT_APPLY(socket,data);
 		});
+
 		socket.on('S_KICKOUT_GUILD',function (data) {
 			managerGuild.S_KICKOUT_GUILD(socket,data);
 		});

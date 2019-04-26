@@ -11,7 +11,7 @@ var DictTimeOut ={};
 var EnumApplyGuild={};
 var stringTimeOut;
 
-var timeAccept 		= 8*60*60*60*1000;
+var timeAccept 		= 24*60*60*60*1000;
 var time
 // var dataGuild ={
 // 	GuildTag: 	'ABf',
@@ -24,11 +24,11 @@ var time
 // 	Guild_ID: 	13,
 // 	Server_ID: 	1,
 // }
-exports.S_APPLY_GUILD = function s_apply_guild (socket,data) {
+exports.S_APPLY_GUILD = function s_apply_guild (io,data) {
 	checkCurrentGuild (socket,data,function (checkGuildBool) {
 		if (checkGuildBool==true) {
 			//console.log('chua co guild');
-			applyGuild (socket,data);
+			applyGuild (io,data);
 		}
 	});	
 }
@@ -68,13 +68,14 @@ function sendApplyToGuildMember (socket,data) {
 		}
 	});
 }
-function R_APPLY (socket,row,data) {
+function R_APPLY (io,row,data) {
 	// console.log(data.ID_User)
 	var stringQuery = "SELECT `Socket` FROM `user_info` WHERE `ID_User`='"+row.ID_User+"'";
 	db_all_user.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('ApplyGuild.js: sendApplyToGuildMember: '+ stringQuery);functions.WriteLogError(DetailError,2);}
 		if (rows[0].Socket!=null) {
-			socket.broadcast.to(rows[0].Socket).emit('R_APPLY',{R_APPLY:data});
+			io.to(rows[0].Socket).emit('R_APPLY',{R_APPLY: data});
+			// socket.broadcast.to(rows[0].Socket).emit('R_APPLY',{R_APPLY:data});
 		}
 	});
 }
@@ -176,9 +177,7 @@ function checkCurrentGuild (socket,data,checkGuildBool) {
 			}
 			resolve();
 		});
-	}).then(
-
-	new Promise((resolve,reject)=>{		
+	}).then(()=>new Promise((resolve,reject)=>{		
 		var stringGuildApply = "SELECT `ID_User` FROM `all_guilds`.`"+data.Guild_ID+"` WHERE `ID_User`='"+data.ID_User+"'";
 		db_all_guild.query(stringGuildApply,function (error,rows) {	
 			if (!!error){DetailError = ('ApplyGuild.js: checkCurrentGuild_stringGuildApply: '+ stringGuildApply);functions.WriteLogError(DetailError,2);}
@@ -207,6 +206,7 @@ var dataAcceptApply={
 	ID_Apply: 	42,
 	Guild_ID: 	13,
 }
+
 exports.S_ACCEPT_APPLY = function s_accept_apply (socket,data) {
 	checkGuildPosition (data,function (checkBool) {
 		//console.log('checkBool: '+checkBool)		
@@ -239,6 +239,7 @@ function updateApplyPlayer (data) {
 	}));
 	
 }
+
 function sendUserInfo (socket,data) {
 	var stringQueryGuildMember = "SELECT `ID_User` FROM `"+data.Guild_ID+"` WHERE `ID_User`<>'"+data.ID_Player+"'";
 	db_all_guild.query(stringQueryGuildMember, function (error,rows) {

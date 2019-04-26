@@ -27,11 +27,15 @@ var currentTime,stringData;
 var DetailError, logChangeDetail;
 
 var stringHkey,stringKey;
+exports.Test = function test (data) {
+	console.log(data)
+}
 exports.MoveCalc = function moveCalc (io,socket,data) {
 	moveCalc2 (io,socket,data)
 }
 
-var S_MOVE_data = { Server_ID: 1,
+var S_MOVE_data = { 
+	Server_ID: 1,
 	ID: 10,
 	ID_Unit: 16,
 	ID_User: 9,
@@ -40,7 +44,8 @@ var S_MOVE_data = { Server_ID: 1,
 	End_Cell: '11,11,0',
 	TimeMoveNextCell: '2019-03-19T01:27:24.473',
 	TimeFinishMove: '2019-03-19T01:27:24.473',
-	ListMove: [] }
+	ListMove: [] 
+}
 //
 // moveCalc2 (S_MOVE_data)
 function moveCalc2 (io,socket,data) {

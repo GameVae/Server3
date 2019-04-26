@@ -1,0 +1,5 @@
+
+ logChangeDetail: 2019-04-24T04:40:36.322Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-04-24T06:17:38.606Z: Training.js: update_insert_BaseDefend UPDATE `42` SET `Quality`=`Quality`+'25' WHERE `BaseNumber` = '1' AND `ID_Unit` = '16'
+ logChangeDetail: 2019-04-24T06:17:38.617Z: Training.js: updateUserMight: UPDATE `game_info_s1` SET `Might`=`Might`+'50' WHERE `ID_User`='42'
+ logChangeDetail: 2019-04-24T06:17:38.617Z: Training.js: clearBaseInfo UPDATE `42` SET `TrainingUnit_ID` = NULL, `TrainingTime`=NULL, `TrainingQuality`=NULL,`Training_Might`=NULL WHERE `BaseNumber` = 1

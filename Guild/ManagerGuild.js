@@ -10,7 +10,7 @@ var DetailError, LogChange;
 var DictTimeOut = {};
 var EnumApplyGuild = {};
 var stringTimeOut;
-var timeRemove 		= 8*60*60*60*1000;
+var timeRemove 		= 30*60*1000;//30 phut
 var kickOutTime,currentTime;
 // var dataGuild ={
 // 	GuildTag: 	'ABf',

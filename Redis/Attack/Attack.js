@@ -4,6 +4,10 @@ var getInfo 				= require("./../../Info/GetInfo.js")
 var db_position				= require('./../../Util/Database/Db_position.js');
 // var db_all_user				= require('./../../Util/Database/Db_all_user.js');
 
+var moving_Attack 			= require('./../../Unit/Moving_Attack.js');
+var move 					= require('./../Move/Move.js');
+
+var position_Check				= require('./../Position/Position_Check.js');
 var functions 				= require('./../../Util/Functions.js');
 var Promise 				= require('promise');
 
@@ -17,6 +21,7 @@ var DictTimeInterval = {};
 
 var stringHAttack,stringHUnit;
 
+// move.Test(2)
 // var dataA ={
 // 	"ID":9,"ID_Unit":16,"Level":1,"ID_User":9,"BaseNumber":1,"Quality":3,"Hea_cur":5.2,"Health":5.2,"Attack":2.15,"Defend":1.1,"Position_Cell":"489,80,0","Next_Cell":null,"End_Cell":null,"TimeMoveNextCell":null,"ListMove":null,"Status":0,"Attack_Base_ID":null,"Attack_Unit_ID":null,"Attacked_ID":0
 // }
@@ -38,21 +43,24 @@ exports.Test = function test (argument) {
 	console.log(argument)
 }
 
-var S_MOVE_data = { Server_ID: 1,
-	ID: 13,
-	ID_Unit: 16,
-	ID_User: 42,
-	Position_Cell: '489,82,0',
-	Next_Cell: '10,11,0',
-	End_Cell: '10,9,0',
-	TimeMoveNextCell: '2019-03-06T03:33:19.686',
-	TimeFinishMove: '2019-03-05T01:25:22.210',
-	ListMove:[ { CurrentCell: '10,11,0',	NextCell: '10,10,0',TimeMoveNextCell: '2019-03-05T01:25:19.686' } ] };
+// var S_MOVE_data = { Server_ID: 1,
+// 	ID: 13,
+// 	ID_Unit: 16,
+// 	ID_User: 42,
+// 	Position_Cell: '489,82,0',
+// 	Next_Cell: '10,11,0',
+// 	End_Cell: '10,9,0',
+// 	TimeMoveNextCell: '2019-03-06T03:33:19.686',
+// 	TimeFinishMove: '2019-03-05T01:25:22.210',
+// 	ListMove:[ { CurrentCell: '10,11,0',	NextCell: '10,10,0',TimeMoveNextCell: '2019-03-05T01:25:19.686' } ] };
 //
 // setAttackData (1,'1_16_42_13','1_16_9_9')
 
 
-exports.SetAttackData = function setAttackData (Server_ID,ID_Defend,ID_Attack) {
+exports.SetAttackData = function setAttackData2 (Server_ID,ID_Defend,ID_Attack) {
+	setAttackData (Server_ID,ID_Defend,ID_Attack)
+}
+function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
 	// console.log(Server_ID,ID_Defend,ID_Attack)
@@ -105,16 +113,16 @@ function checkAttacking (Server_ID,ID_Defend,ID_Attack,returnBool) {
 	});
 }
 
-function checkUnitDef (server_ID,dataAttack,dataDefend) {
-	var stringHkey = "s"+server_ID+"_unit";	
-	client.hexists(stringHkey,dataDefend, function (error, result) {
-		if (result==1) {
-			getAttackCalc (server_ID,dataAttack,dataDefend);
-		}else{
-			console.log('error Get Attack Info Defend');
-		}
-	});
-}
+// function checkUnitDef (io,server_ID,dataAttack,dataDefend) {
+// 	var stringHkey = "s"+server_ID+"_unit";	
+// 	client.hexists(stringHkey,dataDefend, function (error, result) {
+// 		if (result==1) {
+// 			getAttackCalc (io,server_ID,dataAttack,dataDefend);
+// 		}else{
+// 			console.log('error Get Attack Info Defend');
+// 		}
+// 	});
+// }
 
 function checkSocketClient (io,dataDefend,def) {
 	var Server_ID = dataDefend.split("_")[0]
@@ -129,11 +137,12 @@ function checkSocketClient (io,dataDefend,def) {
 	});	
 
 }
-// getAttackCalc (null,1,['1_16_42_36'],'1_16_9_10')
+
+// getAttackCalc (null,1,[ '1_16_42_54' ], '1_16_9_43')
 function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 	// console.log(dataAttack,dataDefend);
-	var stringHUnit = "s"+server_ID+"_unit";
-	var stringHAttack = "s"+server_ID+"_attack";
+	stringHUnit = "s"+server_ID+"_unit";
+	stringHAttack = "s"+server_ID+"_attack";
 	var def = {};
 	var Attack = 0, Hea_Lost = 0;
 	var CounterMul = [];
@@ -162,8 +171,8 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 				}
 			}			
 			Hea_Lost = parseFloat(Attack - def.Defend).toFixed(2);
-			// console.log(def.Hea_Lost);
-			if (Hea_Lost < 0) {Hea_Lost = 1;}
+
+			if (Hea_Lost < 1) {Hea_Lost = 1;}
 			if (Hea_Lost < def.Hea_cur){
 				def.Hea_cur = parseFloat(def.Hea_cur - Hea_Lost).toFixed(2);
 			}
@@ -173,7 +182,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 
 				def.Quality = def.Quality -(parseInt((Hea_Lost - def.Hea_cur)/def.Health) +1);
 			}
-
+			
 			if (def.Quality <= 0) {
 				def.Quality = 0;
 				for (var i = 0; i < rows.length; i++) {
@@ -185,7 +194,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 				}
 			}
 			def.Hea_cur = Number(def.Hea_cur);
-			// console.log(def)
+			console.log(def)
 			resolve();
 		});
 	}).then(()=> new Promise((resolve,reject)=>{
@@ -197,6 +206,9 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 		}else{
 			client.hdel(stringHAttack,dataDefend);
 			client.hdel(stringHUnit,dataDefend);
+
+			move.ClearMoveTimeout(dataDefend);
+			moving_Attack.ClearMoveTimeout(dataDefend);
 
 			updateAttackData (dataAttack);
 			
@@ -252,7 +264,8 @@ function sendToClient (io,socketID,def) {
 		ID_Unit: 		def.ID_Unit,
 		Quality:        def.Quality,
 		Hea_cur: 		def.Hea_cur,
-		Health: 		def.Health
+		Health: 		def.Health,
+		Attack_Unit_ID: def.Attack_Unit_ID
 	}
 	io.to(socketID).emit('R_ATTACK',{R_ATTACK:dataSend});
 }
@@ -304,55 +317,14 @@ function returnCaseUnit (dataUnit) {
 	return returnCase;
 }
 
-exports.AttackInterval = function attackInterval (io,Server_ID,ID_User_Defend) {
-	stringHAttack = "s"+Server_ID+"_attack";
-	stringHUnit = "s"+Server_ID+"_unit";
-	// console.log(ID_User_Defend)
-	if (DictTimeInterval[ID_User_Defend]!=undefined) {
-
-		client.hexists(stringHUnit,ID_User_Defend,function (error,rows) {
-			if (rows==0) {
-				clearInterval(DictTimeInterval[ID_User_Defend]);
-				delete DictTimeInterval[ID_User_Defend];
-
-			}	
-		});
-
-		client.hexists(stringHAttack,ID_User_Defend,function (error,rows) {
-			if (rows==0) {
-				// new Promise((resolve,reject)=>{
-				// 	//check position
-				// })
-				clearInterval(DictTimeInterval[ID_User_Defend]);
-				delete DictTimeInterval[ID_User_Defend];
-			}
-		}
-		);
-
-	}else {
-
-		DictTimeInterval[ID_User_Defend] = setInterval(function (ID_User_Defend) {
-			client.hexists(stringHAttack,ID_User_Defend,function (error,rows) {
-				if (rows==0) {
-					// new Promise((resolve,reject)=>{
-					// 	//check position
-					// })
-					clearInterval(DictTimeInterval[ID_User_Defend]);
-					delete DictTimeInterval[ID_User_Defend];
-				}else{
-					client.hget(stringHAttack,ID_User_Defend,function (error,rows) {			
-						var dataAttack = rows.split("/").filter(String);
-						getAttackCalc (io,Server_ID,dataAttack,ID_User_Defend);			
-					});					
-				}
-			})
-		}, 1000, ID_User_Defend);
-	}	
+exports.AttackInterval = function attackInterval2 (io,Server_ID,ID_User_Defend) {
+	attackInterval (io,Server_ID,ID_User_Defend);
 }
+
 
 function updateAttackData (data) {
 	for (var i = 0; i < data.length; i++) {
-		checkDataAttack (data[i])	
+		checkDataAttack (data[i])
 	}
 }
 
@@ -361,6 +333,7 @@ function checkDataAttack (dataCheck) {
 	// var stringHUnit = "s1_unit"
 	stringQuery = "SELECT * FROM `s"+dataCheck.toString().split("_")[0]+"_unit` WHERE "+
 	"`ID`='"+dataCheck.toString().split("_")[3]+"'";
+
 	db_position.query(stringQuery,function(error,rows){
 		if (!!error) {console.log(error);}
 		// console.log(rows[0])
@@ -376,14 +349,14 @@ function checkDataAttack (dataCheck) {
 					var result = JSON.parse(rows);
 					result.Status = functions.UnitStatus.Standby;
 					result.Attack_Unit_ID = null;
-					client.hset(stringHUnit,dataCheck,JSON.stringify(result))
+					client.hset(stringHUnit,dataCheck,JSON.stringify(result));
 				});
 			}else{
 				stringUpdate = "UPDATE `s"+dataCheck.toString().split("_")[0]+"_unit` SET "
 				+"`Attack_Unit_ID`= NULL"
 				+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
 
-				// checkAttackedUnit(dataCheck);
+				// checkAttackedUnit(rows[0],dataCheck);//unit in base
 			}
 		}else {
 			stringUpdate = "UPDATE `s"+dataCheck.toString().split("_")[0]+"_unit` SET "
@@ -398,10 +371,128 @@ function checkDataAttack (dataCheck) {
 				result.Attack_Unit_ID = null;
 				client.hset(stringHUnit,dataCheck,JSON.stringify(result));
 			});
+			
+			checkAttackedUnit(io,Server_ID,rows[0],dataCheck);
+			// checkAttackedData(io,Server_ID,rows[0],dataCheck);
 		}
 		// console.log(stringUpdate)
 		db_position.query(stringUpdate,function(error,result){
 			if (!!error) {console.log(error);}
 		})
 	})
+}
+function checkAttackedData (io,Server_ID,rowData,dataCheck) {
+	if (true) {}
+}
+function checkAttackedUnit (io,Server_ID,rowData,dataCheck) {
+	// console.log(io,Server_ID,rowData,dataCheck)
+	var posArray = [];
+	var dataAttack = dataCheck;
+
+	var dataDefendArray = [];
+	var dataDefend;
+
+	var Server_ID = dataCheck.split("_")[0]
+
+	var attackBool = false;
+	
+	new Promise((resolve,reject)=>{
+		position_Check.GetPosition(dataCheck,function (returnPosArray) {
+			posArray = returnPosArray;
+			resolve();
+		})
+	}).then(()=>Promise((resolve,reject)=>{
+		client.hget(stringHAttack,dataCheck,function (error,rows) {
+			var result = rows.split("/").filter(String);
+			dataDefendArray = result;
+			resolve();
+		})
+	}).then(()=>new Promise((resolve,reject)=>{
+		client.hmget(stringHUnit,dataDefendArray,function (error,rows) {
+			for (var i = 0; i < rows.length; i++) {
+				if (posArray.includes(rows[i].Position_Cell)) {
+					attackBool = true;
+					dataDefend = dataDefendArray[i];
+					setAttackData (Server_ID,dataDefend,dataAttack);
+					updateDataBaseAttack (Server_ID,dataAttack,dataDefend);
+					break;
+				}	
+			}
+			resolve();
+		});
+	}).then(()=>Promise((resolve,reject)=>{
+		if (attackBool==true) {			
+			attackInterval(io,Server_ID,dataDefend);
+		}
+		resolve();
+	}))
+	)
+	)	
+}
+
+function attackInterval (io,Server_ID,ID_User_Defend){
+	stringHAttack = "s"+Server_ID+"_attack";
+	stringHUnit = "s"+Server_ID+"_unit";
+	// console.log(ID_User_Defend)
+	if (DictTimeInterval[ID_User_Defend]!=undefined) {
+
+		client.hexists(stringHUnit,ID_User_Defend,function (error,rows) {
+			if (rows==0) {
+				moving_Attack.ClearMoveTimeout(ID_User_Defend);
+				move.ClearMoveTimeout(ID_User_Defend);
+
+				clearInterval(DictTimeInterval[ID_User_Defend]);
+				delete DictTimeInterval[ID_User_Defend];
+			}	
+		});
+
+		client.hexists(stringHAttack,ID_User_Defend,function (error,rows) {
+			if (rows==0) {
+				// new Promise((resolve,reject)=>{
+				// 	//check position
+				// })
+
+				moving_Attack.ClearMoveTimeout(ID_User_Defend);
+				move.ClearMoveTimeout(ID_User_Defend);
+
+				clearInterval(DictTimeInterval[ID_User_Defend]);
+				delete DictTimeInterval[ID_User_Defend];
+			}
+		}
+		);
+
+	}else {
+
+		DictTimeInterval[ID_User_Defend] = setInterval(function (ID_User_Defend) {
+			client.hexists(stringHAttack,ID_User_Defend,function (error,rows) {
+				if (rows==0) {
+					// new Promise((resolve,reject)=>{
+					// 	//check position
+					// })
+					moving_Attack.ClearMoveTimeout(ID_User_Defend);
+					move.ClearMoveTimeout(ID_User_Defend);
+					clearInterval(DictTimeInterval[ID_User_Defend]);
+					delete DictTimeInterval[ID_User_Defend];
+				}else{
+					client.hget(stringHAttack,ID_User_Defend,function (error,rows) {			
+						var dataAttack = rows.split("/").filter(String);
+						getAttackCalc (io,Server_ID,dataAttack,ID_User_Defend);			
+					});					
+				}
+			})
+		}, 1000, ID_User_Defend);
+	}
+}
+function updateDataBaseAttack (Server_ID,dataAttack,dataDefend) {
+	// console.log(dataAttack,dataDefend)
+	
+	var stringUpdate = "UPDATE `s"+Server_ID+"_unit` SET `Attack_Unit_ID` ='"+dataDefend+"', `Status`='"+functions.UnitStatus.Attack_Unit+"' WHERE `ID`='"+ID+"'"
+	db_position.query(stringUpdate,function (error,result) {
+		if (!!error) {console.log(error)}
+	});
+	client.hget(stringHUnit,dataAttack,function (error,rows) {
+		var result = JSON.parse(rows)
+		result.Attack_Unit_ID = dataDefend;
+		client.hset(stringHUnit,stringAttack,JSON.stringify(result));
+	});
 }

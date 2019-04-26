@@ -66,11 +66,12 @@ var sendUnit				= require('./Unit/Deploy.js');
 
 var moveUnit 				= require('./Unit/Moving.js');
 
-var attackingUpdate 		= require('./Unit/Attacking _Update.js');
+var attacking 				= require('./Attack/Attacking.js');
+// var attackingUpdate 		= require('./Unit/Attacking _Update.js');
 
-var attackingUnit			= require('./Unit/Attacking.js');
+// var attackingUnit			= require('./Unit/Attacking.js');
 
-// var moveUnit_Attack			= require('./Unit/Moving_Attack.js');
+
 
 var moving_Update 			= require('./Unit/Moving_Update.js');
 moving_Update.UpdateDataBase(1);
@@ -96,9 +97,9 @@ if (app.get('port') === process.env.PORT)
 	info.Start(io);
 	sendUnit.Start(io);
 	moveUnit.Start(io);
-	// moveUnit_Attack.Start(io);
-
-	attackingUnit.Start(io);
+	
+	attacking.Start(io);
+	// attackingUnit.Start(io);
 	getUnit.Start(io);
 
 	// attackingUpdate.UpdateAttack (io,1);

@@ -1,0 +1,2 @@
+
+ logChangeDetail: 2019-04-19T04:44:30.130Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null

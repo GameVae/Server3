@@ -27,22 +27,6 @@ var stringHPos, stringHUnit;
 // exports.Test = function test (param) {
 // 	console.log(param)
 // }
-
-exports.ClearMoveTimeout = function clearMoveTimeout2 (stringData) {
-	clearMoveTimeout (stringData)
-}
-
-function clearMoveTimeout (stringData) {
-	if (DictTimeMoveAttack[stringData]!=undefined) {
-		clearTimeout(DictTimeMoveAttack[stringData]);
-		delete DictTimeMoveAttack[stringData];
-	}
-}
-
-exports.S_MOVE_ATT = function S_MOVE_ATT (io,data) {
-	 
-}
-
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){			
@@ -52,24 +36,24 @@ exports.Start = function start (io) {
 	});
 }
 
-// var S_MOVE_data = { 
-// 	Server_ID: 1,
-// 	ID: 47,
-// 	ID_Unit: 16,
-// 	ID_User: 42,
-// 	Position_Cell: '10,10,0',
-// 	Next_Cell: '11,9,0',
-// 	End_Cell: '12,8,0',
-// 	TimeMoveNextCell: '2019-04-24T04:26:39.137',
-// 	TimeFinishMove: '2019-04-24T04:26:41.799',
-// 	ListMove:
-// 	[ { Position_Cell: '11,9,0',
-// 	Next_Cell: '11,8,0',
-// 	TimeMoveNextCell: '2019-04-24T04:26:40.399' },
-// 	{ Position_Cell: '11,8,0',
-// 	Next_Cell: '12,8,0',
-// 	TimeMoveNextCell: '2019-04-24T04:26:41.799' } ],
-// 	Attack_Unit_ID: 'NULL' }
+var S_MOVE_data = { 
+	Server_ID: 1,
+	ID: 47,
+	ID_Unit: 16,
+	ID_User: 42,
+	Position_Cell: '10,10,0',
+	Next_Cell: '11,9,0',
+	End_Cell: '12,8,0',
+	TimeMoveNextCell: '2019-04-24T04:26:39.137',
+	TimeFinishMove: '2019-04-24T04:26:41.799',
+	ListMove:
+	[ { Position_Cell: '11,9,0',
+	Next_Cell: '11,8,0',
+	TimeMoveNextCell: '2019-04-24T04:26:40.399' },
+	{ Position_Cell: '11,8,0',
+	Next_Cell: '12,8,0',
+	TimeMoveNextCell: '2019-04-24T04:26:41.799' } ],
+	Attack_Unit_ID: 'NULL' }
 
 //
 // S_MOVE_ATT (S_MOVE_data)
@@ -93,12 +77,12 @@ function S_MOVE_ATT (io,data) {
 	}
 	// console.log(dataMove);
 	// // console.log(data);
-	// checkCurrentPosition (io,dataMove,dataMove.Position_Cell);
+	checkCurrentPosition (io,dataMove,dataMove.Position_Cell);
 
-	// stringUnitMoving = dataMove.Server_ID+"_"+dataMove.ID_Unit+"_"+dataMove.ID_User+"_"+dataMove.ID;
-	// clearMoveTimeout2 (stringUnitMoving);
+	stringUnitMoving = dataMove.Server_ID+"_"+dataMove.ID_Unit+"_"+dataMove.ID_User+"_"+dataMove.ID;
+	clearMoveTimeout2 (stringUnitMoving);
 
-	// checkTimeMoveAttack (io,dataMove);
+	checkTimeMoveAttack (io,dataMove);
 }
 
 function checkTimeMoveAttack (io,data) {
@@ -182,31 +166,40 @@ function convertTimeMove (data) {
 	return returnData;
 }
 
+exports.ClearMoveTimeout = function clearMoveTimeout (stringData) {
+	clearMoveTimeout2 (stringData)
+}
 
+function clearMoveTimeout2 (stringData) {
+	if (DictTimeMoveAttack[stringData]!=undefined) {
+		clearTimeout(DictTimeMoveAttack[stringData]);
+		delete DictTimeMoveAttack[stringData];
+	}
+}
 
-// var dataS = {
-// 	Server_ID: 1,
-// 	ID: 51,
-// 	ID_Unit: 16,
-// 	ID_User: 42,
-// 	Position_Cell: '11,8,0',
-// 	Next_Cell: '12,7,0',
-// 	End_Cell: '13,4,0',
-// 	TimeMoveNextCell: '2019-04-25T01:22:19.983',
-// 	TimeFinishMove: '2019-04-25T01:22:23.769',
-// 	ListMove:
-// 	[ { Position_Cell: '12,7,0',
-// 	Next_Cell: '12,6,0',
-// 	TimeMoveNextCell: '2019-04-25T01:22:21.245' },
-// 	{ Position_Cell: '12,6,0',
-// 	Next_Cell: '13,5,0',
-// 	TimeMoveNextCell: '2019-04-25T01:22:22.507' },
-// 	{ Position_Cell: '13,5,0',
-// 	Next_Cell: '13,4,0',
-// 	TimeMoveNextCell: '2019-04-25T01:22:23.769' } ],
-// 	Attack_Unit_ID: 'NULL'
-// }
-// var posT = '11,8,0';
+var dataS = {
+	Server_ID: 1,
+	ID: 51,
+	ID_Unit: 16,
+	ID_User: 42,
+	Position_Cell: '11,8,0',
+	Next_Cell: '12,7,0',
+	End_Cell: '13,4,0',
+	TimeMoveNextCell: '2019-04-25T01:22:19.983',
+	TimeFinishMove: '2019-04-25T01:22:23.769',
+	ListMove:
+	[ { Position_Cell: '12,7,0',
+	Next_Cell: '12,6,0',
+	TimeMoveNextCell: '2019-04-25T01:22:21.245' },
+	{ Position_Cell: '12,6,0',
+	Next_Cell: '13,5,0',
+	TimeMoveNextCell: '2019-04-25T01:22:22.507' },
+	{ Position_Cell: '13,5,0',
+	Next_Cell: '13,4,0',
+	TimeMoveNextCell: '2019-04-25T01:22:23.769' } ],
+	Attack_Unit_ID: 'NULL'
+}
+var posT = '11,8,0';
 
 // checkCurrentPosition (dataS,posT)
 function checkCurrentPosition (io,data,pos) {

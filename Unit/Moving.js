@@ -4,6 +4,7 @@
 var db_position		= require('./../Util/Database/Db_position.js');
 var moveUnit 		= require('./../Redis/Move/Move.js');
 
+
 var functions 		= require('./../Util/Functions.js');
 
 var DetailError,LogChange;
@@ -16,18 +17,8 @@ client.select(functions.RedisData.TestUnit);
 
 var Promise = require('promise');
 
-// var dataMove =  { S_MOVE:
-//    { Server_ID: 1,
-//      ID: 16,
-//      ID_Unit: 16,
-//      ID_User: 42,
-//      Position_Cell: '4,4,0',
-//      Next_Cell: '5,3,0',
-//      End_Cell: '8,3,0',
-//      TimeMoveNextCell: 2524,
-//      TimeFinishMove: 10924,
-//      ListMove: [ [Object], [Object], [Object] ] } }
-// //
+var moveUnit_Attack = require('./Moving_Attack.js');
+
 // console.log(dataMove.S_MOVE.Server_ID)
 
 exports.Start = function start (io) {
@@ -38,7 +29,9 @@ exports.Start = function start (io) {
 			// console.log(stringKeyMove,data)
 			client.set(stringKeyMove,JSON.stringify(data.S_MOVE));		
 			R_MOVE (io,socket,data.S_MOVE.ID_User,data.S_MOVE.Server_ID);	
-			S_MOVE (io,socket,data.S_MOVE);			
+			S_MOVE (io,socket,data.S_MOVE);
+
+			// moveUnit_Attack.MOVE_ATTACK(io,data.S_MOVE);
 		});
 	});
 }
@@ -91,33 +84,6 @@ function updateDataBase (data) {
 			updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0]);
 		}
 		
-		// if (rows[0].Attack_Unit_ID!=null) {
-		// 	// console.log(data,rows[0].Attack_Unit_ID,rows[0])
-		// 	updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0]);
-
-		// 	stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-		// 	+"`Position_Cell`='"+data.Position_Cell+"',"
-		// 	+"`Next_Cell`='"+data.Next_Cell+"',"
-		// 	+"`End_Cell`='"+data.End_Cell+"',"
-		// 	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-		// 	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-		// 	+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-		// 	+"`Status`='"+functions.UnitStatus.Move+"',"
-		// 	+"`Attack_Unit_ID`= NULL"+
-		// 	" WHERE `ID`='"+data.ID+"'";
-// Attack_Unit_ID : Server_ID+"_"+dataDefend.ID_Unit+"_"+dataDefend.ID_User+"_"+ID_Defend
-		// }else {
-		// 	stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-		// 	+"`Position_Cell`='"+data.Position_Cell+"',"
-		// 	+"`Next_Cell`='"+data.Next_Cell+"',"
-		// 	+"`End_Cell`='"+data.End_Cell+"',"
-		// 	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-		// 	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-		// 	+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-		// 	+"`Status`='"+functions.UnitStatus.Move+
-		// 	"' WHERE `ID`='"+data.ID+"'";
-		// }
-
 		stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
 		+"`Position_Cell`='"+data.Position_Cell+"',"
 		+"`Next_Cell`='"+data.Next_Cell+"',"
