@@ -268,8 +268,11 @@ function updateRedisData (stringKey,updateData,Position_Cell) {
 }
 
 function clearMoveTimeout (stringData) {
-	clearTimeout(DictMoveTimeOut[stringData]);
-	delete DictMoveTimeOut[stringData];
+	if (DictMoveTimeOut[stringData]!=undefined) {
+		clearTimeout(DictMoveTimeOut[stringData]);
+		delete DictMoveTimeOut[stringData];
+	}
+	
 }
 
 exports.ClearMoveTimeout = function clearTimeout (stringData) {

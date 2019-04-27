@@ -381,9 +381,9 @@ function checkDataAttack (dataCheck) {
 		})
 	})
 }
-function checkAttackedData (io,Server_ID,rowData,dataCheck) {
-	if (true) {}
-}
+// function checkAttackedData (io,Server_ID,rowData,dataCheck) {
+// 	if (true) {}
+// }
 function checkAttackedUnit (io,Server_ID,rowData,dataCheck) {
 	// console.log(io,Server_ID,rowData,dataCheck)
 	var posArray = [];
