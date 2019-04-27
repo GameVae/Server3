@@ -77,6 +77,9 @@ exports.Start = function start (io) {
 function S_MOVE_ATT (io,data) {
 	// console.log('S_MOVE_ATT')
 	// console.log(data)
+	var stringData = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	clearMoveTimeout (stringData);
+	
 	var dataMove =  Object.create(data)
 	dataMove={
 		Server_ID:data.Server_ID,
@@ -98,10 +101,10 @@ function S_MOVE_ATT (io,data) {
 	// stringUnitMoving = dataMove.Server_ID+"_"+dataMove.ID_Unit+"_"+dataMove.ID_User+"_"+dataMove.ID;
 	// clearMoveTimeout2 (stringUnitMoving);
 
-	// checkTimeMoveAttack (io,dataMove);
+	checkTimeMoveAttack (io,dataMove,stringData);
 }
 
-function checkTimeMoveAttack (io,data) {
+function checkTimeMoveAttack (io,data,stringUnitMoving) {
 	//check theo timemovenextcell/2
 	// console.log(data)
 
@@ -115,10 +118,12 @@ function checkTimeMoveAttack (io,data) {
 		var Position_Cell_Y = data.Position_Cell.split(',')[1];
 		var Next_Cell_X = data.Next_Cell.split(',')[0];
 		var Next_Cell_Y = data.Next_Cell.split(',')[1];
+		
 		var caseReturn = 1;
 		var timeCheck = 0;
 
 		if (Position_Cell_X!=Next_Cell_X&&Position_Cell_Y!=Next_Cell_Y) {caseReturn = 2};
+		
 		switch (caseReturn) {
 			case 1:
 			timeCheck = functions.TimeMove.Straight*0.5;
@@ -127,6 +132,7 @@ function checkTimeMoveAttack (io,data) {
 			timeCheck = functions.TimeMove.Diagonal*0.5;
 			break;
 		}
+
 		if (data.TimeMoveNextCell>timeCheck) {
 			// timeMove = data.TimeMoveNextCell - timeCheck;
 			timeMove = data.TimeMoveNextCell + 100;
