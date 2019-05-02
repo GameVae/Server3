@@ -65,6 +65,7 @@ var getUnit 				= require('./Login/Login/GetUnit.js');
 var sendUnit				= require('./Unit/Deploy.js');
 
 var moveUnit 				= require('./Unit/Moving.js');
+var moveUnit_Attack			= require('./Unit/Moving_Attack.js');
 
 var attacking 				= require('./Attack/Attacking.js');
 // var attackingUpdate 		= require('./Unit/Attacking _Update.js');
@@ -96,7 +97,9 @@ if (app.get('port') === process.env.PORT)
 	friend.Start(io);
 	info.Start(io);
 	sendUnit.Start(io);
+
 	moveUnit.Start(io);
+	moveUnit_Attack.Start(io);
 	
 	attacking.Start(io);
 	// attackingUnit.Start(io);

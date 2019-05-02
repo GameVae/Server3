@@ -4,7 +4,7 @@
 var db_position				= require('./../Util/Database/Db_position.js');
 
 var functions 				= require('./../Util/Functions.js');
-
+// console.log(functions.TimeMove.Straight)
 var guildData				= require('./../Redis/Guild/GuildData.js');
 var friendData				= require('./../Redis/Friend/FriendData.js');
 
@@ -39,10 +39,6 @@ function clearMoveTimeout (stringData) {
 	}
 }
 
-exports.S_MOVE_ATT = function S_MOVE_ATT (io,data) {
-	 
-}
-
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){			
@@ -70,20 +66,44 @@ exports.Start = function start (io) {
 // 	Next_Cell: '12,8,0',
 // 	TimeMoveNextCell: '2019-04-24T04:26:41.799' } ],
 // 	Attack_Unit_ID: 'NULL' }
-
+var S_MOVE_data ={ Server_ID: 1,
+	ID: 57,
+	ID_Unit: 16,
+	ID_User: 42,
+	Position_Cell: '9,4,0',
+	Next_Cell: '10,5,0',
+	End_Cell: '12,9,0',
+	TimeMoveNextCell: '2019-05-02T02:55:24.645',
+	TimeFinishMove: '2019-05-02T02:55:29.693',
+	ListMove:
+	[ { Position_Cell: '10,5,0',
+	Next_Cell: '10,6,0',
+	TimeMoveNextCell: '2019-05-02T02:55:25.907' },
+	{ Position_Cell: '10,6,0',
+	Next_Cell: '11,7,0',
+	TimeMoveNextCell: '2019-05-02T02:55:27.169' },
+	{ Position_Cell: '11,7,0',
+	Next_Cell: '11,8,0',
+	TimeMoveNextCell: '2019-05-02T02:55:28.431' },
+	{ Position_Cell: '11,8,0',
+	Next_Cell: '12,9,0',
+	TimeMoveNextCell: '2019-05-02T02:55:29.693' } ],
+	Attack_Unit_ID: 'NULL' }
 //
 // S_MOVE_ATT (S_MOVE_data)
 
 function S_MOVE_ATT (io,data) {
 	// console.log('S_MOVE_ATT')
-	// console.log(data)
-	var stringData = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	clearMoveTimeout (stringData);
+	console.log(data)
+
+	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	clearMoveTimeout (stringUnitMoving);
 	
-	var dataMove =  Object.create(data)
-	dataMove={
-		Server_ID:data.Server_ID,
-		ID:data.ID,
+	var dataMove =  Object.create(data);
+
+	dataMove = {
+		Server_ID: data.Server_ID,
+		ID: data.ID,
 		ID_Unit:data.ID_Unit,
 		ID_User:data.ID_User,
 		Position_Cell:data.Position_Cell,
@@ -95,25 +115,145 @@ function S_MOVE_ATT (io,data) {
 		Attack_Unit_ID:data.Attack_Unit_ID,
 	}
 	// console.log(dataMove);
-	// // console.log(data);
+	// console.log(data);
 	// checkCurrentPosition (io,dataMove,dataMove.Position_Cell);
+
+	// checkTimeMoveAttack (io,dataMove,stringUnitMoving);
 
 	// stringUnitMoving = dataMove.Server_ID+"_"+dataMove.ID_Unit+"_"+dataMove.ID_User+"_"+dataMove.ID;
 	// clearMoveTimeout2 (stringUnitMoving);
 
-	checkTimeMoveAttack (io,dataMove,stringData);
+	// 
 }
 
 function checkTimeMoveAttack (io,data,stringUnitMoving) {
+	var timeOut,timeCheck,timeNextCellAttack,caseReturn;
+	var stringPos = data.Position_Cell;
+	var timeMoveObj = Object.create(data);
+	caseReturn = 1;
+	timeMoveObj = {
+		Server_ID: data.Server_ID,
+		ID: data.ID,
+		ID_Unit: data.ID_Unit,
+		ID_User: data.ID_User,
+		Position_Cell: data.Position_Cell,
+		Next_Cell: data.Next_Cell,
+		End_Cell: data.End_Cell,
+		TimeMoveNextCell: data.TimeMoveNextCell,
+		TimeFinishMove: data.TimeFinishMove,
+		ListMove: data.ListMove,
+		Attack_Unit_ID: data.Attack_Unit_ID,
+	}
+
+	if (data.TimeMoveNextCell!=null) {
+		timeOut = functions.ExportTimeDatabase(data.TimeMoveNextCell)-functions.GetTime();
+		
+		if (timeOut>0) {
+
+			var Position_Cell_X = data.Position_Cell.split(',')[0];
+			var Position_Cell_Y = data.Position_Cell.split(',')[1];
+			var Next_Cell_X = data.Next_Cell.split(',')[0];
+			var Next_Cell_Y = data.Next_Cell.split(',')[1];
+			
+			if (Position_Cell_X != Next_Cell_X && Position_Cell_Y != Next_Cell_Y) {caseReturn = 2;}
+
+			switch (caseReturn) {
+				case 1:
+				timeCheck = functions.TimeMove.Straight;
+				break;
+				case 2:
+				timeCheck = functions.TimeMove.Diagonal;
+				break;
+			}
+
+			if (timeOut < timeCheck) {
+				if (timeOut-(timeCheck*0.5)>0) {
+					timeNextCellAttack = timeOut-(timeCheck*0.5);
+				}else{
+					DetailError = ('Moving_Attack.js: checkTimeMoveAttack: timeNextCellAttack '+timeNextCellAttack); functions.WriteLogError(DetailError,2);
+				}
+			}
+			if (timeOut == timeCheck) {
+				timeNextCellAttack = timeOut+10;
+			}
+			if (timeOut > timeCheck) {
+				timeNextCellAttack = timeOut - (timeCheck*0.5) +10;
+			}
+
+		}else{
+
+			if (data.ListMove.length>0) {
+				if (data.Next_Cell!=data.ListMove[0].Position_Cell) {
+					DetailError = ('Moving_Attack.js: checkTimeMoveAttack: '+stringUnitMoving); functions.WriteLogError(DetailError,2);
+				}else {
+					timeMoveObj.Position_Cell = data.Next_Cell;
+					timeMoveObj.Next_Cell = data.ListMove[0].Next_Cell;
+					timeMoveObj.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
+					timeMoveObj.ListMove.shift();
+				}
+			}else {
+
+				timeMoveObj.Position_Cell = data.Next_Cell;
+				timeMoveObj.Next_Cell = null;
+				timeMoveObj.End_Cell = null;
+				timeMoveObj.ListMove = null;
+				timeMoveObj.TimeMoveNextCell = null;
+				timeMoveObj.TimeFinishMove = null;
+
+			}
+			timeNextCellAttack = 0;
+		}
+
+		DictTimeMoveAttack[stringUnitMoving] = setTimeout(function (io,timeMoveObj,stringUnitMoving) {
+			checkCurrentPosition (io,timeMoveObj,timeMoveObj.Position_Cell);
+			checkTimeMoveAttack (io,timeMoveObj,stringUnitMoving);
+		}, timeNextCellAttack, io,timeMoveObj,stringUnitMoving);
+
+	}else{
+		checkCurrentPosition (io,data,stringPos);
+		clearMoveTimeout (stringPos);
+	}
+}
+
+function checkTimeMoveAttack2 (io,data,stringUnitMoving) {
 	//check theo timemovenextcell/2
 	// console.log(data)
 
 	var timeMove = 0;
 	var stringPos = data.Position_Cell;
 	// stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	var timeMoveObj = Object.create(data);
+
+	timeMoveObj = {
+		Server_ID: data.Server_ID,
+		ID: data.ID,
+		ID_Unit: data.ID_Unit,
+		ID_User: data.ID_User,
+		Position_Cell: data.Position_Cell,
+		Next_Cell: data.Next_Cell,
+		End_Cell: data.End_Cell,
+		TimeMoveNextCell: data.TimeMoveNextCell,
+		TimeFinishMove: data.TimeFinishMove,
+		ListMove: data.ListMove,
+		Attack_Unit_ID: data.Attack_Unit_ID,
+	}
 
 	if (data.TimeMoveNextCell!=null) {
-		data.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
+		if (functions.ExportTimeDatabase(data.TimeMoveNextCell) >= functions.GetTime()) {
+			timeMoveObj.TimeMoveNextCell = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
+			
+			if (data.Next_Cell!=null) {
+				stringPos = data.Next_Cell;
+			}else{
+				stringPos = data.End_Cell;
+			}
+			
+
+		}else{
+			stringPos = data.End_Cell;
+		}
+		
+
 		var Position_Cell_X = data.Position_Cell.split(',')[0];
 		var Position_Cell_Y = data.Position_Cell.split(',')[1];
 		var Next_Cell_X = data.Next_Cell.split(',')[0];
@@ -123,7 +263,8 @@ function checkTimeMoveAttack (io,data,stringUnitMoving) {
 		var timeCheck = 0;
 
 		if (Position_Cell_X!=Next_Cell_X&&Position_Cell_Y!=Next_Cell_Y) {caseReturn = 2};
-		
+		else if (Position_Cell_X==Next_Cell_X&&Position_Cell_Y==Next_Cell_Y) {caseReturn=3;}
+
 		switch (caseReturn) {
 			case 1:
 			timeCheck = functions.TimeMove.Straight*0.5;
@@ -131,16 +272,28 @@ function checkTimeMoveAttack (io,data,stringUnitMoving) {
 			case 2:
 			timeCheck = functions.TimeMove.Diagonal*0.5;
 			break;
+			case 3:
+			timeCheck = 0;
+			break;
 		}
 
-		if (data.TimeMoveNextCell>timeCheck) {
+		if (data.TimeMoveNextCell>timeCheck&&timeCheck>0) {
 			// timeMove = data.TimeMoveNextCell - timeCheck;
 			timeMove = data.TimeMoveNextCell + 100;
-			stringPos = data.Next_Cell;
+
+			// if (data.Next_Cell!=null) {
+			// 	stringPos = data.Next_Cell;
+			// }
+			// new data?
+
+
 		}else{
 			timeMove = data.TimeMoveNextCell;
 			checkCurrentPosition (io,data,data.Position_Cell);
 		}
+
+		// tính data mới?
+
 		// console.log(timeMove)
 		// console.log(stringUnitMoving)
 
@@ -156,17 +309,121 @@ function checkTimeMoveAttack (io,data,stringUnitMoving) {
 						checkCurrentPosition (io,resultData,stringPos);
 					});
 				}else{
-					clearTimeout(DictTimeMoveAttack[stringUnitMoving]);
-					delete DictTimeMoveAttack[stringUnitMoving];
+					clearMoveTimeout (stringPos);
 				}
 			})
 			
 		}, timeMove,data,stringPos);
+
 	}else{
+		if (functions.ExportTimeDatabase(data.TimeFinishMove) >= functions.GetTime()) {
+			stringPos = data.End_Cell;
+		}else {
+			// stringPos = 
+		}
 		checkCurrentPosition (io,data,stringPos);
-		clearMoveTimeout2 (stringPos);
-	}	
+		clearMoveTimeout (stringPos);
+	}
 }
+
+function checkCurrentPosition (io,data,pos) {
+	// check unit co ton tai khong
+	// console.log(data,pos);
+
+	stringHPos = "s"+data.Server_ID+"_pos";
+	stringHUnit ="s"+data.Server_ID+"_unit";
+	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	// var stringHUnit = "s"+data.Server_ID+"_unit";
+	// var pos = data.Position_Cell;
+	var unitBool = false;
+	new Promise((resolve,reject)=>{
+		client.hexists(stringHUnit,stringUnitMoving,function (error,rowBool) {
+			if (rowBool==1) {
+				unitBool = true;
+			}else{
+				clearMoveTimeout2 (stringUnitMoving);
+				return null;
+			}
+			resolve();
+		})
+	}).then(()=>new Promise((resolve,reject)=>{		
+		if (unitBool == true) {			
+			
+			client.hexists(stringHPos,pos,function (error,resultPos) {				
+				if (resultPos==1) {
+					client.hget(stringHPos,pos,function (error,rowsUnit) {
+						console.log(rowsUnit)
+						if (rowsUnit!=null) {
+							var unitResult = rowsUnit.split("/").filter(String);
+
+							for (var i = 0; i < unitResult.length; i++) {
+								var Attack_ID = unitResult[i].split("_")[2]
+								if (Attack_ID!=data.ID_User) {
+									getAttackData (io,data,unitResult[i]);
+								}
+							}
+						}												
+					})
+
+				}else{
+					return null;
+				}
+
+			});	
+		}
+		resolve();
+	})
+
+	)
+}
+// getAttackData (S_MOVE_data,stringKeyAttack)
+function getAttackData (io,data,stringKeyAttack) {
+	// console.log(data,stringKeyAttack)
+	var checkBoolFriendData = false;
+	var checkBoolGuildData = false;
+	var attackBool = false;
+	var stringKeyDefend;
+
+	if (data.ID_User!=stringKeyAttack.split("_")[2]) {
+
+		new Promise((resolve,reject)=>{
+			friendData.CheckFriendData (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
+				checkBoolFriendData =returnBool;
+				resolve();
+			})
+		}).then(()=>new Promise((resolve,reject)=>{
+			guildData.CheckSameGuildID (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
+				checkBoolGuildData = returnBool;
+				resolve();
+			})						
+		}).then(()=>new Promise((resolve,reject)=>{
+			console.log(checkBoolFriendData,checkBoolGuildData)
+			if (checkBoolFriendData==false&&checkBoolGuildData==false) {
+				stringKeyDefend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+				// console.log(stringKeyAttack);
+				stringHUnit = "s"+data.Server_ID+"_unit";
+				client.hget(stringHUnit,stringKeyAttack,function (error,rows) {
+					var result = JSON.parse(rows);
+					if (rows.Status==functions.UnitStatus.Standby) {
+						attackBool = true;
+						attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKeyAttack);
+						resolve();
+					}
+				})				
+			}
+		}).then(()=>new Promise((resolve,reject)=>{
+			if (attackBool == true) {
+				console.log('stringKeyDefend:'+stringKeyDefend)
+				attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend);
+				resolve();
+			}			
+		}))
+		)
+		)
+	}
+	
+}
+
 // convertTimeMove (S_MOVE_data)
 function convertTimeMove (data) {
 	var returnData=data;
@@ -186,128 +443,4 @@ function convertTimeMove (data) {
 	}
 	// console.log(returnData)
 	return returnData;
-}
-
-
-
-// var dataS = {
-// 	Server_ID: 1,
-// 	ID: 51,
-// 	ID_Unit: 16,
-// 	ID_User: 42,
-// 	Position_Cell: '11,8,0',
-// 	Next_Cell: '12,7,0',
-// 	End_Cell: '13,4,0',
-// 	TimeMoveNextCell: '2019-04-25T01:22:19.983',
-// 	TimeFinishMove: '2019-04-25T01:22:23.769',
-// 	ListMove:
-// 	[ { Position_Cell: '12,7,0',
-// 	Next_Cell: '12,6,0',
-// 	TimeMoveNextCell: '2019-04-25T01:22:21.245' },
-// 	{ Position_Cell: '12,6,0',
-// 	Next_Cell: '13,5,0',
-// 	TimeMoveNextCell: '2019-04-25T01:22:22.507' },
-// 	{ Position_Cell: '13,5,0',
-// 	Next_Cell: '13,4,0',
-// 	TimeMoveNextCell: '2019-04-25T01:22:23.769' } ],
-// 	Attack_Unit_ID: 'NULL'
-// }
-// var posT = '11,8,0';
-
-// checkCurrentPosition (dataS,posT)
-function checkCurrentPosition (io,data,pos) {
-	// check unit co ton tai khong
-	// console.log(data,pos);
-
-	stringHPos = "s"+data.Server_ID+"_pos";
-	stringHUnit ="s"+data.Server_ID+"_unit";
-	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	// var stringHUnit = "s"+data.Server_ID+"_unit";
-	// var pos = data.Position_Cell;
-	var unitBool = false;
-	new Promise((resolve,reject)=>{
-		client.hexists(stringHUnit,stringUnitMoving,function (error,rowBool) {
-			if (rowBool==1) {
-				unitBool = true;
-			}
-			resolve();
-		})
-	}).then(()=>new Promise((resolve,reject)=>{
-		
-		if (unitBool == true) {			
-			client.hexists(stringHPos,pos,function (error,resultPos) {
-				
-				if (resultPos==1) {
-					client.hget(stringHPos,pos,function (error,rowsUnit) {
-						console.log(rowsUnit)
-						if (rowsUnit!=null) {
-							var unitResult = rowsUnit.split("/").filter(String);
-
-							for (var i = 0; i < unitResult.length; i++) {
-								var Attack_ID = unitResult[i].split("_")[2]
-								if (Attack_ID!=data.ID_User) {
-									getAttackData (io,data,unitResult[i]);
-								}
-							}
-						}						
-						
-					})
-				}
-
-			});	
-		}else{
-			clearMoveTimeout2 (stringUnitMoving);
-		}
-		resolve();
-	})
-	)
-	
-
-}
-// getAttackData (S_MOVE_data,ID_Player)
-function getAttackData (io,data,ID_Player) {
-	// console.log(data,ID_Player)
-	var checkBoolFriendData = false;
-	var checkBoolGuildData = false;
-	var attackBool = false;
-	var ID_Defend;
-
-	if (data.ID_User!=ID_Player.split("_")[2]) {
-
-		new Promise((resolve,reject)=>{
-			friendData.CheckFriendData (data.ID_User,ID_Player.split("_")[2],function (returnBool) {
-				checkBoolFriendData =returnBool;
-				resolve();
-			})
-		}).then(()=>new Promise((resolve,reject)=>{
-			guildData.CheckSameGuildID (data.ID_User,ID_Player.split("_")[2],function (returnBool) {
-				checkBoolGuildData = returnBool;
-				resolve();
-			})						
-		}).then(()=>new Promise((resolve,reject)=>{
-			console.log(checkBoolFriendData,checkBoolGuildData)
-			if (checkBoolFriendData==false&&checkBoolGuildData==false) {
-				ID_Defend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-				// console.log(ID_Player);
-				stringHUnit = "s"+data.Server_ID+"_unit";
-				client.hget(stringHUnit,ID_Player,function (error,rows) {
-					var result = JSON.parse(rows);
-					if (rows.Status==functions.UnitStatus.Standby) {
-						attackBool = true;
-						attackFunc.SetAttackData(data.Server_ID,ID_Defend,ID_Player);
-						resolve();
-					}
-				})				
-			}
-		}).then(()=>new Promise((resolve,reject)=>{
-			if (attackBool == true) {
-				console.log('ID_Defend:'+ID_Defend)
-				attackFunc.AttackInterval(io,data.Server_ID,ID_Defend);
-				resolve();
-			}			
-		}))
-		)
-		)
-	}
-	
 }
