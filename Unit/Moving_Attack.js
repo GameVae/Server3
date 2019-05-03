@@ -128,10 +128,22 @@ function S_MOVE_ATT (io,data) {
 
 function checkTimeMoveAttack (io,data,stringUnitMoving) {
 	// console.log(data)
+	client.hexists(stringHUnit,stringUnitMoving,function (error,rowResult) {
+		if (rowResult==1) {
+			calcMove (io,data,stringUnitMoving);
+		}else {
+			clearMoveTimeout(stringUnitMoving);
+		}
+	})
+	
+}
+
+function calcMove (io,data,stringUnitMoving) {
 	var timeOut,timeCheck,timeNextCellAttack,caseReturn;
 	var stringPos = data.Position_Cell;
 	var timeMoveObj = Object.create(data);
 	var currentTime = functions.GetTime();
+	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 
 	caseReturn = 1;
 	timeMoveObj = {
@@ -177,7 +189,7 @@ function checkTimeMoveAttack (io,data,stringUnitMoving) {
 				if (timeOut-(timeCheck*0.5)>0) {
 					timeNextCellAttack = timeOut - (timeCheck*0.5);
 				}else{
-					timeNextCellAttack = 0;
+					timeNextCellAttack = timeOut;
 					// DetailError = ('Moving_Attack.js: checkTimeMoveAttack: timeNextCellAttack '+timeNextCellAttack); functions.WriteLogError(DetailError,2);
 				}
 			}
@@ -214,10 +226,9 @@ function checkTimeMoveAttack (io,data,stringUnitMoving) {
 
 	}else{
 		checkCurrentPosition (io,data,stringPos);
-		clearMoveTimeout (stringPos);
+		clearMoveTimeout (stringUnitMoving);
 	}
 }
-
 function checkCurrentPosition (io,data,pos) {
 	// check unit co ton tai khong
 	// console.log(data,pos);
@@ -239,8 +250,9 @@ function checkCurrentPosition (io,data,pos) {
 			resolve();
 		});
 	}).then(()=>new Promise((resolve,reject)=>{		
-		if (unitBool == true) {			
-			
+		
+		if (unitBool == true) {
+
 			client.hexists(stringHPos,pos,function (error,resultPos) {				
 				if (resultPos==1) {
 					client.hget(stringHPos,pos,function (error,rowsUnit) {
@@ -279,7 +291,7 @@ function getAttackData (io,data,stringKeyAttack) {
 
 		new Promise((resolve,reject)=>{
 			friendData.CheckFriendData (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
-				checkBoolFriendData =returnBool;
+				checkBoolFriendData = returnBool;
 				resolve();
 			})
 		}).then(()=>new Promise((resolve,reject)=>{
