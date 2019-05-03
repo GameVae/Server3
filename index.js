@@ -99,7 +99,7 @@ if (app.get('port') === process.env.PORT)
 	sendUnit.Start(io);
 
 	moveUnit.Start(io);
-	moveUnit_Attack.Start(io);
+	// moveUnit_Attack.Start(io);
 	
 	attacking.Start(io);
 	// attackingUnit.Start(io);

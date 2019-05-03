@@ -1,0 +1,11 @@
+
+ logChangeDetail: 2019-05-03T02:10:14.826Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-05-03T02:11:23.021Z: TaskServer.js: ClearAllSocket ConnectUser UPDATE `user_info` SET `TimeLogIn`=null,`TimeLogOut`=null,`Socket`=null
+ logChangeDetail: 2019-05-03T03:01:51.822Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-03T03:15:36.068Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-03T03:19:15.739Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-03T03:28:26.085Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-03T03:52:25.779Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-05-03T03:55:09.336Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-03T03:55:51.419Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-05-03T04:15:24.064Z: Login.js: queryUserNamePass: ndinhtoan44

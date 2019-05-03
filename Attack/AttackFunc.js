@@ -100,6 +100,15 @@ function attackInterval (io,Server_ID,ID_User_Defend){
 		}, 1000, ID_User_Defend);
 	}
 }
+
+exports.ClearIntervalAttack = function clearIntervalAttack2 (ID_User_Defend) {
+	if (DictTimeInterval[ID_User_Defend]!=undefined) {
+		clearInterval(DictTimeInterval[ID_User_Defend]);
+		delete DictTimeInterval[ID_User_Defend];
+	}
+	client.hdel(stringHAttack,ID_User_Defend);
+}
+
 function clearIntervalAttack (ID_User_Defend) {
 	if (DictTimeInterval[ID_User_Defend]!=undefined) {
 		clearInterval(DictTimeInterval[ID_User_Defend]);
