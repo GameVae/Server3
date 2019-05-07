@@ -12,11 +12,11 @@ var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-exports.UpdateAttack = function updateAttack (io,Server_ID) {
+exports.UpdateAttack = function updateAttack2 (io,Server_ID) {
 	updateAttack2 (io,Server_ID);	
 }
 
-function updateAttack2 (io,Server_ID) {
+function updateAttack (io,Server_ID) {
 	stringHAttack = "s"+Server_ID+"_attack";
 	client.hkeys(stringHAttack,function (error,rows) {
 		for (var i = 0; i < rows.length; i++) {

@@ -147,6 +147,9 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 					CounterMul[i] = checkCounter(result,def);
 					// console.log(result)			
 					Attack = Attack + (result.Attack * (result.Quality/def.Quality)*CounterMul[i]);
+
+					checkSocketAttack (io,dataAttack[i],result,dataDefend);
+
 				}else{
 					Attack = Attack + 0;
 					removeRedisData (stringHAttack,dataDefend,dataAttack[i]);
@@ -161,8 +164,8 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 				}else{
 					def.Hea_cur = parseFloat(def.Hea_cur - Hea_Lost).toFixed(2);
 				}	
-
 			}
+
 			else if (Hea_Lost >= def.Hea_cur) {
 				if (parseFloat(def.Health - parseInt((Hea_Lost - def.Hea_cur)%def.Health)).toFixed(2)<1) {
 					def.Hea_cur = def.Hea_cur - 1;
@@ -171,7 +174,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 				}
 				
 				QualityLost = parseInt((Hea_Lost - def.Hea_cur)/def.Health);
-				def.Quality = def.Quality -(parseInt((Hea_Lost - def.Hea_cur)/def.Health) +1);
+				def.Quality = def.Quality - (parseInt((Hea_Lost - def.Hea_cur)/def.Health) +1);
 			}
 			
 			if (def.Quality <= 0) {
@@ -267,6 +270,27 @@ function checkSocketClient (io,dataDefend,def) {
 			sendToClient (io,rowsSocket[i],def);
 		}
 	});
+}
+function checkSocketAttack (io,dataAttack,att,dataDefend) {
+	var Server_ID = dataAttack.split("_")[0]
+	var stringHSocket = "s"+Server_ID+"_socket";
+	client.hvals(stringHSocket,function (error,rowsSocket) {	
+		for (var i = 0; i < rowsSocket.length; i++) {
+			sendToClientAttack (io,rowsSocket[i],att,dataDefend);
+		}
+	});
+}
+function sendToClientAttack (io,socketID,att,dataDefend) {
+	console.log(att.Attack_Unit_ID)
+	var dataSend ={
+		ID: 			att.ID,
+		ID_Unit: 		att.ID_Unit,
+		Quality:        att.Quality,
+		Hea_cur: 		att.Hea_cur,
+		Health: 		att.Health,
+		Attack_Unit_ID: dataDefend
+	}
+	io.to(socketID).emit('R_ATTACK',{R_ATTACK:dataSend});
 }
 
 function sendToClient (io,socketID,def) {

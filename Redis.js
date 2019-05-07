@@ -28,7 +28,6 @@ function getUnitDataPos (server_ID) {
 	}))
 }
 
-
 function getUnitMight (client) {
 	var stringQuery = "SELECT * FROM `unit`";
 	var stringHkey = "unit_Might";

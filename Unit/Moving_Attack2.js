@@ -142,9 +142,9 @@ function calcMove (io,data,stringUnitMoving) {
 	var stringPos = data.Position_Cell;
 	var timeMoveObj = Object.create(data);
 	var currentTime = functions.GetTime();
-	
-	caseReturn = 1;
+	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 
+	caseReturn = 1;
 	timeMoveObj = {
 		Server_ID: data.Server_ID,
 		ID: data.ID,
@@ -160,61 +160,76 @@ function calcMove (io,data,stringUnitMoving) {
 	}
 
 	if (data.TimeMoveNextCell!=null) {
-		stringPos = data.Next_Cell;
-		checkCurrentPosition (io,timeMoveObj,stringPos);
+
+		console.log('functions.ExportTimeDatabase(data.TimeMoveNextCell): '+functions.ExportTimeDatabase(data.TimeMoveNextCell))
+		console.log('functions.GetTime(): '+functions.GetTime())
 		
 		timeOut = functions.ExportTimeDatabase(data.TimeMoveNextCell) - currentTime;
-
-		var Position_Cell_X = data.Position_Cell.split(',')[0];
-		var Position_Cell_Y = data.Position_Cell.split(',')[1];
-		var Next_Cell_X = data.Next_Cell.split(',')[0];
-		var Next_Cell_Y = data.Next_Cell.split(',')[1];
-
-		if (Position_Cell_X != Next_Cell_X && Position_Cell_Y != Next_Cell_Y) {caseReturn = 2;}
-
-		switch (caseReturn) {
-			case 1:
-			timeCheck = functions.TimeMove.Straight;
-			break;
-			case 2:
-			timeCheck = functions.TimeMove.Diagonal;
-			break;
-		}
-
-		if (timeOut>timeCheck) {
-			timeNextCellAttack = timeOut - (timeCheck*0.5);
-		}else if (timeOut==timeCheck){
-			timeNextCellAttack = (timeCheck*0.5);
-		}else {
-			timeNextCellAttack = timeOut;
-		}
-
-		if (data.ListMove.length>0) {			
-			timeMoveObj.Position_Cell = data.Next_Cell;
-			timeMoveObj.Next_Cell = data.ListMove[0].Next_Cell;
-			timeMoveObj.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
-			timeMoveObj.ListMove.shift();
-		}else {
-			timeMoveObj.Position_Cell = data.Next_Cell;
-			timeMoveObj.Next_Cell = null;
-			timeMoveObj.End_Cell = null;
-			timeMoveObj.ListMove = null;
-			timeMoveObj.TimeMoveNextCell = null;
-			timeMoveObj.TimeFinishMove = null;							
-		}
 		
-		DictTimeMoveAttack[stringUnitMoving] = setTimeout(function (io,timeMoveObj,stringUnitMoving,stringPos) {
-			checkCurrentPosition (io,timeMoveObj,stringPos);
+		if (timeOut>0) {
+
+			var Position_Cell_X = data.Position_Cell.split(',')[0];
+			var Position_Cell_Y = data.Position_Cell.split(',')[1];
+			var Next_Cell_X = data.Next_Cell.split(',')[0];
+			var Next_Cell_Y = data.Next_Cell.split(',')[1];
+			
+			if (Position_Cell_X != Next_Cell_X && Position_Cell_Y != Next_Cell_Y) {caseReturn = 2;}
+
+			switch (caseReturn) {
+				case 1:
+				timeCheck = functions.TimeMove.Straight;
+				break;
+				case 2:
+				timeCheck = functions.TimeMove.Diagonal;
+				break;
+			}
+			// console.log('timeOut: '+timeOut)
+			// console.log('timeCheck: '+timeCheck)
+
+			if (timeOut < timeCheck) {
+				if (timeOut-(timeCheck*0.5)>0) {
+					timeNextCellAttack = timeOut - (timeCheck*0.5);
+				}else{
+					timeNextCellAttack = timeOut;
+					// DetailError = ('Moving_Attack.js: checkTimeMoveAttack: timeNextCellAttack '+timeNextCellAttack); functions.WriteLogError(DetailError,2);
+				}
+			}
+			if (timeOut == timeCheck) {
+				timeNextCellAttack = timeOut+10;
+			}
+			if (timeOut > timeCheck) {
+				timeNextCellAttack = timeOut - (timeCheck*0.5) +10;
+			}
+
+		}else{
+
+			if (data.ListMove.length>0) {
+				
+				timeMoveObj.Position_Cell = data.Next_Cell;
+				timeMoveObj.Next_Cell = data.ListMove[0].Next_Cell;
+				timeMoveObj.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
+				timeMoveObj.ListMove.shift();
+			}else {
+				timeMoveObj.Position_Cell = data.Next_Cell;
+				timeMoveObj.Next_Cell = null;
+				timeMoveObj.End_Cell = null;
+				timeMoveObj.ListMove = null;
+				timeMoveObj.TimeMoveNextCell = null;
+				timeMoveObj.TimeFinishMove = null;							
+			}
+			timeNextCellAttack = 0;
+		}
+
+		DictTimeMoveAttack[stringUnitMoving] = setTimeout(function (io,timeMoveObj,stringUnitMoving) {
+			checkCurrentPosition (io,timeMoveObj,timeMoveObj.Position_Cell);
 			checkTimeMoveAttack (io,timeMoveObj,stringUnitMoving);
-		}, timeNextCellAttack, io,timeMoveObj,stringUnitMoving,stringPos);
+		}, timeNextCellAttack, io,timeMoveObj,stringUnitMoving);
 
 	}else{
 		checkCurrentPosition (io,data,stringPos);
 		clearMoveTimeout (stringUnitMoving);
 	}
-
 }
-
 function checkCurrentPosition (io,data,pos) {
 	// check unit co ton tai khong
 	// console.log(data,pos);

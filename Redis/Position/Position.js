@@ -12,13 +12,13 @@ client.select(functions.RedisData.TestUnit);
 // exports.Test = function Test (server_ID){
 // 	console.log(server_ID);
 // }
-exports.GetPosition = function getPosition (server_ID){
-	getPosition_test (server_ID);
+exports.GetPosition = function getPosition2 (server_ID){
+	getPosition (server_ID);
 }
 exports.AddPosition = function addPosition (data) {
 	getRangeUnit (data,data.Server_ID)
 }
-function getPosition_test (server_ID) {
+function getPosition (server_ID) {
 	var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"'";
 	// console.log(stringQuery)
 	db_position.query(stringQuery,function (error,rows) {
@@ -91,6 +91,7 @@ function unitRange1 (row,server_ID) {
 		stringKey[4] = (posX+1)+","+(posY-1)+",0";
 		stringKey[5] = (posX+1)+","+(posY+1)+",0";
 		stringKey[6] = (posX+1)+","+(posY)+",0";
+
 	}else{
 		//odd
 		// new Vector3Int(-1, 0, 0),
@@ -166,26 +167,14 @@ function unitRange2 (row,server_ID) {
 	stringKey[0] = row.Position_Cell;
 
 	if (posY%2==0) {
-		//odd
-		// new Vector3Int(-2, 0, 0),
-		// new Vector3Int(-1,-1, 0),
-		// new Vector3Int(-1, 1, 0),
-		// new Vector3Int(-1,-2, 0),
-		// new Vector3Int(-1, 2, 0),
-		// new Vector3Int( 0,-2, 0),
-		// new Vector3Int( 0, 2, 0),
-		// new Vector3Int( 1,-2, 0),
-		// new Vector3Int( 1, 2, 0),
-		// new Vector3Int( 2,-1, 0),
-		// new Vector3Int( 2, 1, 0),
-		// new Vector3Int( 2, 0, 0),
+		//even
 		stringKey[1] = (posX-1)+","+(posY)+",0";
 		stringKey[2] = (posX)+","+(posY-1)+",0";
 		stringKey[3] = (posX)+","+(posY+1)+",0";
 		stringKey[4] = (posX+1)+","+(posY-1)+",0";
 		stringKey[5] = (posX+1)+","+(posY+1)+",0";
 		stringKey[6] = (posX+1)+","+(posY)+",0";
-
+		
 		stringKey[7] = (posX-2)+","+(posY)+",0";
 		stringKey[8] = (posX-1)+","+(posY-1)+",0";
 		stringKey[9] = (posX-1)+","+(posY+1)+",0";
@@ -200,20 +189,7 @@ function unitRange2 (row,server_ID) {
 		stringKey[18] = (posX+2)+","+(posY)+",0";
 
 	}else {
-		
-		//even
-		// new Vector3Int(-2, 0, 0),
-		// new Vector3Int(-2,-1, 0),
-		// new Vector3Int(-2, 1, 0),
-		// new Vector3Int(-1,-2, 0),
-		// new Vector3Int(-1, 2, 0),
-		// new Vector3Int( 0,-2, 0),
-		// new Vector3Int( 0, 2, 0),
-		// new Vector3Int( 1, 2, 0),
-		// new Vector3Int( 1,-2, 0),
-		// new Vector3Int( 1,-1, 0),
-		// new Vector3Int( 1, 1, 0),
-		// new Vector3Int( 2, 0, 0),
+		// odd
 		stringKey[1] = (posX-1) +","+posY+",0";
 		stringKey[2] = (posX-1) +","+(posY-1)+",0";
 		stringKey[3] = (posX-1) +","+(posY+1)+",0";
@@ -250,25 +226,7 @@ function unitRange3 (row,server_ID) {
 	var ID_Key = server_ID+"_"+row.ID_Unit+"_"+row.ID_User+"_"+row.BaseNumber;
 	
 	if (posY%2==0) {
-		//odd
-		// new Vector3Int( -3, 0, 0),
-		// new Vector3Int( -2, 1, 0),
-		// new Vector3Int( -2,-1, 0),
-		// new Vector3Int( -2, 2, 0),
-		// new Vector3Int( -2,-2, 0),
-		// new Vector3Int( -1, 3, 0),
-		// new Vector3Int( -1,-3, 0),
-		// new Vector3Int(  0, 3, 0),
-		// new Vector3Int(  0,-3, 0),
-		// new Vector3Int(  1, 3, 0),
-		// new Vector3Int(  1,-3, 0),
-		// new Vector3Int(  2, 3, 0),
-		// new Vector3Int(  2,-3, 0),
-		// new Vector3Int(  2, 2, 0),
-		// new Vector3Int(  2,-2, 0),
-		// new Vector3Int(  3, 1, 0),
-		// new Vector3Int(  3,-1, 0),
-		// new Vector3Int(  3, 0, 0),
+		//odd		
 		stringKey[0] = (posX-2)+","+(posY)+",0";
 		stringKey[1] = (posX-1)+","+(posY-1)+",0";
 		stringKey[2] = (posX-1)+","+(posY+1)+",0";
@@ -302,24 +260,6 @@ function unitRange3 (row,server_ID) {
 		stringKey[29] = (posX+3)+","+(posY)+",0";
 	}else {		
 		//even
-		// new Vector3Int( -3, 0, 0),
-		// new Vector3Int( -3, 1, 0),
-		// new Vector3Int( -3,-1, 0),
-		// new Vector3Int( -2, 2, 0),
-		// new Vector3Int( -2,-2, 0),
-		// new Vector3Int( -2, 3, 0),
-		// new Vector3Int( -2,-3, 0),
-		// new Vector3Int( -1, 3, 0),
-		// new Vector3Int( -1,-3, 0),
-		// new Vector3Int(  0, 3, 0),
-		// new Vector3Int(  0,-3, 0),
-		// new Vector3Int(  1, 3, 0),
-		// new Vector3Int(  1,-3, 0),
-		// new Vector3Int(  2, 2, 0),
-		// new Vector3Int(  2,-2, 0),
-		// new Vector3Int(  2, 1, 0),
-		// new Vector3Int(  2,-1, 0),
-		// new Vector3Int(  3, 0, 0),
 		stringKey[0] = (posX-2)+","+(posY)+",0";
 		stringKey[1] = (posX-2)+","+(posY-1)+",0";
 		stringKey[2] = (posX-2)+","+(posY+1)+",0";
