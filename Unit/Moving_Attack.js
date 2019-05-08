@@ -211,6 +211,8 @@ function calcMove (io,data,stringUnitMoving) {
 	}else{
 		checkCurrentPosition (io,data,stringPos);
 		clearMoveTimeout (stringUnitMoving);
+
+		attackFunc.CheckAttackedUnit(io,data.Server_ID,stringUnitMoving);
 	}
 
 }

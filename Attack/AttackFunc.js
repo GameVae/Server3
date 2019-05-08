@@ -56,6 +56,7 @@ function addValue (stringHkey,ID_Defend,data,ID_Attack) {
 exports.AttackInterval = function attackInterval2(io,Server_ID,stringKeyDefend) {
 	attackInterval(io,Server_ID,stringKeyDefend);
 }
+
 function attackInterval (io,Server_ID,ID_User_Defend){
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
@@ -375,7 +376,11 @@ function checkDataAttack (dataCheck) {
 		})
 	})
 }
-function checkAttackedUnit (io,Server_ID,rowData,dataCheck) {
+exports.CheckAttackedUnit = function checkAttackedUnit2 (io,Server_ID,dataCheck) {
+	checkAttackedUnit (io,Server_ID,dataCheck);
+}
+
+function checkAttackedUnit (io,Server_ID,dataCheck) {
 	// console.log(io,Server_ID,rowData,dataCheck)
 	var posArray = [];
 	var dataAttack = dataCheck;
