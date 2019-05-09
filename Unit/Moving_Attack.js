@@ -95,7 +95,7 @@ var S_MOVE_data ={ Server_ID: 1,
 
 function S_MOVE_ATT (io,data) {
 	
-	console.log(data)
+	// console.log(data)
 
 	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	clearMoveTimeout (stringUnitMoving);
@@ -189,13 +189,15 @@ function calcMove (io,data,stringUnitMoving) {
 			timeNextCellAttack = timeOut;
 		}
 
+		// console.log('data.ListMove.length: '+data.ListMove.length)
+
 		if (data.ListMove.length>0) {			
 			timeMoveObj.Position_Cell = data.Next_Cell;
 			timeMoveObj.Next_Cell = data.ListMove[0].Next_Cell;
 			timeMoveObj.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
 			timeMoveObj.ListMove.shift();
 		}else {
-			timeMoveObj.Position_Cell = data.Next_Cell;
+			timeMoveObj.Position_Cell = data.End_Cell;
 			timeMoveObj.Next_Cell = null;
 			timeMoveObj.End_Cell = null;
 			timeMoveObj.ListMove = null;
@@ -209,10 +211,14 @@ function calcMove (io,data,stringUnitMoving) {
 		}, timeNextCellAttack, io,timeMoveObj,stringUnitMoving,stringPos);
 
 	}else{
-		checkCurrentPosition (io,data,stringPos);
-		clearMoveTimeout (stringUnitMoving);
 
+		console.log('checkCurrentPosition ')
+		console.log(data);
+		console.log(new Date().toISOString());
+		checkCurrentPosition (io,data,stringPos);
 		attackFunc.CheckAttackedUnit(io,data.Server_ID,stringUnitMoving);
+
+		// clearMoveTimeout (stringUnitMoving);		
 	}
 
 }
@@ -244,7 +250,7 @@ function checkCurrentPosition (io,data,pos) {
 			client.hexists(stringHPos,pos,function (error,resultPos) {				
 				if (resultPos==1) {
 					client.hget(stringHPos,pos,function (error,rowsUnit) {
-						console.log(rowsUnit)
+						// console.log(rowsUnit)
 						if (rowsUnit!=null) {
 							var unitResult = rowsUnit.split("/").filter(String);
 
@@ -252,6 +258,7 @@ function checkCurrentPosition (io,data,pos) {
 								var Attack_ID = unitResult[i].split("_")[2]
 								if (Attack_ID!=data.ID_User) {
 									getAttackData (io,data,unitResult[i]);
+									break;
 								}
 							}
 						}
@@ -273,45 +280,43 @@ function getAttackData (io,data,stringKeyAttack) {
 	var checkBoolFriendData = false;
 	var checkBoolGuildData = false;
 	var attackBool = false;
-	var stringKeyDefend;
+	var stringKeyDefend;	
 
-	if (data.ID_User!=stringKeyAttack.split("_")[2]) {
-
-		new Promise((resolve,reject)=>{
-			friendData.CheckFriendData (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
-				checkBoolFriendData = returnBool;
-				resolve();
-			})
-		}).then(()=>new Promise((resolve,reject)=>{
-			guildData.CheckSameGuildID (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
-				checkBoolGuildData = returnBool;
-				resolve();
-			})						
-		}).then(()=>new Promise((resolve,reject)=>{
-			console.log(checkBoolFriendData,checkBoolGuildData)
-			if (checkBoolFriendData==false&&checkBoolGuildData==false) {
-				stringKeyDefend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-				// console.log(stringKeyAttack);
-				stringHUnit = "s"+data.Server_ID+"_unit";
-				client.hget(stringHUnit,stringKeyAttack,function (error,rows) {
-					var result = JSON.parse(rows);
-					if (result.Status==functions.UnitStatus.Standby) {
-						attackBool = true;
-						attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKeyAttack);
-						resolve();
-					}
-				})				
-			}
-		}).then(()=>new Promise((resolve,reject)=>{
-			if (attackBool == true) {
-				console.log('stringKeyDefend:'+stringKeyDefend)
-				attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend);
-				resolve();
-			}			
-		}))
-		)
-		)
-	}
+	new Promise((resolve,reject)=>{
+		friendData.CheckFriendData (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
+			checkBoolFriendData = returnBool;
+			resolve();
+		})
+	}).then(()=>new Promise((resolve,reject)=>{
+		guildData.CheckSameGuildID (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
+			checkBoolGuildData = returnBool;
+			resolve();
+		})						
+	}).then(()=>new Promise((resolve,reject)=>{
+		// console.log(checkBoolFriendData,checkBoolGuildData)
+		if (checkBoolFriendData==false&&checkBoolGuildData==false) {
+			stringKeyDefend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+			// console.log(stringKeyAttack);
+			stringHUnit = "s"+data.Server_ID+"_unit";
+			client.hget(stringHUnit,stringKeyAttack,function (error,rows) {
+				var result = JSON.parse(rows);
+				if (result.Status==functions.UnitStatus.Standby) {
+					attackBool = true;
+					attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKeyAttack);
+					resolve();
+				}
+			})				
+		}
+	}).then(()=>new Promise((resolve,reject)=>{
+		if (attackBool == true) {
+			// console.log('stringKeyDefend:'+stringKeyDefend)
+			attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend);
+			resolve();
+		}			
+	}))
+	)
+	)
+	
 	
 }
 

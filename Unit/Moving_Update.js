@@ -14,11 +14,11 @@ var Promise = require('promise')
 var DetailError,LogChange;
 var currentTime,offlineTime,calcTime;
 // move.Test(2)
-exports.UpdateDataBase = function updateDataBase (serverInt) {
-	updateDataBase2 (serverInt);
+exports.UpdateDataBase = function updateDataBase2 (serverInt) {
+	updateDataBase (serverInt);
 }
 // updateDataBase2 (1)
-function updateDataBase2 (serverInt) {
+function updateDataBase (serverInt) {
 	var stringQuery = "SELECT * FROM `s"+serverInt+"_unit` WHERE `TimeFinishMove`<> 'Null'";
 	
 	db_position.query(stringQuery,function (error,rows) {
@@ -39,27 +39,27 @@ function updateDataBase2 (serverInt) {
 
 }
 
-var S_MOVE_data = {
-	ID: 17,
-	ID_Unit: 16,
-	ID_User: 42,
-	BaseNumber: 1,
-	Level: 2,
-	Quality: 3,
-	Hea_cur: 5.45,
-	Health: 5.45,
-	Attack: 2.3,
-	Defend: 1.15,
-	Position_Cell: '4,4,0',
-	Next_Cell: '5,5,0',
-	End_Cell: '12,12,0',
-	TimeMoveNextCell: '2019-04-01T07:06:13.000Z',
-	TimeFinishMove: '2019-04-01T07:06:42.000Z',
-	ListMove: '[{"Position_Cell":"5,5,0","Next_Cell":"5,6,0","TimeMoveNextCell":"2019-04-01T07:06:16.021"},{"Position_Cell":"5,6,0","Next_Cell":"6,7,0","TimeMoveNextCell":"2019-04-01T07:06:18.545"},{"Position_Cell":"6,7,0","Next_Cell":"6,8,0","TimeMoveNextCell":"2019-04-01T07:06:21.068"},{"Position_Cell":"6,8,0","Next_Cell":"7,9,0","TimeMoveNextCell":"2019-04-01T07:06:23.592"},{"Position_Cell":"7,9,0","Next_Cell":"7,10,0","TimeMoveNextCell":"2019-04-01T07:06:26.116"},{"Position_Cell":"7,10,0","Next_Cell":"8,11,0","TimeMoveNextCell":"2019-04-01T07:06:28.640"},{"Position_Cell":"8,11,0","Next_Cell":"9,11,0","TimeMoveNextCell":"2019-04-01T07:06:31.440"},{"Position_Cell":"9,11,0","Next_Cell":"10,11,0","TimeMoveNextCell":"2019-04-01T07:06:34.240"},{"Position_Cell":"10,11,0","Next_Cell":"11,11,0","TimeMoveNextCell":"2019-04-01T07:06:37.040"},{"Position_Cell":"11,11,0","Next_Cell":"11,12,0","TimeMoveNextCell":"2019-04-01T07:06:39.564"},{"Position_Cell":"11,12,0","Next_Cell":"12,12,0","TimeMoveNextCell":"2019-04-01T07:06:42.364"}]',
-	Status: 1,
-	Attack_Base_ID: null,
-	Attack_Unit_ID: null,
-	AttackedBool: 0 }
+// var S_MOVE_data = {
+// 	ID: 17,
+// 	ID_Unit: 16,
+// 	ID_User: 42,
+// 	BaseNumber: 1,
+// 	Level: 2,
+// 	Quality: 3,
+// 	Hea_cur: 5.45,
+// 	Health: 5.45,
+// 	Attack: 2.3,
+// 	Defend: 1.15,
+// 	Position_Cell: '4,4,0',
+// 	Next_Cell: '5,5,0',
+// 	End_Cell: '12,12,0',
+// 	TimeMoveNextCell: '2019-04-01T07:06:13.000Z',
+// 	TimeFinishMove: '2019-04-01T07:06:42.000Z',
+// 	ListMove: '[{"Position_Cell":"5,5,0","Next_Cell":"5,6,0","TimeMoveNextCell":"2019-04-01T07:06:16.021"},{"Position_Cell":"5,6,0","Next_Cell":"6,7,0","TimeMoveNextCell":"2019-04-01T07:06:18.545"},{"Position_Cell":"6,7,0","Next_Cell":"6,8,0","TimeMoveNextCell":"2019-04-01T07:06:21.068"},{"Position_Cell":"6,8,0","Next_Cell":"7,9,0","TimeMoveNextCell":"2019-04-01T07:06:23.592"},{"Position_Cell":"7,9,0","Next_Cell":"7,10,0","TimeMoveNextCell":"2019-04-01T07:06:26.116"},{"Position_Cell":"7,10,0","Next_Cell":"8,11,0","TimeMoveNextCell":"2019-04-01T07:06:28.640"},{"Position_Cell":"8,11,0","Next_Cell":"9,11,0","TimeMoveNextCell":"2019-04-01T07:06:31.440"},{"Position_Cell":"9,11,0","Next_Cell":"10,11,0","TimeMoveNextCell":"2019-04-01T07:06:34.240"},{"Position_Cell":"10,11,0","Next_Cell":"11,11,0","TimeMoveNextCell":"2019-04-01T07:06:37.040"},{"Position_Cell":"11,11,0","Next_Cell":"11,12,0","TimeMoveNextCell":"2019-04-01T07:06:39.564"},{"Position_Cell":"11,12,0","Next_Cell":"12,12,0","TimeMoveNextCell":"2019-04-01T07:06:42.364"}]',
+// 	Status: 1,
+// 	Attack_Base_ID: null,
+// 	Attack_Unit_ID: null,
+// 	AttackedBool: 0 }
 //
 // getDataUpdate (1,S_MOVE_data)
 

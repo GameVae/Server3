@@ -209,7 +209,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 		resolve();
 	}).then(()=>new Promise((resolve,reject)=>{
 		
-		console.log("QualityLost: "+QualityLost);
+		// console.log("QualityLost: "+QualityLost);
 		if (QualityLost>0) {
 			updateMight_Kill (QualityLost,dataAttack,dataDefend);
 		}
@@ -349,7 +349,7 @@ function checkDataAttack (dataCheck) {
 				+"`Attack_Unit_ID`= NULL"
 				+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
 
-				checkAttackedUnit (io,Server_ID,rows[0],dataCheck);
+				checkAttackedUnit (io,Server_ID,dataCheck);
 
 				// checkAttackedUnit(rows[0],dataCheck);
 			}
@@ -380,8 +380,10 @@ exports.CheckAttackedUnit = function checkAttackedUnit2 (io,Server_ID,dataCheck)
 	checkAttackedUnit (io,Server_ID,dataCheck);
 }
 
+// checkAttackedUnit (null,1,'1_16_42_58')
+
 function checkAttackedUnit (io,Server_ID,dataCheck) {
-	// console.log(io,Server_ID,rowData,dataCheck)
+	console.log("dataCheck: "+dataCheck)
 	var posArray = [];
 	var dataAttack = dataCheck;
 
@@ -389,22 +391,29 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 	var dataDefend;
 
 	var attackBool = false;
+	stringHUnit = "s"+Server_ID+"_unit";
+	stringHAttack = "s"+Server_ID+"_attack";
 	
 	new Promise((resolve,reject)=>{
 		position_Check.GetPosition(dataCheck,function (returnPosArray) {
 			posArray = returnPosArray;
+			console.log(posArray)
 			resolve();
 		});
 	}).then(()=>Promise((resolve,reject)=>{
 		client.hget(stringHAttack,dataCheck,function (error,rows) {
 			var result = rows.split("/").filter(String);
 			dataDefendArray = result;
+			console.log('dataDefendArray')
+			console.log(dataDefendArray);
 			resolve();
 		})
 	}).then(()=>new Promise((resolve,reject)=>{
 		client.hmget(stringHUnit,dataDefendArray,function (error,rows) {
+
 			for (var i = 0; i < rows.length; i++) {
-				if (posArray.includes(rows[i].Position_Cell)) {
+				var result = JSON.parse(rows[i]);
+				if (posArray.includes(result.Position_Cell)) {
 					attackBool = true;
 					dataDefend = dataDefendArray[i];
 					setAttackData (Server_ID,dataDefend,dataAttack);
