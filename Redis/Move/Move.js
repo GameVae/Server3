@@ -117,7 +117,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 						if (!!error){DetailError = ('Move.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,2);}
 						logChangeDetail = ("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
 					});
-					updateData.Position_Cell = data.Next_Cell;
+					updateData.Position_Cell = data.End_Cell;
 					updateData.Next_Cell = null;
 					updateData.End_Cell = null;
 					updateData.ListMove = null;
@@ -181,11 +181,14 @@ function checkPositionAttackUnit (io,data,stringKey) {
 		});
 	}).then(()=>new Promise((resolve,reject)=>{
 		// console.log(data.Attack_Unit_ID);
-		client.hget(stringHUnit,data.Attack_Unit_ID,function (error,rows) {
-			var result = JSON.parse(rows)
-			posDefend = result.Position_Cell;
-			resolve();
-		});
+		if (data.Attack_Unit_ID!="NULL") {
+			client.hget(stringHUnit,data.Attack_Unit_ID,function (error,rows) {
+				var result = JSON.parse(rows)
+				posDefend = result.Position_Cell;
+				resolve();
+			});
+		}
+		
 	}).then(()=>new Promise((resolve,reject)=>{
 		// console.log(returnArrayPos,posDefend)
 		if (returnArrayPos.includes(posDefend)) {

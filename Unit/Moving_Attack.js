@@ -209,15 +209,27 @@ function calcMove (io,data,stringUnitMoving) {
 			checkCurrentPosition (io,timeMoveObj,stringPos);
 			checkTimeMoveAttack (io,timeMoveObj,stringUnitMoving);
 		}, timeNextCellAttack, io,timeMoveObj,stringUnitMoving,stringPos);
-
 	}else{
-
-		console.log('checkCurrentPosition ')
-		console.log(data);
-		console.log(new Date().toISOString());
+		// console.log('checkCurrentPosition ')
+		// console.log(data);
+		// console.log(new Date().toISOString());
 		checkCurrentPosition (io,data,stringPos);
-		attackFunc.CheckAttackedUnit(io,data.Server_ID,stringUnitMoving);
-
+		
+		// new Promise((resolve,reject)=>{
+		// 	checkCurrentPosition (io,data,stringPos);
+		// 	resolve();
+		// }).then(()=>new Promise((resolve,reject)=>{
+		// 	var stringHAttack = "s"+data.Server_ID+"_attack";
+		// 	client.hexists(stringHAttack,stringUnitMoving,function (error,result) {
+		// 		console.log(result);
+		// 		if (result==1) {
+		// 			attackFunc.CheckAttackedUnit(io,data.Server_ID,stringUnitMoving);
+		// 		}
+		// 		resolve();
+		// 	});
+		// }))
+		
+		
 		// clearMoveTimeout (stringUnitMoving);		
 	}
 
@@ -258,7 +270,7 @@ function checkCurrentPosition (io,data,pos) {
 								var Attack_ID = unitResult[i].split("_")[2]
 								if (Attack_ID!=data.ID_User) {
 									getAttackData (io,data,unitResult[i]);
-									break;
+									//break;
 								}
 							}
 						}
@@ -310,6 +322,12 @@ function getAttackData (io,data,stringKeyAttack) {
 	}).then(()=>new Promise((resolve,reject)=>{
 		if (attackBool == true) {
 			// console.log('stringKeyDefend:'+stringKeyDefend)
+			if (data.TimeFinishMove==null) {
+				console.log(data);
+				// console.log('hrer')
+				attackFunc.CheckAttackedUnit(io,data.Server_ID,stringKeyDefend);
+			}
+			
 			attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend);
 			resolve();
 		}			

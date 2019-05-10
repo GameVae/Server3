@@ -70,6 +70,8 @@ function getPosition (stringKeyCheck,returnArrayPos) {
 function unitRange1 (row,returnArray) {
 	// console.log(row)
 	var posCenter = row.Position_Cell;
+	// console.log(row)
+	// if (row.TimeMoveNextCell==null) {posCenter = row.End_Cell;}
 	var posX = parseInt(posCenter.split(",")[0]);
 	var posY = parseInt(posCenter.split(",")[1]);
 	var stringKey=[];	
