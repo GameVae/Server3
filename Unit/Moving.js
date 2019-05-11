@@ -36,6 +36,8 @@ exports.Start = function start (io) {
 	});
 }
 
+
+
 function R_MOVE (io,socket,ID_User,Server_ID) {
 	var stringHSocket = "s"+Server_ID+"_socket";
 	client.hgetall(stringHSocket,function (error,rows) {
@@ -83,17 +85,30 @@ function updateDataBase (data) {
 		if (rows[0].Attack_Unit_ID!=null) {
 			updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0]);
 		}
+		if (data.Attack_Unit_ID=="NULL") {
+			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+			+"`Position_Cell`='"+data.Position_Cell+"',"
+			+"`Next_Cell`='"+data.Next_Cell+"',"
+			+"`End_Cell`='"+data.End_Cell+"',"
+			+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+			+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+			+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+			+"`Attack_Unit_ID`= NULL,"
+			+"`Status`='"+functions.UnitStatus.Move+
+			"' WHERE `ID`='"+data.ID+"'";
+		}else{
+			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+			+"`Position_Cell`='"+data.Position_Cell+"',"
+			+"`Next_Cell`='"+data.Next_Cell+"',"
+			+"`End_Cell`='"+data.End_Cell+"',"
+			+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+			+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+			+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+			+"`Attack_Unit_ID`='"+ data.Attack_Unit_ID +"',"
+			+"`Status`='"+functions.UnitStatus.Move+
+			"' WHERE `ID`='"+data.ID+"'";
+		}
 		
-		stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-		+"`Position_Cell`='"+data.Position_Cell+"',"
-		+"`Next_Cell`='"+data.Next_Cell+"',"
-		+"`End_Cell`='"+data.End_Cell+"',"
-		+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-		+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-		+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-		+"`Attack_Unit_ID`='"+ data.Attack_Unit_ID +"',"
-		+"`Status`='"+functions.UnitStatus.Move+
-		"' WHERE `ID`='"+data.ID+"'";
 		// console.log(stringUpdate);
 
 		db_position.query(stringUpdate,function (error,result) {

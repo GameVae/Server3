@@ -107,17 +107,24 @@ exports.ClearIntervalAttack = function clearIntervalAttack2 (ID_User_Defend) {
 	if (DictTimeInterval[ID_User_Defend]!=undefined) {
 		clearInterval(DictTimeInterval[ID_User_Defend]);
 		delete DictTimeInterval[ID_User_Defend];
+		client.hdel(stringHAttack,ID_User_Defend);
 	}
-	client.hdel(stringHAttack,ID_User_Defend);
+	
 }
 
 function clearIntervalAttack (ID_User_Defend) {
 	if (DictTimeInterval[ID_User_Defend]!=undefined) {
 		clearInterval(DictTimeInterval[ID_User_Defend]);
 		delete DictTimeInterval[ID_User_Defend];
-		client.hdel(stringHAttack,ID_User_Defend);
+		stringHAttack = "s"+ID_User_Defend.split("_")[0]+"_attack"
+		client.hdel(stringHAttack ,ID_User_Defend);
 		move.ClearMoveTimeout(ID_User_Defend);
 		moving_Attack.ClearMoveTimeout(ID_User_Defend);
+
+		// stringHAttack = "s"+ID_User_Defend.split("_")[0]+"_attack";
+
+		// removeRedisData(stringHkey,ID_User_Defend,ID_Attack)
+
 	}
 }
 
@@ -202,7 +209,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			client.hdel(stringHAttack,dataDefend);
 			client.hdel(stringHUnit,dataDefend);
 
-			updateAttackData (dataAttack);			
+			updateAttackData (io,dataAttack);			
 			clearIntervalAttack (ID_User_Defend);
 		}
 		resolve();
@@ -284,6 +291,7 @@ function sendToClientAttack (io,socketID,att,dataDefend) {
 	// console.log(att.Attack_Unit_ID)
 	var dataSend ={
 		ID: 			att.ID,
+		ID_User: 		att.ID_User,
 		ID_Unit: 		att.ID_Unit,
 		Quality:        att.Quality,
 		Hea_cur: 		att.Hea_cur,
@@ -296,6 +304,7 @@ function sendToClientAttack (io,socketID,att,dataDefend) {
 function sendToClient (io,socketID,def) {
 	var dataSend ={
 		ID: 			def.ID,
+		ID_User: 		def.ID_User,
 		ID_Unit: 		def.ID_Unit,
 		Quality:        def.Quality,
 		Hea_cur: 		def.Hea_cur,
@@ -313,12 +322,12 @@ function updateMight_Kill (QualityLost,dataAttack,dataDefend) {
 // #end: updateMight_Kill
 
 //#begin: updateAttackData
-function updateAttackData (data) {
+function updateAttackData (io,data) {
 	for (var i = 0; i < data.length; i++) {
-		checkDataAttack (data[i])
+		checkDataAttack (io,data[i])
 	}
 }
-function checkDataAttack (dataCheck) {
+function checkDataAttack (io,dataCheck) {
 	var stringUpdate,stringQuery;
 	// var stringHUnit = "s1_unit"
 	stringQuery = "SELECT * FROM `s"+dataCheck.toString().split("_")[0]+"_unit` WHERE "+
@@ -348,7 +357,7 @@ function checkDataAttack (dataCheck) {
 				+"`Attack_Unit_ID`= NULL"
 				+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
 
-				checkAttackedUnit (io,Server_ID,dataCheck);
+				checkAttackedUnit (io,dataCheck.toString().split("_")[0],dataCheck);
 
 				// checkAttackedUnit(rows[0],dataCheck);
 			}
@@ -382,7 +391,7 @@ exports.CheckAttackedUnit = function checkAttackedUnit2 (io,Server_ID,dataCheck)
 // checkAttackedUnit (null,1,'1_16_42_58')
 
 function checkAttackedUnit (io,Server_ID,dataCheck) {
-	console.log("dataCheck: "+dataCheck)
+	// console.log("dataCheck: "+dataCheck)
 	var posArray = [];
 	var dataAttack = dataCheck;
 
@@ -391,8 +400,10 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 
 	var attackBool = false;
 	var attackDataBool = false;
+
 	stringHUnit = "s"+Server_ID+"_unit";
 	stringHAttack = "s"+Server_ID+"_attack";
+	
 	position_Check.GetPosition(dataCheck,function (returnPosArray) {
 		posArray = returnPosArray;
 		//console.log(posArray)
@@ -492,18 +503,29 @@ function updateDataBaseAttack (Server_ID,dataAttack,dataDefend) {
 }
 // #end: updateAttackData
 //#begin: removeRedisData
+
+// xoa trong redis thoi khi di chuyen
+exports.RemoveRedisData = function removeRedisData2 (stringHkey,stringKeyDefend,ID_Attack) {
+	removeRedisData (stringHkey,stringKeyDefend,ID_Attack);
+}
+
 function removeRedisData (stringHkey,stringKeyDefend,ID_Attack) {
+	// console.log(stringKeyDefend,ID_Attack);
 	client.hexists(stringHkey,stringKeyDefend,function (error,rowsCheck) {
 		if (rowsCheck==1) {
-			client.hget(stringHkey,stringKeyDefend,function (error,rows) {
-				var result = rows.split("/").filter(String);
-				if (result.includes(ID_Attack)) {
-					var stringReplace = rows.replace(ID_Attack+"/","");
-					client.hset(stringHkey,stringKeyDefend,stringReplace);
-					if (stringReplace.length==0) {
-						client.hdel(stringHkey,stringKeyDefend);
+			client.hget(stringHkey,stringKeyDefend,function (error,rows) {				
+				if (rows!=null) {
+					var result = rows.split("/").filter(String);
+					if (result.includes(ID_Attack)) {
+						var stringReplace = rows.replace(ID_Attack+"/","");
+						client.hset(stringHkey,stringKeyDefend,stringReplace);
+						if (stringReplace.length==0) {
+							client.hdel(stringHkey,stringKeyDefend);
+						}
 					}
 				}
+				
+				
 			})
 		}
 	})

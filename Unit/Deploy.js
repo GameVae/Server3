@@ -196,6 +196,7 @@ function insertPosition (io,socket,data,Cellposition) {
 }
 function sendToClient (io,socket,socketID,dataDeploy) {
 		// socket.broadcast.to(socketID).emit('R_DEPLOY',{R_DEPLOY:dataDeploy});
+		// console.log(dataDeploy)
 		io.to(socketID).emit('R_DEPLOY',{R_DEPLOY:dataDeploy});
 }
 // test (1)
