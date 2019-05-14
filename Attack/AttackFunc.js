@@ -1,7 +1,7 @@
 'use strict';
 var getInfo 				= require("./../Info/GetInfo.js");
-var move 					= require('./../Redis/Move/Move.js');
-var moving_Attack 			= require('./../Unit/Moving_Attack.js');
+// var move 					= require('./../Redis/Move/Move.js');
+// var moving_Attack 			= require('./../Unit/Moving_Attack.js');
 
 var position_Check			= require('./../Redis/Position/Position_Check.js');
 
@@ -22,6 +22,33 @@ client.select(functions.RedisData.TestUnit);
 var stringHAttack, stringHUnit;
 var DictTimeInterval={};
 
+// //#begin SetDataMoving
+// exports.SetAttackDataMoving = function setAttackDataMoving2(Server_ID,stringKeyDefend,stringKeyAttack) {
+// 	// console.log(Server_ID,stringKeyDefend,stringKeyAttack)
+// 	setAttackDataMoving(Server_ID,stringKeyDefend,stringKeyAttack);
+// }
+
+// function setAttackDataMoving (Server_ID,ID_Defend,ID_Attack) {
+// 	stringHAttack = "s"+Server_ID+"_attack";
+// 	stringHUnit = "s"+Server_ID+"_unit";
+// 	// console.log(Server_ID,ID_Defend,ID_Attack)
+	
+// 	client.hexists(stringHAttack,ID_Defend,function (error,resultBool) {
+// 		// console.log(resultBool)
+// 		if (resultBool==1) {
+// 			client.hget(stringHAttack,ID_Defend,function (error,result) {
+// 				var resultID = result.split("/").filter(String)
+// 				// console.log("resultID: "+resultID);
+// 				if (!resultID.includes(ID_Attack)) {
+// 					addValue (stringHAttack,ID_Defend,result,ID_Attack);
+// 				}
+// 			});
+// 		}else{
+// 			addValue (stringHAttack,ID_Defend,"",ID_Attack);
+// 		}
+// 	})
+// }
+// //#end SetDataMoving
 //#begin SetData
 exports.SetAttackData = function setAttackData2(Server_ID,stringKeyDefend,stringKeyAttack) {
 	// console.log(Server_ID,stringKeyDefend,stringKeyAttack)
@@ -118,8 +145,8 @@ function clearIntervalAttack (ID_User_Defend) {
 		delete DictTimeInterval[ID_User_Defend];
 		stringHAttack = "s"+ID_User_Defend.split("_")[0]+"_attack"
 		client.hdel(stringHAttack ,ID_User_Defend);
-		move.ClearMoveTimeout(ID_User_Defend);
-		moving_Attack.ClearMoveTimeout(ID_User_Defend);
+		// move.ClearMoveTimeout(ID_User_Defend);
+		// moving_Attack.ClearMoveTimeout(ID_User_Defend);
 
 		// stringHAttack = "s"+ID_User_Defend.split("_")[0]+"_attack";
 

@@ -33,9 +33,9 @@ exports.ClearMoveTimeout = function clearMoveTimeout2 (stringData) {
 }
 
 function clearMoveTimeout (stringData) {
-	if (DictTimeMoveAttack["Unit_Moving_"+stringData]!=undefined) {
-		clearTimeout(DictTimeMoveAttack["Unit_Moving_"+stringData]);
-		delete DictTimeMoveAttack["Unit_Moving_"+stringData];
+	if (DictTimeMoveAttack[stringData]!=undefined) {
+		clearTimeout(DictTimeMoveAttack[stringData]);
+		delete DictTimeMoveAttack[stringData];
 	}
 }
 
@@ -96,11 +96,10 @@ var S_MOVE_data ={ Server_ID: 1,
 function S_MOVE_ATT (io,data) {
 	
 	// console.log(data)
-
-	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-
-	clearMoveTimeout ("Unit_Moving_"+stringUnitMoving);
-	
+	stringUnitMoving = "Unit_Moving_"+data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	// clearMoveTimeout ("Unit_Moving_"+stringUnitMoving);
+	clearMoveTimeout (stringUnitMoving);
+	//clearAttackUnit (stringUnitMoving);
 	var dataMove =  Object.create(data);
 
 	dataMove = {
@@ -119,10 +118,10 @@ function S_MOVE_ATT (io,data) {
 	// console.log(dataMove);
 	// console.log(data);
 	
-	checkCurrentPosition (io,dataMove,dataMove.Position_Cell);
-	checkTimeMoveAttack (io,dataMove,stringUnitMoving);
+	// checkCurrentPosition (io,dataMove,data.Position_Cell);
+	checkTimeMoveAttack (io,dataMove);
 
-	clearAttackUnit (stringUnitMoving);
+	
 	
 	// stringUnitMoving = dataMove.Server_ID+"_"+dataMove.ID_Unit+"_"+dataMove.ID_User+"_"+dataMove.ID;
 	// clearMoveTimeout2 (stringUnitMoving);
@@ -146,24 +145,33 @@ function clearAttackUnit (stringUnitMoving) {
 	})
 }
 
-function checkTimeMoveAttack (io,data,stringUnitMoving) {
+function checkTimeMoveAttack (io,data) {
 	// console.log(data)
+	stringHUnit = "s"+data.Server_ID+"_unit";
+	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	client.hexists(stringHUnit,stringUnitMoving,function (error,rowResult) {
 		if (rowResult==1) {
-			calcMove (io,data,stringUnitMoving);
+			checkCurrentPosition (io,data,data.Position_Cell);
+			if (data.TimeMoveNextCell!=null) {
+
+				// console.log('stringUnitMoving: '+stringUnitMoving)
+				calcMove (io,data,stringUnitMoving);
+			}						
 		}else {
 			clearMoveTimeout(stringUnitMoving);
 		}
 	});	
 }
 
-function calcMove (io,data,stringUnitMoving) {
-	var timeOut,timeCheck,timeNextCellAttack,caseReturn;
-	var stringPos = data.Position_Cell;
+
+function calcMove2 (io,data,stringUnitMoving) {
+	// console.log('stringUnitMoving: '+stringUnitMoving)
+	var timeOut,timeNextCellAttack;
+	var timeCheck = calcTimeCheck (data);
+	var nextCellTime = timeCheck*0.5;
+
+	// console.log(data)
 	var timeMoveObj = Object.create(data);
-	var currentTime = functions.GetTime();
-	
-	caseReturn = 1;
 
 	timeMoveObj = {
 		Server_ID: data.Server_ID,
@@ -178,87 +186,78 @@ function calcMove (io,data,stringUnitMoving) {
 		ListMove: data.ListMove,
 		Attack_Unit_ID: data.Attack_Unit_ID,
 	}
-
-	
-	
-	if (data.TimeMoveNextCell!=null) {
-		// stringPos = data.Next_Cell;
-		checkCurrentPosition (io,timeMoveObj,stringPos);
+	// console.log(timeMoveObj)
+	if (timeMoveObj.TimeMoveNextCell == timeMoveObj.TimeFinishMove||timeMoveObj.Next_Cell == timeMoveObj.End_Cell) {
+		timeNextCellAttack = (functions.ExportTimeDatabase(timeMoveObj.TimeMoveNextCell) - functions.GetTime())*0.5;	
+		timeMoveObj.Position_Cell = data.End_Cell;
+		timeMoveObj.Next_Cell = null;
+		timeMoveObj.End_Cell = null;
+		timeMoveObj.TimeMoveNextCell = null;
+		timeMoveObj.TimeFinishMove = null;
+		timeMoveObj.ListMove = null;
 		
-		timeOut = functions.ExportTimeDatabase(data.TimeMoveNextCell) - currentTime;
-
-		var Position_Cell_X = data.Position_Cell.split(',')[0];
-		var Position_Cell_Y = data.Position_Cell.split(',')[1];
-		var Next_Cell_X = data.Next_Cell.split(',')[0];
-		var Next_Cell_Y = data.Next_Cell.split(',')[1];
-
-		if (Position_Cell_X != Next_Cell_X && Position_Cell_Y != Next_Cell_Y) {caseReturn = 2;}
-
-		switch (caseReturn) {
-			case 1:
-			timeCheck = functions.TimeMove.Straight;
-			break;
-			case 2:
-			timeCheck = functions.TimeMove.Diagonal;
-			break;
-		}
-
-		if (timeOut>timeCheck) {
-			timeNextCellAttack = timeOut - (timeCheck*0.5);
-		}else if (timeOut==timeCheck){
-			timeNextCellAttack = (timeCheck*0.5);
-		}else {
-			timeNextCellAttack = timeOut;
-		}
-
-		// console.log('data.ListMove.length: '+data.ListMove.length)
-		if (data.ListMove.length>0) {			
-			timeMoveObj.Position_Cell = data.Next_Cell;
-			timeMoveObj.Next_Cell = data.ListMove[0].Next_Cell;
-			timeMoveObj.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
-			timeMoveObj.ListMove.shift();
-		}else {
-			timeMoveObj.Position_Cell = data.End_Cell;
-			timeMoveObj.Next_Cell = null;
-			timeMoveObj.End_Cell = null;
-			timeMoveObj.ListMove = null;
-			timeMoveObj.TimeMoveNextCell = null;
-			timeMoveObj.TimeFinishMove = null;							
-		}
-		
-		DictTimeMoveAttack["Unit_Moving_"+stringUnitMoving] = setTimeout(function (io,timeMoveObj,stringUnitMoving,stringPos) {
-			checkCurrentPosition (io,timeMoveObj,stringPos);
-			checkTimeMoveAttack (io,timeMoveObj,stringUnitMoving);
-		}, timeNextCellAttack, io,timeMoveObj,stringUnitMoving,stringPos);
 	}else{
-		// console.log('checkCurrentPosition ')
-		// console.log(data);
-		// console.log(new Date().toISOString());
-		// console.log(stringPos,data.End_Cell)
-		checkCurrentPosition (io,data,stringPos);
-		
-		// new Promise((resolve,reject)=>{
-		// 	checkCurrentPosition (io,data,stringPos);
-		// 	resolve();
-		// }).then(()=>new Promise((resolve,reject)=>{
-		// 	var stringHAttack = "s"+data.Server_ID+"_attack";
-		// 	client.hexists(stringHAttack,stringUnitMoving,function (error,result) {
-		// 		console.log(result);
-		// 		if (result==1) {
-		// 			attackFunc.CheckAttackedUnit(io,data.Server_ID,stringUnitMoving);
-		// 		}
-		// 		resolve();
-		// 	});
-		// }))
-		
-		
-		// clearMoveTimeout (stringUnitMoving);		
+		if (timeMoveObj.ListMove.length>0) {
+			console.log('timeMoveObj.ListMove.length: '+timeMoveObj.ListMove.length)
+			timeMoveObj.Position_Cell = data.Next_Cell;
+			timeMoveObj.Next_Cell = data.ListMove[0].Position_Cell;
+			timeMoveObj.End_Cell = data.End_Cell;
+			timeMoveObj.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;			
+		}else {
+			console.log(data)
+			timeMoveObj.Position_Cell = data.Next_Cell;
+			timeMoveObj.Next_Cell = data.End_Cell;
+			timeMoveObj.End_Cell = data.End_Cell;
+			timeMoveObj.TimeMoveNextCell = data.TimeFinishMove;
+			timeMoveObj.ListMove = null;
+		}
+		if (timeMoveObj.ListMove==null ||timeMoveObj.ListMove==[]) {
+			console.log('timeMoveObj.ListMove '+timeMoveObj.ListMove)
+		}
 	}
+
+
+	if (timeMoveObj.TimeMoveNextCell!=null) {
+		timeOut = functions.ExportTimeDatabase(timeMoveObj.TimeMoveNextCell) - functions.GetTime();
+		if (timeOut > timeCheck) {			
+			timeNextCellAttack = timeOut - nextCellTime;
+		}else if (timeOut == timeCheck) {
+			timeNextCellAttack = nextCellTime;
+		}
+	}
+
+
+	// console.log('timeOut: '+timeOut);
+	// console.log('timeCheck: '+timeCheck);
+	console.log("timeNextCellAttack: "+timeNextCellAttack);
+	// console.log(timeMoveObj)
+
+	DictTimeMoveAttack[stringUnitMoving] = setTimeout(function (io,timeMoveObj) {
+		checkTimeMoveAttack (io,timeMoveObj)
+	}, timeNextCellAttack,io,timeMoveObj);
 
 }
 
+function calcTimeCheck (data) {
+	var timeCheck;
+	var Position_Cell_X = data.Position_Cell.split(',')[0];
+	var Position_Cell_Y = data.Position_Cell.split(',')[1];
+	var Next_Cell_X = data.Next_Cell.split(',')[0];
+	var Next_Cell_Y = data.Next_Cell.split(',')[1];
+	var caseReturn =1;
+	if (Position_Cell_X != Next_Cell_X && Position_Cell_Y != Next_Cell_Y) {caseReturn = 2;}
+	switch (caseReturn) {
+		case 1:
+		timeCheck = functions.TimeMove.Straight;
+		break;
+		case 2:
+		timeCheck = functions.TimeMove.Diagonal;
+		break;
+	}
+	return timeCheck;
+}
+
 function checkCurrentPosition (io,data,pos) {
-	// check unit co ton tai khong
 	console.log(new Date().toISOString()+"_"+pos);
 
 	stringHPos = "s"+data.Server_ID+"_pos";
@@ -267,47 +266,75 @@ function checkCurrentPosition (io,data,pos) {
 	// var stringHUnit = "s"+data.Server_ID+"_unit";
 	// var pos = data.Position_Cell;
 	var unitBool = false;
-	new Promise((resolve,reject)=>{
-		client.hexists(stringHUnit,stringUnitMoving,function (error,rowBool) {
-			if (rowBool==1) {
-				unitBool = true;
-			}else{
-				clearMoveTimeout (stringUnitMoving);
-				return null;
-			}
-			resolve();
-		});
-	}).then(()=>new Promise((resolve,reject)=>{		
-		
-		if (unitBool == true) {
+	client.hexists(stringHPos,pos,function (error,resultPos) {				
+		if (resultPos==1) {
+			// add moi
+			attackFunc.ClearIntervalAttack(stringUnitMoving);
+			// 
+			client.hget(stringHPos,pos,function (error,rowsUnit) {
+				// console.log(rowsUnit)
+				if (rowsUnit!=null) {
+					var unitResult = rowsUnit.split("/").filter(String);
 
-			client.hexists(stringHPos,pos,function (error,resultPos) {				
-				if (resultPos==1) {
-					client.hget(stringHPos,pos,function (error,rowsUnit) {
-						// console.log(rowsUnit)
-						if (rowsUnit!=null) {
-							var unitResult = rowsUnit.split("/").filter(String);
-
-							for (var i = 0; i < unitResult.length; i++) {
-								var Attack_ID = unitResult[i].split("_")[2]
-								if (Attack_ID!=data.ID_User) {
-
-									getAttackData (io,data,unitResult[i]);
-									break;
-								}
-							}
+					for (var i = 0; i < unitResult.length; i++) {
+						var Attack_ID = unitResult[i].split("_")[2]
+						if (Attack_ID!=data.ID_User) {
+							getAttackData (io,data,unitResult[i]);
+							// break;
 						}
-					})
-
-				}else{
-					attackFunc.ClearIntervalAttack(stringUnitMoving);
+					}
 				}
+			})
 
-			});	
+		}else{
+			attackFunc.ClearIntervalAttack(stringUnitMoving);
 		}
-	})
+	});
 
-	)
+	// new Promise((resolve,reject)=>{
+
+	// 	client.hexists(stringHUnit,stringUnitMoving,function (error,rowBool) {
+	// 		if (rowBool==1) {
+	// 			unitBool = true;
+	// 		}else{
+	// 			clearMoveTimeout ("Unit_Moving_"+stringUnitMoving);
+	// 			return null;
+	// 		}
+	// 		resolve();
+	// 	});
+	// }).then(()=>new Promise((resolve,reject)=>{		
+
+	// 	if (unitBool == true) {
+
+	// 		client.hexists(stringHPos,pos,function (error,resultPos) {				
+	// 			if (resultPos==1) {
+	// 				//add moi
+	// 				attackFunc.ClearIntervalAttack(stringUnitMoving);
+	// 				//				
+	// 				client.hget(stringHPos,pos,function (error,rowsUnit) {
+	// 					// console.log(rowsUnit)
+	// 					if (rowsUnit!=null) {
+	// 						var unitResult = rowsUnit.split("/").filter(String);
+
+	// 						for (var i = 0; i < unitResult.length; i++) {
+	// 							var Attack_ID = unitResult[i].split("_")[2]
+	// 							if (Attack_ID!=data.ID_User) {
+	// 								getAttackData (io,data,unitResult[i]);
+	// 								// break;
+	// 							}
+	// 						}
+	// 					}
+	// 				})
+
+	// 			}else{
+	// 				attackFunc.ClearIntervalAttack(stringUnitMoving);
+	// 			}
+
+	// 		});	
+	// 	}
+	// })
+
+	// )
 }
 // getAttackData (S_MOVE_data,stringKeyAttack)
 function getAttackData (io,data,stringKeyAttack) {
@@ -345,7 +372,7 @@ function getAttackData (io,data,stringKeyAttack) {
 	}).then(()=>new Promise((resolve,reject)=>{
 		if (attackBool == true) {
 			// console.log('stringKeyDefend:'+stringKeyDefend)
-			console.log(data.TimeFinishMove)
+			// console.log(data.TimeFinishMove)
 			if (data.TimeFinishMove==null) {
 				// console.log(data);
 				// console.log('hrer')

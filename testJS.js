@@ -1,6 +1,6 @@
 // // // 
 
-// // // var functions 			= require('./Util/Functions.js');
+// // // 
 // // // var DetailError;
 
 // // // var dataTest={
@@ -953,24 +953,79 @@
 // console.log(Object.keys(socketList)[0]);
 // console.log(Object.values(socketList)[0])
 
-var redis 				= require("redis"),
-client 					= redis.createClient();
-client.select(2);
-var stringHUnit,stringHAttack;
+// var redis 				= require("redis"),
+// client 					= redis.createClient();
+// client.select(2);
+// var stringHUnit,stringHAttack;
 
-var dataAttack = [ '1_16_9_9', '1_16_9_10' ]
-test ()
-function test () {
-	stringHAttack = "s1_attack";
-	stringHUnit = "s1_unit";
-	var stringDefend = "1_16_42_25";
-	client.hget(stringHAttack,stringDefend,function (error,rows) {
-		if (!!error) {console.log(error);}
-		var result = rows.split("/").filter(String);
-		// console.log(result)
-		for (var i = 0; i < result.length; i++) {
-			result[i]
-		}
-	});
-}
+// var dataAttack = [ '1_16_9_9', '1_16_9_10' ]
+// test ()
+// function test () {
+// 	stringHAttack = "s1_attack";
+// 	stringHUnit = "s1_unit";
+// 	var stringDefend = "1_16_42_25";
+// 	client.hget(stringHAttack,stringDefend,function (error,rows) {
+// 		if (!!error) {console.log(error);}
+// 		var result = rows.split("/").filter(String);
+// 		// console.log(result)
+// 		for (var i = 0; i < result.length; i++) {
+// 			result[i]
+// 		}
+// 	});
+// }
+var data ={ Server_ID: 1,
+  ID: 67,
+  ID_Unit: 16,
+  ID_User: 42,
+  Position_Cell: '7,12,0',
+  Next_Cell: '8,11,0',
+  End_Cell: '10,9,0',
+  TimeMoveNextCell: '2019-05-13T10:03:16.033',
+  TimeFinishMove: '2019-05-13T10:03:19.957',
+  ListMove:
+   [ { Position_Cell: '8,11,0',
+       Next_Cell: '8,10,0',
+       TimeMoveNextCell: '2019-05-13T10:03:17.295' },
+     { Position_Cell: '8,10,0',
+       Next_Cell: '9,9,0',
+       TimeMoveNextCell: '2019-05-13T10:03:18.557' },
+     { Position_Cell: '9,9,0',
+       Next_Cell: '10,9,0',
+       TimeMoveNextCell: '2019-05-13T10:03:19.957' } ],
+  Attack_Unit_ID: 'NULL' }
+//
 
+var functions 			= require('./Util/Functions.js');
+
+var a = functions.ExportTimeDatabase('2019-05-14T09:11:18.047')-functions.GetTime();
+var b = functions.ExportTimeDatabase('2019-05-14T09:11:18.396')-functions.GetTime();
+console.log(a,b)
+console.log(b-a)
+
+// if (data.TimeMoveNextCell == data.TimeFinishMove||data.Next_Cell == data.End_Cell) {
+// 			timeMoveObj.Position_Cell = data.End_Cell;
+// 			timeMoveObj.Next_Cell = null;
+// 			timeMoveObj.End_Cell = null;
+// 			timeMoveObj.TimeMoveNextCell = null;
+// 			timeMoveObj.TimeFinishMove = null;
+// 			timeMoveObj.ListMove = null;
+// 			// timeNextCellAttack = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime() - (timeCheck*0.5);
+			
+// 		}else{
+// 			if (data.ListMove.length>0) {
+// 				timeMoveObj.Position_Cell = data.Next_Cell;
+		// 		timeMoveObj.Next_Cell = data.ListMove[0].Next_Cell;
+		// 		timeMoveObj.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
+		// 		// timeNextCellAttack = functions.ExportTimeDatabase(data.ListMove[0].TimeMoveNextCell)-functions.ExportTimeDatabase(data.TimeMoveNextCell)
+		// 		// console.log(functions.ExportTimeDatabase(data.ListMove[0].TimeMoveNextCell))
+		// 		// console.log(functions.ExportTimeDatabase(data.TimeMoveNextCell))
+		// 		// console.log('timeNextCellAttack2: '+timeNextCellAttack)
+		// 		data.ListMove.shift();
+		// 		timeMoveObj.ListMove = data.ListMove;
+		// 		// if (timeNextCellAttack==2800) {
+		// 		// 	console.log('data.ListMove[0].TimeMoveNextCell: '+data.ListMove[0].TimeMoveNextCell)
+		// 		// 	console.log('data.TimeMoveNextCell: '+data.TimeMoveNextCell)
+		// 		// 	console.log(data)
+		// 		// }
+		// 	}
+		// }
