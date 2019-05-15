@@ -1,0 +1,86 @@
+
+ logChangeDetail: 2019-05-15T01:26:23.491Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:26:23.498Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:26:23.493Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:26:23.496Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:26:33.553Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:27:33.188Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:27:33.190Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:27:33.193Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:27:33.195Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:27:42.412Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:27:42.413Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:27:42.416Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:27:42.418Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:27:47.695Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:31:37.787Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:31:37.790Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:31:37.792Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:31:37.794Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:31:44.507Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:31:56.655Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:31:56.656Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:31:56.659Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:31:56.661Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:32:03.805Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:32:03.807Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:32:03.810Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:32:03.813Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:32:15.038Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:32:15.040Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:32:15.043Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:32:15.046Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:32:21.577Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:34:45.228Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:34:45.231Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:34:45.233Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:34:45.236Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:34:53.939Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:37:26.017Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:37:26.018Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:37:26.020Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:37:26.023Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:37:36.994Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:40:17.560Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:40:17.562Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:40:17.565Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:40:17.567Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:40:29.378Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:40:44.933Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:40:46.976Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:40:46.978Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:40:46.981Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:40:46.983Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:46:04.495Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:46:04.498Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:46:04.501Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:46:04.503Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:46:20.490Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:50:30.258Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:50:30.261Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:50:30.263Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:50:30.265Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:50:41.139Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:52:09.886Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:52:09.894Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:52:09.895Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:52:09.895Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:52:20.759Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:52:38.825Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:52:38.827Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:52:38.830Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:52:38.832Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:54:38.164Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:54:38.167Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:54:38.169Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:54:38.172Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:54:49.455Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-05-15T01:55:08.778Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:55:08.780Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:55:08.783Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:55:08.786Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:58:39.916Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-15T01:58:39.918Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-15T01:58:39.920Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-15T01:58:39.923Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-15T01:58:48.548Z: Login.js: queryUserNamePass: ndinhtoan45
