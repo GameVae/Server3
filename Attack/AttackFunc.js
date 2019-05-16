@@ -16,6 +16,7 @@ var redis 					= require("redis"),
 client 						= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
+var counter = 1.2;
 
 
 
@@ -135,8 +136,7 @@ exports.ClearIntervalAttack = function clearIntervalAttack2 (ID_User_Defend) {
 		clearInterval(DictTimeInterval[ID_User_Defend]);
 		delete DictTimeInterval[ID_User_Defend];
 		client.hdel(stringHAttack,ID_User_Defend);
-	}
-	
+	}	
 }
 
 function clearIntervalAttack (ID_User_Defend) {
