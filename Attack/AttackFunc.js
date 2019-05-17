@@ -23,33 +23,6 @@ var counter = 1.2;
 var stringHAttack, stringHUnit;
 var DictTimeInterval={};
 
-// //#begin SetDataMoving
-// exports.SetAttackDataMoving = function setAttackDataMoving2(Server_ID,stringKeyDefend,stringKeyAttack) {
-// 	// console.log(Server_ID,stringKeyDefend,stringKeyAttack)
-// 	setAttackDataMoving(Server_ID,stringKeyDefend,stringKeyAttack);
-// }
-
-// function setAttackDataMoving (Server_ID,ID_Defend,ID_Attack) {
-// 	stringHAttack = "s"+Server_ID+"_attack";
-// 	stringHUnit = "s"+Server_ID+"_unit";
-// 	// console.log(Server_ID,ID_Defend,ID_Attack)
-	
-// 	client.hexists(stringHAttack,ID_Defend,function (error,resultBool) {
-// 		// console.log(resultBool)
-// 		if (resultBool==1) {
-// 			client.hget(stringHAttack,ID_Defend,function (error,result) {
-// 				var resultID = result.split("/").filter(String)
-// 				// console.log("resultID: "+resultID);
-// 				if (!resultID.includes(ID_Attack)) {
-// 					addValue (stringHAttack,ID_Defend,result,ID_Attack);
-// 				}
-// 			});
-// 		}else{
-// 			addValue (stringHAttack,ID_Defend,"",ID_Attack);
-// 		}
-// 	})
-// }
-// //#end SetDataMoving
 //#begin SetData
 exports.SetAttackData = function setAttackData2(Server_ID,stringKeyDefend,stringKeyAttack) {
 	// console.log(Server_ID,stringKeyDefend,stringKeyAttack)
