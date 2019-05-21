@@ -34,7 +34,9 @@ exports.GetFriendData = function getFriendData () {
 // 		}
 // 	})
 // }
-
+exports.SetFriendData = function setDataBase2 (TABLE_NAME) {
+	setDataBase (TABLE_NAME);
+}
 function setDataBase (TABLE_NAME) {
 	var stringHkey = "all_friends";
 	var queryStringFriend = "SELECT * FROM `"+TABLE_NAME+"`";
@@ -76,6 +78,7 @@ exports.RemoveValueFriend = function removeValueFriend (stringKey,ID_Key) {
 	removeValue (stringHkey,stringKey,ID_Key);
 }
 function removeValue (stringHkey,stringKey,ID_Key) {
+	
 	client.hget(stringHkey,stringKey,function (error,rows) {
 		var result = rows.split("/");
 		if (result.includes(ID_Key)) {

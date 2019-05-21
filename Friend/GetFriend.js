@@ -2,13 +2,16 @@
 
 var db_friend		= require('./../Util/Database/Db_all_friend.js');
 var db_all_user		= require('./../Util/Database/Db_all_user.js');
+
+var friendData 		= require('./../Redis/Friend/FriendData.js');
+
 var functions 		= require('./../Util/Functions.js');
 
 var DetailError, LogChange;
 
 var dataFriend ={
- ID_User: 	42,
- ID_Player: 43, 
+	ID_User: 	43,
+	ID_Player: 42, 
 }
 var timeAccept 		= 24*60*60*1000;// 24h
 var timeUnfriend 	= 30*60*1000;// 30 phut
@@ -26,16 +29,19 @@ client.select(functions.RedisData.TestUnit);
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_ADD_FRIEND', function (data){
-			S_ADD_FRIEND (io,data);
+			
+			S_ADD_FRIEND (io,data.S_ADD_FRIEND);
 		});
 		socket.on('S_ACCEPT_FRIEND',function (data) {
-			S_ACCEPT_FRIEND(io,data);
+			
+			S_ACCEPT_FRIEND(io,data.S_ACCEPT_FRIEND);
 		});
 		socket.on('S_REJECT_FRIEND',function (data) {
-			S_REJECT_FRIEND(io,data);
+			S_REJECT_FRIEND(io,data.S_REJECT_FRIEND);
 		});
-		socket.on('S_UNFRIEND',function (socket,data) {
-			S_UNFRIEND(io,data);
+
+		socket.on('S_UNFRIEND',function (data) {			
+			S_UNFRIEND(io,data.S_UNFRIEND);
 		});
 
 	});
@@ -48,15 +54,17 @@ exports.Start = function start (io) {
 function S_ADD_FRIEND (io,data) {
 	timeOut = functions.GetTime()+timeAccept;
 	
-	var stringInsert = "INSERT INTO `"+data.ID_User+"` (`ID_Player`, `AcceptTime`) VALUES ("+
-	"'"+data.ID_Player+"',"+
+	var stringInsert = "INSERT INTO `"+data.ID_User+"` (`ID_Player`, `RequestBool`,`AcceptTime`) VALUES ("+
+	"'"+data.ID_Player+"',"
+	+"'1',"+
 	"'"+functions.ImportTimeToDatabase(new Date(timeOut).toISOString())+"');"+
-	"INSERT INTO `"+data.ID_Player+"` (`ID_Player`, `AcceptTime`) VALUES ("+
-	"'"+data.ID_User+"',"+
+	"INSERT INTO `"+data.ID_Player+"` (`ID_Player`, `RequestBool`,`AcceptTime`) VALUES ("+
+	"'"+data.ID_User+"',"
+	+"'0',"+
 	"'"+functions.ImportTimeToDatabase(new Date(timeOut).toISOString())+"');";
 
 	db_friend.query(stringInsert, function (error,result) {
-		if (!!error){DetailError = ('GetFriend.js: stringInsert ' + stringInsert);functions.WriteLogError(DetailError,2);}		
+		if (!!error){DetailError = ('GetFriend.js: stringInsert S_ADD_FRIEND' + stringInsert);functions.WriteLogError(DetailError,2);}		
 	});
 	setTimeoutAddFriend (data,timeOut);
 
@@ -92,12 +100,13 @@ function setTimeoutAddFriend (data,timeOut) {
 		var stringQuery = "SELECT * FROM `"+data.ID_User+"` WHERE `ID_Player`="+data.ID_Player;
 		db_friend.query(stringQuery, function (error,rows) {
 			if (!!error){DetailError = ('GetFriend.js: setTimeoutAddFriend');functions.WriteLogError(DetailError,2);}
-			if (rows!=undefined) {
-				if (rows[0].AcceptTime!=null) {
+			if (rows[0]!=undefined) {
+				if (rows[0].AcceptTime!=undefined) {
 					var databaseTime = new Date(functions.ExportTimeDatabase(rows[0].AcceptTime)).getTime();
 					var currentTime = functions.GetTime();
 					if (databaseTime<=currentTime) {
-						removeAddFriend (ID_User,ID_Player);
+						console.log(data);
+						removeAddFriend (data.ID_User,data.ID_Player);
 						delete DictRemoveAddFriend[stringAddFriend];
 					}else{
 						var timeNext = currentTime - databaseTime;
@@ -110,8 +119,9 @@ function setTimeoutAddFriend (data,timeOut) {
 }
 
 function removeAddFriend (ID_User,ID_Player) {
-	var stringQuery = "DELETE FROM `"+ID_User+"` WHERE `ID_Player`="+ID_Player+";"+
+	var stringQuery = "DELETE FROM `"+ID_User+"` WHERE `ID_Player`='"+ID_Player+"';"+
 	"DELETE FROM `"+ID_Player+"` WHERE `ID_Player`="+ID_User;
+	// console.log(stringQuery)
 	db_friend.query(stringQuery,function (error,result) {
 		if (!!error){DetailError = ('GetFriend.js: removeAddFriend '+ID_User);functions.WriteLogError(DetailError,2);}
 		LogChange='GetFriend.js: removeAddFriend: '+ID_User;functions.LogChange(LogChange,1);
@@ -119,7 +129,7 @@ function removeAddFriend (ID_User,ID_Player) {
 }
 
 function S_ACCEPT_FRIEND(io,data){
-	var stringQuery = "UPDATE `"+data.ID_User+"` SET `AcceptTime`=null,`RemoveTime`=null ;"+
+	var stringQuery = "UPDATE `"+data.ID_User+"` SET `RequestBool`='0', `AcceptTime`=null,`RemoveTime`=null ;"+
 	"UPDATE `"+data.ID_Player+"` SET `AcceptTime`=null,`RemoveTime`=null;";
 	db_friend.query(stringQuery,function (error,result) {
 		if (!!error){DetailError = ('GetFriend.js: S_ACCEPT_FRIEND '+data.ID_User);functions.WriteLogError(DetailError,2);}
@@ -138,6 +148,9 @@ function S_ACCEPT_FRIEND(io,data){
 	});
 
 	removeAddFriendWaitTime (data);
+	//add Redis Data
+	friendData.SetFriendData(data.ID_User);
+	friendData.SetFriendData(data.ID_Player);
 }
 
 function removeAddFriendWaitTime (data) {
@@ -156,7 +169,8 @@ function removeAddFriendWaitTime (data) {
 function S_UNFRIEND (io,data) {
 	timeOut = functions.GetTime()+timeUnfriend;
 	var timeUnfriendData = functions.ImportTimeToDatabase(new Date(timeOut).toISOString());
-	var stringQuery ="UPDATE `"+data.ID_User+"` SET `RemoveTime`="+timeUnfriendData+";"+
+	console.log(data)
+	var stringQuery ="UPDATE `"+data.ID_User+"` SET `RequestBool`='0',`RemoveTime`="+timeUnfriendData+";"+
 	"UPDATE `"+data.ID_Player+"` SET `RemoveTime`="+timeUnfriendData+";";
 	db_friend.query(stringQuery,function (error,result) {
 		if (!!error){DetailError = ('GetFriend.js: S_UNFRIEND '+data.ID_User+"_"+data.ID_Player);functions.WriteLogError(DetailError,2);}
@@ -164,9 +178,12 @@ function S_UNFRIEND (io,data) {
 
 		var stringUnfriend1 = data.ID_User+"_"+data.ID_Player;
 		var stringUnfriend2 = data.ID_Player+"_"+data.ID_User;
+		//remove Redis data
 		deleteUnfriendData (io,stringUnfriend1,data.ID_User,data.ID_Player,timeOut);
 		deleteUnfriendData (io,stringUnfriend2,data.ID_Player,data.ID_User,timeOut);
-
+		
+		friendData.RemoveValueFriend(data.ID_User,data.ID_Player);
+		friendData.RemoveValueFriend(data.ID_Player,data.ID_User);
 
 		var playerID = "SELECT `Socket` FROM `user_info` WHERE `ID_User` = "+data.ID_Player;
 		db_all_user.query(playerID,function (error,rows) {
@@ -197,7 +214,6 @@ function deleteUnfriendData (io,stringUnfriend,ID_User,ID_Player,timeOut) {
 							LogChange='GetFriend.js: deleteUnfriendData: '+ID_User+"_"+ID_Player;functions.LogChange(LogChange,1);
 						});
 						delete DictTimeOut[stringUnfriend];
-
 						
 					}else{
 						var nextTimeOut = databaseTime-currentTime;
@@ -218,15 +234,21 @@ function getFriendInfo (socket,ID_User) {
 	var stringQuery = "SELECT * FROM `"+ID_User+"`";
 	db_friend.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('GetFriend.js: GetFriendInfo '+ID_User);functions.WriteLogError(DetailError,2);}
-		var currentTime = functions.GetTime();
-		if (rows[0].AcceptTime!=null) {
-			rows[0].AcceptTime = (functions.ExportTimeDatabase(rows[0].AcceptTime) - currentTime)*0.001;
+		if (rows[0]!=undefined) {
+			var currentTime = functions.GetTime();
+			if (rows[0].AcceptTime!=null) {
+				rows[0].AcceptTime = (functions.ExportTimeDatabase(rows[0].AcceptTime) - currentTime)*0.001;
+			}
+			if (rows[0].RemoveTime!=null) {
+				rows[0].RemoveTime = (functions.ExportTimeDatabase(rows[0].RemoveTime) - currentTime)*0.001;
+			}
+			// console.log(rows)
+			socket.emit('R_FRIEND_INFO',{R_FRIEND_INFO:rows});
+		}else {
+			socket.emit('R_FRIEND_INFO',{R_FRIEND_INFO:[]});
 		}
-		if (rows[0].RemoveTime!=null) {
-			rows[0].RemoveTime = (functions.ExportTimeDatabase(rows[0].RemoveTime) - currentTime)*0.001;
-		}
-		console.log(rows)
-		// socket.emit('R_FRIEND_INFO',{R_FRIEND_INFO:rows});
+
+
 	});
 }
 exports.UpdateDatabase = function updateDatabase () {
@@ -277,13 +299,11 @@ function updateRemoveTime (rowdata) {
 	if (currentTime<=databaseTime) {
 		removeAddFriend (rowdata.ID_User,rowdata.ID_Player)
 	}else{
-
 		timeOut = databaseTime-currentTime;
 		var stringUnfriend1 = rowdata.ID_User+"_"+rowdata.ID_Player;
 		var stringUnfriend2 = rowdata.ID_Player+"_"+rowdata.ID_User;
 		deleteUnfriendData (stringUnfriend1,rowdata.ID_User,rowdata.ID_Player,timeOut);
-		deleteUnfriendData (stringUnfriend2,rowdata.ID_Player,rowdata.ID_User,timeOut);
-		
+		deleteUnfriendData (stringUnfriend2,rowdata.ID_Player,rowdata.ID_User,timeOut);		
 	}
 
 }
