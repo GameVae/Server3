@@ -65,6 +65,7 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 		if (!!error){DetailError = ('Login.js: S_USER_INFO queryUser :'+ queryString); functions.WriteLogError(DetailError,1);}
 		dataUser= rows[0];
 		delete dataUser.ID;
+		
 		getFriend.GetFriendInfo(socket,dataUser.ID_User);
 
 		taskServer.ConnectSocket(socket.id,ID_User);
@@ -92,6 +93,8 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 
 			getRss.R_GET_RSS(socket,dataUser.Server_ID);
 			getPosition.R_GET_POSITION(socket,dataUser.Server_ID);
+
+
 			data=[];
 			data.push(dataUser);
 			socket.emit('R_USER_INFO',{R_USER_INFO:data});

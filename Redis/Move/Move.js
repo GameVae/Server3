@@ -76,21 +76,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 			updateDatabase (updateData);
 			// updateRedisData (stringKey,updateData,Position_Cell);
 			setTimerUpdateDatabase (io,socket,updateData,stringKey);
-
-			// if (updateData.Next_Cell!=data.ListMove[0].Position_Cell) {
-			// 	DetailError = ('Move.js: setTimerUpdateDatabase: '+stringKey); functions.WriteLogError(DetailError,2);
-			// 	// console.log(updateData)
-			// 	// console.log(updateData.Next_Cell,data.ListMove[0].Position_Cell)
-			// }else{
-			// 	updateData.Position_Cell = data.Next_Cell;
-			// 	updateData.Next_Cell = data.ListMove[0].Next_Cell;
-			// 	updateData.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
-			// 	updateData.ListMove.shift();
-			// 	// console.log(updateData.ListMove)
-			// 	updateDatabase (updateData);
-			// 	// updateRedisData (stringKey,updateData,Position_Cell);
-			// 	setTimerUpdateDatabase (io,socket,updateData,stringKey);
-			// }
+			
 		}else{	
 			checkPosition (updateData,function (returnBool) {
 				if (returnBool) {

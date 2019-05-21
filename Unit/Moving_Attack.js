@@ -333,100 +333,8 @@ function checkCurrentPosition (io,data,pos) {
 	}))
 	);
 
-	// new Promise((resolve,reject)=>{
-	// 	client.hexists(stringHPos,pos,function (error,resultPos) {
-	// 		if (resultPos==1) {
-	// 			posBool = true;
-	// 		}else{
-	// 			attackFunc.ClearIntervalAttack(stringUnitMoving);
-	// 		}
-	// 		resolve();
-	// 	});
-	// }).then(()=>new Promise((resolve,reject)=>{
-	// 	if (posBool == true) {
-	// 		client.hget(stringHPos,pos,function (error,rowsUnit) {
-	// 			var unitResult = rowsUnit.split("/").filter(String);
-	// 			for (var i = 0; i < unitResult.length; i++) {
-	// 				var Attack_ID = unitResult[i].split("_")[2];
-	// 				if (Attack_ID!=data.ID_User) {
-	// 					getAttackData (io,data,unitResult[i]);
-	// 					// break;
-	// 				}
-	// 			}
-	// 		});
-	// 	}
-	// })
-	// );
-	
-
-	// client.hexists(stringHPos,pos,function (error,resultPos) {				
-	// 	if (resultPos==1) {
-	// 		// // add moi
-	// 		// attackFunc.ClearIntervalAttack(stringUnitMoving);
-	// 		// // 
-	// 		client.hget(stringHPos,pos,function (error,rowsUnit) {
-	// 			// console.log(rowsUnit)
-	// 			if (rowsUnit!=null) {
-	// 				var unitResult = rowsUnit.split("/").filter(String);
-
-	// 				for (var i = 0; i < unitResult.length; i++) {
-	// 					var Attack_ID = unitResult[i].split("_")[2]
-	// 					if (Attack_ID!=data.ID_User) {
-	// 						getAttackData (io,data,unitResult[i]);
-	// 						break;
-	// 					}
-	// 				}
-	// 			}
-	// 		})
-
-	// 	}else{
-	// 		attackFunc.ClearIntervalAttack(stringUnitMoving);
-	// 	}
-	// });
-
-	// new Promise((resolve,reject)=>{
-
-	// 	client.hexists(stringHUnit,stringUnitMoving,function (error,rowBool) {
-	// 		if (rowBool==1) {
-	// 			unitBool = true;
-	// 		}else{
-	// 			clearMoveTimeout ("Unit_Moving_"+stringUnitMoving);
-	// 			return null;
-	// 		}
-	// 		resolve();
-	// 	});
-	// }).then(()=>new Promise((resolve,reject)=>{		
-
-	// 	if (unitBool == true) {
-
-	// 		client.hexists(stringHPos,pos,function (error,resultPos) {				
-	// 			if (resultPos==1) {
-	// 				// //add moi
-	// 				// attackFunc.ClearIntervalAttack(stringUnitMoving);
-	// 				// //				
-	// 				client.hget(stringHPos,pos,function (error,rowsUnit) {
-	// 					// console.log(rowsUnit)
-	// 					if (rowsUnit!=null) {
-	// 						var unitResult = rowsUnit.split("/").filter(String);
-
-	// 						for (var i = 0; i < unitResult.length; i++) {
-	// 							var Attack_ID = unitResult[i].split("_")[2]
-	// 							if (Attack_ID!=data.ID_User) {
-	// 								getAttackData (io,data,unitResult[i]);
-	// 								break;
-	// 							}
-	// 						}
-	// 					}
-	// 				})
-
-	// 			}else{
-	// 				attackFunc.ClearIntervalAttack(stringUnitMoving);
-	// 			}
-	// 		});	
-	// 	}
-	// })
-	// )
 }
+
 // getAttackData (S_MOVE_data,stringKeyAttack)
 function getAttackData (io,data,stringKeyAttack) {
 	// console.log(data,stringKeyAttack)
@@ -474,59 +382,7 @@ function getAttackData (io,data,stringKeyAttack) {
 		}			
 	}))
 	)
-	)
-	
-	
-}
-function getAttackData2 (io,data,stringKeyAttack) {
-	// console.log(data,stringKeyAttack)
-	var checkBoolFriendData = false;
-	var checkBoolGuildData = false;
-	var attackBool = false;
-	var stringKeyDefend;	
-
-	new Promise((resolve,reject)=>{
-		friendData.CheckFriendData (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
-			checkBoolFriendData = returnBool;
-			resolve();
-		})
-	}).then(()=>new Promise((resolve,reject)=>{
-		guildData.CheckSameGuildID (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
-			checkBoolGuildData = returnBool;
-			resolve();
-		})						
-	}).then(()=>new Promise((resolve,reject)=>{
-		// console.log(checkBoolFriendData,checkBoolGuildData)
-		if (checkBoolFriendData==false&&checkBoolGuildData==false) {
-			stringKeyDefend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-			// console.log(stringKeyAttack);
-			stringHUnit = "s"+data.Server_ID+"_unit";
-			client.hget(stringHUnit,stringKeyAttack,function (error,rows) {
-				var result = JSON.parse(rows);
-				if (result.Status==functions.UnitStatus.Standby) {
-					attackBool = true;
-					attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKeyAttack);
-					resolve();
-				}
-			})				
-		}
-	}).then(()=>new Promise((resolve,reject)=>{
-		if (attackBool == true) {
-			// console.log('stringKeyDefend:'+stringKeyDefend)
-			// console.log(data.TimeFinishMove)
-			if (data.TimeFinishMove==null) {
-				// console.log(data);
-				// console.log('hrer')
-				attackFunc.CheckAttackedUnit(io,data.Server_ID,stringKeyDefend);
-			}			
-			attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend);
-			resolve();
-		}			
-	}))
-	)
-	)
-	
-	
+	)		
 }
 
 // convertTimeMove (S_MOVE_data)

@@ -6,11 +6,11 @@ var functions 		= require('./../Util/Functions.js');
 
 var DetailError, LogChange;
 
-// var data ={
-// 	ID_User: 	9,
-// 	ID_Player: 10, 
-// }
-var timeAccept 		= 24*60*60*60*1000;
+var dataFriend ={
+ ID_User: 	42,
+ ID_Player: 43, 
+}
+var timeAccept 		= 24*60*60*1000;// 24h
 var timeUnfriend 	= 30*60*1000;// 30 phut
 var timeOut;
 var DictTimeOut={};
@@ -35,7 +35,7 @@ exports.Start = function start (io) {
 			S_REJECT_FRIEND(io,data);
 		});
 		socket.on('S_UNFRIEND',function (socket,data) {
-			S_UNFRIEND(socket,data);
+			S_UNFRIEND(io,data);
 		});
 
 	});
@@ -43,6 +43,8 @@ exports.Start = function start (io) {
 
 
 // var stringHSocket;
+// S_ADD_FRIEND (null,dataFriend)
+// getFriendInfo (null,42);
 function S_ADD_FRIEND (io,data) {
 	timeOut = functions.GetTime()+timeAccept;
 	
@@ -64,7 +66,7 @@ function S_ADD_FRIEND (io,data) {
 		if (rows!=undefined) {
 			if (rows[0].Socket!=null) {
 				io.to(rows[0].Socket).emit('R_ADD_FRIEND',{R_ADD_FRIEND: data.ID_User});
-				// socket.socket(rows[0].Socket).emit('R_ADD_FRIEND',{R_ADD_FRIEND: 	data.ID_User});
+				
 			}
 		}
 	});	
@@ -78,11 +80,12 @@ function S_REJECT_FRIEND (io,data) {
 		if (rows!=undefined) {
 			if (rows[0].Socket!=null) {
 				io.to(rows[0].Socket).emit('R_REJECT_FRIEND',{R_REJECT_FRIEND: data.ID_Player});
-				// socket.socket(rows[0].Socket).emit('R_ADD_FRIEND',{R_ADD_FRIEND: 	data.ID_User});
+				
 			}
 		}
 	});	
 }
+
 function setTimeoutAddFriend (data,timeOut) {
 	var stringAddFriend= data.ID_User+"_"+data.ID_Player;
 	DictRemoveAddFriend[stringAddFriend]=setTimeout(function (data) {
@@ -92,7 +95,7 @@ function setTimeoutAddFriend (data,timeOut) {
 			if (rows!=undefined) {
 				if (rows[0].AcceptTime!=null) {
 					var databaseTime = new Date(functions.ExportTimeDatabase(rows[0].AcceptTime)).getTime();
-					var currentTime = functions.getTime();
+					var currentTime = functions.GetTime();
 					if (databaseTime<=currentTime) {
 						removeAddFriend (ID_User,ID_Player);
 						delete DictRemoveAddFriend[stringAddFriend];
@@ -129,7 +132,7 @@ function S_ACCEPT_FRIEND(io,data){
 		if (rows!=undefined) {
 			if (rows[0].Socket!=null) {
 				io.to(rows[0].Socket).emit('R_ACCEPT_FRIEND',{R_ACCEPT_FRIEND:data.ID_User});
-				// socket.socket(rows[0].Socket).emit('R_ACCEPT_FRIEND',{R_ACCEPT_FRIEND:data.ID_User});
+				
 			}
 		}
 	});
@@ -149,7 +152,8 @@ function removeAddFriendWaitTime (data) {
 		delete DictTimeOut[stringAddFriend2];
 	}
 }
-function S_UNFRIEND (socket,data) {
+
+function S_UNFRIEND (io,data) {
 	timeOut = functions.GetTime()+timeUnfriend;
 	var timeUnfriendData = functions.ImportTimeToDatabase(new Date(timeOut).toISOString());
 	var stringQuery ="UPDATE `"+data.ID_User+"` SET `RemoveTime`="+timeUnfriendData+";"+
@@ -160,28 +164,31 @@ function S_UNFRIEND (socket,data) {
 
 		var stringUnfriend1 = data.ID_User+"_"+data.ID_Player;
 		var stringUnfriend2 = data.ID_Player+"_"+data.ID_User;
-		deleteUnfriendData (stringUnfriend1,data.ID_User,data.ID_Player,timeOut);
-		deleteUnfriendData (stringUnfriend2,data.ID_Player,data.ID_User,timeOut);
+		deleteUnfriendData (io,stringUnfriend1,data.ID_User,data.ID_Player,timeOut);
+		deleteUnfriendData (io,stringUnfriend2,data.ID_Player,data.ID_User,timeOut);
+
 
 		var playerID = "SELECT `Socket` FROM `user_info` WHERE `ID_User` = "+data.ID_Player;
 		db_all_user.query(playerID,function (error,rows) {
 			if (!!error){DetailError = ('GetFriend.js: playerID '+playerID);functions.WriteLogError(DetailError,2);}
 			if (rows!=undefined) {
 				if (rows[0].Socket!=null) {
-					socket.socket(rows[0].Socket).emit('R_UNFRIEND',{R_UNFRIEND:data.ID_User});
+					io.to(rows[0].Socket).emit('R_UNFRIEND',{R_UNFRIEND:data.ID_User});					
 				}
 			}
 		});		
 	});
 }
 
-function deleteUnfriendData (stringUnfriend,ID_User,ID_Player,timeOut) {
+function deleteUnfriendData (io,stringUnfriend,ID_User,ID_Player,timeOut) {
 	DictTimeOut[stringUnfriend]= setTimeout(function (ID_User,ID_Player) {
 		var unfriend = "SELECT * FROM `"+ID_User+"` WHERE `ID_Player`= "+ID_Player;
+
 		db_friend.query(unfriend, function (error,rows) {
 			if (rows!=undefined) {
 				if (rows[0].RemoveTime!=null) {
-					var currentTime = functions.getTime();
+
+					var currentTime = functions.GetTime();
 					var databaseTime = new Date(functions.ExportTimeDatabase(rows[0].RemoveTime)).getTime();
 					if (databaseTime<=currentTime) {
 						var deleteString = "DELETE FROM `"+ID_User+"` WHERE `ID_Player`= "+ID_Player;
@@ -190,26 +197,38 @@ function deleteUnfriendData (stringUnfriend,ID_User,ID_Player,timeOut) {
 							LogChange='GetFriend.js: deleteUnfriendData: '+ID_User+"_"+ID_Player;functions.LogChange(LogChange,1);
 						});
 						delete DictTimeOut[stringUnfriend];
+
+						
 					}else{
 						var nextTimeOut = databaseTime-currentTime;
 						deleteUnfriendData (stringUnfriend,ID_User,ID_Player,nextTimeOut);
 					}
+
 				}
 			}
 		});
 	}, timeOut, ID_User,ID_Player);
 }
 
-exports.GetFriendInfo = function getFriendInfo (socket,ID_User) {
+exports.GetFriendInfo = function getFriendInfo2 (socket,ID_User) {
+	getFriendInfo (socket,ID_User);
+}
+
+function getFriendInfo (socket,ID_User) {
 	var stringQuery = "SELECT * FROM `"+ID_User+"`";
 	db_friend.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('GetFriend.js: GetFriendInfo '+ID_User);functions.WriteLogError(DetailError,2);}
-		socket.emit('R_FRIEND_INFO',{R_FRIEND_INFO:rows});
+		var currentTime = functions.GetTime();
+		if (rows[0].AcceptTime!=null) {
+			rows[0].AcceptTime = (functions.ExportTimeDatabase(rows[0].AcceptTime) - currentTime)*0.001;
+		}
+		if (rows[0].RemoveTime!=null) {
+			rows[0].RemoveTime = (functions.ExportTimeDatabase(rows[0].RemoveTime) - currentTime)*0.001;
+		}
+		console.log(rows)
+		// socket.emit('R_FRIEND_INFO',{R_FRIEND_INFO:rows});
 	});
 }
-
-
-
 exports.UpdateDatabase = function updateDatabase () {
 	var queryString = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'all_friends' AND TABLE_NAME <> 'friends'";
 	db_friend.query(queryString,function (error,rows) {
@@ -240,7 +259,7 @@ function queryTableUpdate (queryTableString) {
 }
 
 function updateAcceptTime (rowdata) {
-	var currentTime = functions.getTime();
+	var currentTime = functions.GetTime();
 	var databaseTime = new Date(functions.ExportTimeDatabase(rowdata.AcceptTime)).getTime();
 
 	if (currentTime<=databaseTime) {
@@ -252,7 +271,7 @@ function updateAcceptTime (rowdata) {
 }
 
 function updateRemoveTime (rowdata) {
-	var currentTime = functions.getTime();
+	var currentTime = functions.GetTime();
 	var databaseTime = new Date(functions.ExportTimeDatabase(rowdata.RemoveTime)).getTime();
 
 	if (currentTime<=databaseTime) {

@@ -414,8 +414,6 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 					client.hget(stringHAttack,dataCheck,function (error,rows) {
 						var result = rows.split("/").filter(String);
 						dataDefendArray = result;
-						// console.log('dataDefendArray')
-						// console.log(dataDefendArray);
 						resolve();
 					})
 				}
@@ -425,8 +423,6 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 				client.hmget(stringHUnit,dataDefendArray,function (error,rows) {
 					for (var i = 0; i < rows.length; i++) {
 						var result = JSON.parse(rows[i]);
-						// console.log(posArray)
-						// console.log(result.Position_Cell);
 
 						if (posArray.includes(result.Position_Cell)) {
 							attackBool = true;
@@ -448,45 +444,7 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 		)
 		)
 	});
-	// new Promise((resolve,reject)=>{
-	// 	position_Check.GetPosition(dataCheck,function (returnPosArray) {
-	// 		posArray = returnPosArray;
-	// 		// console.log(posArray)
-	// 		resolve();
-	// 	});
-	// }).then(()=>Promise((resolve,reject)=>{
-	// 	console.log(posArray)
-	// 	console.log(stringHAttack,dataCheck)
-	// 	client.hget(stringHAttack,dataCheck,function (error,rows) {
-	// 		var result = rows.split("/").filter(String);
-	// 		dataDefendArray = result;
-	// 		console.log('dataDefendArray')
-	// 		console.log(dataDefendArray);
-	// 		resolve();
-	// 	})
-	// }).then(()=>new Promise((resolve,reject)=>{
-	// 	client.hmget(stringHUnit,dataDefendArray,function (error,rows) {
-	// 		console.log(rows)
-	// 		for (var i = 0; i < rows.length; i++) {
-	// 			var result = JSON.parse(rows[i]);
-	// 			if (posArray.includes(result.Position_Cell)) {
-	// 				attackBool = true;
-	// 				dataDefend = dataDefendArray[i];
-	// 				setAttackData (Server_ID,dataDefend,dataAttack);
-	// 				updateDataBaseAttack (Server_ID,dataAttack,dataDefend);
-	// 				break;
-	// 			}	
-	// 		}
-	// 		resolve();
-	// 	});
-	// }).then(()=>Promise((resolve,reject)=>{
-	// 	if (attackBool==true) {			
-	// 		attackInterval(io,Server_ID,dataDefend);
-	// 	}
-	// 	resolve();
-	// }))
-	// )
-	// )	
+
 }
 function updateDataBaseAttack (Server_ID,dataAttack,dataDefend) {
 	// console.log(dataAttack,dataDefend)
