@@ -1,0 +1,15 @@
+
+ logChangeDetail: 2019-05-22T02:05:34.333Z: GetFriend.js: removeAddFriend: 42
+ logChangeDetail: 2019-05-22T02:05:34.333Z: GetFriend.js: removeAddFriend: 43
+ logChangeDetail: 2019-05-22T02:05:35.252Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='7,7,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-05-22T02:05:35.254Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='43,0,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-05-22T02:05:35.257Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-05-22T02:05:35.259Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-05-22T02:38:06.292Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-05-22T03:02:05.354Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-05-22T03:02:55.613Z: GetFriend.js: removeAddFriend: 43
+ logChangeDetail: 2019-05-22T03:03:04.384Z: GetFriend.js: S_UNFRIEND: 43_44
+ logChangeDetail: 2019-05-22T03:17:17.121Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-05-22T03:19:53.829Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-05-22T03:22:43.276Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-05-22T03:24:59.736Z: Login.js: queryUserNamePass: ndinhtoan44
