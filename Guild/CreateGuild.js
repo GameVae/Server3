@@ -13,6 +13,13 @@ var dataCreateGuild={};
 var EnumCreateGuild={};
 var DictTimeOut ={};
 
+var dataGuild ={
+	GuildTag: 	'ABf',
+	GuildName: 	'123456a',
+	ID_User: 	9,
+	Server_ID: 	1,
+}
+
 exports.S_CREATE_GUILD = function s_CREATE_GUILD (socket,data) {
 	//console.log(data)
 	checkData (socket,data);
@@ -56,12 +63,7 @@ function checkGuildName (socket,data) {
 		socket.emit('R_CREATE_GUILD',{R_CREATE_GUILD : EnumCreateGuild});
 	});
 }
-var dataGuild ={
-	GuildTag: 	'ABf',
-	GuildName: 	'123456a',
-	ID_User: 	9,
-	Server_ID: 	1,
-}
+
 
 function calcDiamond (data) {
 	var updateDiamond = "UPDATE `user_info` SET `Diamond`=`Diamond`-'"+diamondCreateGuild+"' WHERE `ID_User`='"+data.ID_User+"'";

@@ -19,13 +19,13 @@ exports.Start = function start (io) {
 		});
 
 		socket.on('S_APPLY_GUILD', function (data){
-			applyGuild.S_APPLY_GUILD(io,data);
+			applyGuild.S_APPLY_GUILD(io,socket,data);
 		});
 		socket.on('S_ACCEPT_APPLY',function (data) {
-			applyGuild.S_ACCEPT_APPLY(socket,data);
+			applyGuild.S_ACCEPT_APPLY(io,data);
 		});
 		socket.on('S_REJECT_APPLY',function (data) {
-			applyGuild.S_REJECT_APPLY(socket,data);
+			applyGuild.S_REJECT_APPLY(io,data);
 		});
 
 		socket.on('S_KICKOUT_GUILD',function (data) {

@@ -13,7 +13,7 @@ var stringTimeOut;
 
 var timeAccept 		= 24*60*60*1000;
 
-
+var time
 // var dataGuild ={
 // 	GuildTag: 	'ABf',
 // 	GuildName: 	'123456a',
@@ -25,57 +25,16 @@ var timeAccept 		= 24*60*60*1000;
 // 	Guild_ID: 	13,
 // 	Server_ID: 	1,
 // }
-exports.S_APPLY_GUILD = function s_apply_guild (io,socket,data) {
-	checkCurrentGuild (io,socket,data,function (checkGuildBool) {
+exports.S_APPLY_GUILD = function s_apply_guild (socket,data) {
+	checkCurrentGuild (socket,data,function (checkGuildBool) {
 		if (checkGuildBool==true) {
 			//console.log('chua co guild');
-			applyGuild (io,data);
+			applyGuild (socket,data);
 		}
 	});	
 }
 
-function checkCurrentGuild (io,socket,data,checkGuildBool) {
-	var returnBool = false;
-	var currentGuildBool = false;
-	var guildApplyBool = false;
-	
-	new Promise((resolve,reject)=>{
-		var stringQuery = "SELECT `Guild_ID` FROM `game_info_s"+data.Server_ID+"` WHERE `ID_User`='"+data.ID_User+"'";
-		db_all_user.query(stringQuery,function (error,rows) {
-			if (!!error){DetailError = ('ApplyGuild.js: checkCurrentGuild_stringQuery: '+ stringQuery);functions.WriteLogError(DetailError,2);}
-			if (rows[0].Guild_ID!=null) {
-				currentGuildBool = true;
-				EnumApplyGuild.Enum = 2;
-				EnumApplyGuild.Message = "User Have Guild -> Not Apply";
-				//console.log('have guild');
-			}
-			resolve();
-		});
-	}).then(()=>new Promise((resolve,reject)=>{		
-		var stringGuildApply = "SELECT `ID_User` FROM `all_guilds`.`"+data.Guild_ID+"` WHERE `ID_User`='"+data.ID_User+"'";
-		db_all_guild.query(stringGuildApply,function (error,rows) {	
-			if (!!error){DetailError = ('ApplyGuild.js: checkCurrentGuild_stringGuildApply: '+ stringGuildApply);functions.WriteLogError(DetailError,2);}
-			if(rows.length>0){
-				guildApplyBool=true;
-				EnumApplyGuild.Enum = 3;
-				EnumApplyGuild.Message = "Already Apply This Guild";				
-				//console.log('da apply guild')
-			}
-			resolve();
-		});
-
-	}).then(()=>{
-		if (currentGuildBool==false&&guildApplyBool==false) {
-			returnBool=true; 
-			EnumApplyGuild.Enum = 1;
-			EnumApplyGuild.Message = "Apply Guild Success";
-		}
-		// io.socket.emit('R_APPLY_GUILD',{R_APPLY_GUILD:EnumApplyGuild});
-		socket.emit('R_APPLY_GUILD',{R_APPLY_GUILD:EnumApplyGuild});
-		checkGuildBool(returnBool);
-	}));
-}
-function applyGuild (io,data) {
+function applyGuild (socket,data) {
 	var stringGetUserInfo = "SELECT * FROM `game_info_s"+data.Server_ID+"` WHERE `ID_User` = '"+data.ID_User+"'";
 	var timeOutApply = functions.GetTime()+timeAccept;
 	db_all_user.query(stringGetUserInfo,function (error,rows) {
@@ -93,12 +52,11 @@ function applyGuild (io,data) {
 
 		db_all_guild.query(stringInsertApply,function (error,result) {
 			if (!!error){DetailError = ('ApplyGuild.js: applyGuild: '+ stringInsertApply);functions.WriteLogError(DetailError,2);}
-			sendApplyToGuildMember (io,data);
+			sendApplyToGuildMember (socket,data);
 		});
 		setTimeAccept(timeAccept,data,1);		
 	});	
 }
-
 function sendApplyToGuildMember (io,data) {
 	var stringQuery = "SELECT `ID_User` FROM `"+data.Guild_ID+"`";
 	// console.log(stringQuery);
@@ -111,21 +69,19 @@ function sendApplyToGuildMember (io,data) {
 		}
 	});
 }
-
 function R_APPLY (io,row,data) {
 	// console.log(data.ID_User)
 	var stringQuery = "SELECT `io` FROM `user_info` WHERE `ID_User`='"+row.ID_User+"'";
 	db_all_user.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('ApplyGuild.js: sendApplyToGuildMember: '+ stringQuery);functions.WriteLogError(DetailError,2);}
 		if (rows[0].io!=null) {
-			io.to(rows[0].Socket).emit('R_APPLY',{R_APPLY: data});
+			io.to(rows[0].io).emit('R_APPLY',{R_APPLY: data});
 			// io.broadcast.to(rows[0].io).emit('R_APPLY',{R_APPLY:data});
 		}
 	});
 }
-
 function setTimeAccept (timeOutApply,data,enumTime) {
-	var stringTimeOut = data.ID_User+"_"+data.Guild_ID+"_"+enumTime;
+	var stringTimeOut =  data.ID_User+"_"+data.Guild_ID+"_"+enumTime;
 	DictTimeOut[stringTimeOut] = setTimeout(function (data){
 		var stringCheckGuild = "SELECT * FROM `"+data.Guild_ID+"` WHERE `ID_User`='"+data.ID_User+"'";
 		db_all_guild.query(stringCheckGuild, function (error,rows) {
@@ -207,6 +163,48 @@ function getUserServerID (dataID_User,returnServer) {
 	});
 }
 
+function checkCurrentGuild (socket,data,checkGuildBool) {
+	var returnBool = false;
+	var currentGuildBool = false;
+	var guildApplyBool = false;
+	
+	new Promise((resolve,reject)=>{
+		var stringQuery = "SELECT `Guild_ID` FROM `game_info_s"+data.Server_ID+"` WHERE `ID_User`='"+data.ID_User+"'";
+		db_all_user.query(stringQuery,function (error,rows) {
+			if (!!error){DetailError = ('ApplyGuild.js: checkCurrentGuild_stringQuery: '+ stringQuery);functions.WriteLogError(DetailError,2);}
+			if (rows[0].Guild_ID!=null) {
+				currentGuildBool = true;
+				EnumApplyGuild.Enum = 2;
+				EnumApplyGuild.Message = "User Have Guild -> Not Apply";
+				//console.log('have guild');
+			}
+			resolve();
+		});
+	}).then(()=>new Promise((resolve,reject)=>{		
+		var stringGuildApply = "SELECT `ID_User` FROM `all_guilds`.`"+data.Guild_ID+"` WHERE `ID_User`='"+data.ID_User+"'";
+		db_all_guild.query(stringGuildApply,function (error,rows) {	
+			if (!!error){DetailError = ('ApplyGuild.js: checkCurrentGuild_stringGuildApply: '+ stringGuildApply);functions.WriteLogError(DetailError,2);}
+			if(rows.length>0){
+				guildApplyBool=true;
+				EnumApplyGuild.Enum = 3;
+				EnumApplyGuild.Message = "Already Apply This Guild";				
+				//console.log('da apply guild')
+			}
+			resolve();
+		});
+
+	}).then(()=>{
+		if (currentGuildBool==false&&guildApplyBool==false) {
+			returnBool=true; 
+			EnumApplyGuild.Enum = 1;
+			EnumApplyGuild.Message = "Apply Guild Success";
+		}
+		// io.socket.emit('R_APPLY_GUILD',{R_APPLY_GUILD:EnumApplyGuild});
+		socket.emit('R_APPLY_GUILD',{R_APPLY_GUILD:EnumApplyGuild});
+		checkGuildBool(returnBool);
+	}));
+}
+
 var dataAcceptApply={
 	ID_User: 	9,
 	ID_Apply: 	42,
@@ -218,12 +216,12 @@ exports.S_ACCEPT_APPLY = function s_accept_apply (io,data) {
 		//console.log('checkBool: '+checkBool)		
 		if (checkBool) {
 			updateGuildAccept (data);
-			updateApplyPlayer (io,data);
+			updateApplyPlayer (data);
 		}
 	});
 }
 
-function updateApplyPlayer (io,data) {
+function updateApplyPlayer (data) {
 	new Promise((resolve,reject)=>{
 		var getGuildName = "SELECT `GuildName` FROM `guild_info` WHERE `Guild_ID`='"+data.Guild_ID+"'";
 		db_all_guild.query(getGuildName,function (error,rows) {
@@ -264,7 +262,6 @@ function R_ACCEPT_APPLY (io,data) {
 		}
 	});
 }
-
 function updateGuildAccept (data) {
 	new Promise((resolve,reject)=>{
 		getUserServerID (data.ID_Apply,function (returnServer) {
@@ -279,11 +276,7 @@ function updateGuildAccept (data) {
 		var updateGuild = "UPDATE `"+data.Guild_ID+"` SET `AcceptTime`= null,`RemoveTime`= null WHERE `ID_User`='"+data.ID_Apply+"';"
 		+"UPDATE `guild_info` SET `Member`=`Member`+1,`Might`=`Might`+'"+data.Might+"' WHERE `Guild_ID`='"+data.Guild_ID+"';";
 		var stringTimeOut =  data.ID_Apply+"_"+data.Guild_ID+"_1";
-		// if (stringTimeOut in DictTimeOut){
-		// 	clearTimeout(stringTimeOut);
-		// 	delete DictTimeOut[stringTimeOut];
-		// }
-		if (DictTimeOut[stringTimeOut]!=undefined){
+		if (stringTimeOut in DictTimeOut){
 			clearTimeout(stringTimeOut);
 			delete DictTimeOut[stringTimeOut];
 		}
@@ -293,7 +286,6 @@ function updateGuildAccept (data) {
 		});
 	});
 }
-
 function checkGuildPosition (data,checkBool) {
 	var returnBool = false;
 	var positionBool = false;
@@ -350,7 +342,6 @@ var dataReject ={
 	ID_Reject: 42,
 	Guild_ID: 13
 }
-
 exports.S_REJECT_APPLY = function s_reject_apply(io,data) {
 	var positionBool = false;
 	new Promise((resolve,reject)=>{
@@ -383,15 +374,15 @@ function sendReject (io,data) {
 }
 
 function R_REJECT_APPLY (io,data,row) {
-	var stringQuery = "SELECT `Socket` FROM `user_info` WHERE `ID_User`='"+row.ID_User+"'";
+	var stringQuery = "SELECT `io` FROM `user_info` WHERE `ID_User`='"+row.ID_User+"'";
 	var dataRe ={
 		ID_Reject: data.ID_Reject,
 		Guild_ID: data.Guild_ID
 	}
 	db_all_user.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('ApplyGuild.js: sendApplyToGuildMember: '+ stringQuery);functions.WriteLogError(DetailError,2);}
-		if (rows[0].Socket!=null) {
-			io.to(rows[0].Socket).emit('R_REJECT_APPLY',{R_REJECT_APPLY:dataRe});
+		if (rows[0].io!=null) {
+			io.broadcast.to(rows[0].io).emit('R_REJECT_APPLY',{R_REJECT_APPLY:dataRe});
 		}
 	});
 }
