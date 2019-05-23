@@ -29,7 +29,7 @@ exports.Start = function start (io) {
 		});
 
 		socket.on('S_KICKOUT_GUILD',function (data) {
-			managerGuild.S_KICKOUT_GUILD(socket,data);
+			managerGuild.S_KICKOUT_GUILD(io,data);
 		});
 		socket.on('S_PROMOTE',function (data) {
 			managerGuild.S_PROMOTE(socket,data);

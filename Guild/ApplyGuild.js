@@ -13,6 +13,9 @@ var stringTimeOut;
 
 var timeAccept 		= 24*60*60*1000;
 
+var redis = require('redis');
+var client = redis.createClient();
+client.select(functions.RedisData.TestUnit);
 
 // var dataGuild ={
 // 	GuildTag: 	'ABf',
@@ -346,6 +349,7 @@ function getGuildPosition (Guild_ID,ID_User,returnPosition) {
 }
 
 var dataReject ={
+	Server_ID: 1,
 	ID_User: 9,
 	ID_Reject: 42,
 	Guild_ID: 13
@@ -367,7 +371,10 @@ exports.S_REJECT_APPLY = function s_reject_apply(io,data) {
 			resolve();
 		});
 	}).then(()=>{
-		sendReject (io,data);
+		if (positionBool==true) {
+			sendReject (io,data);
+		}
+		
 	});
 }
 
@@ -380,18 +387,26 @@ function sendReject (io,data) {
 			}
 		}
 	});
+	var stringHSocket = "s"+data.Server_ID+"_socket";
+	client.hexists(stringHSocket,data.ID_Reject,function (error,resultBool) {
+		if (resultBool == 1) {
+			client.hget(stringHSocket,data.ID_Reject,function (error,rowsSocket) {
+				io.to(rowsSocket).emit('R_REJECT_APPLY',{R_REJECT_APPLY:data});
+			});
+		}
+	})
 }
 
 function R_REJECT_APPLY (io,data,row) {
 	var stringQuery = "SELECT `Socket` FROM `user_info` WHERE `ID_User`='"+row.ID_User+"'";
-	var dataRe ={
-		ID_Reject: data.ID_Reject,
-		Guild_ID: data.Guild_ID
-	}
+	// var dataRe ={
+	// 	ID_Reject: data.ID_Reject,
+	// 	Guild_ID: data.Guild_ID
+	// }
 	db_all_user.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('ApplyGuild.js: sendApplyToGuildMember: '+ stringQuery);functions.WriteLogError(DetailError,2);}
 		if (rows[0].Socket!=null) {
-			io.to(rows[0].Socket).emit('R_REJECT_APPLY',{R_REJECT_APPLY:dataRe});
+			io.to(rows[0].Socket).emit('R_REJECT_APPLY',{R_REJECT_APPLY:data});
 		}
 	});
 }
