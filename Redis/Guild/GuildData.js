@@ -7,10 +7,13 @@ client = redis.createClient();
 client.select(functions.RedisData.TestUnit)
 
 //getGuildData2 ()
-exports.GetGuildData = function getGuildData () {
-	getGuildData2 ()
+exports.Test = function test (para) {
+	console.log(para)
 }
-function getGuildData2 () {
+exports.GetGuildData = function getGuildData2 () {
+	getGuildData ()
+}
+function getGuildData () {
 	var queryStringTable = "SELECT `TABLE_NAME` FROM information_schema.tables WHERE `TABLE_SCHEMA`='all_guilds' AND `TABLE_NAME`<>'guild' AND `TABLE_NAME`<>'guild_info'"
 	db_all_guild.query(queryStringTable,function (error,rows) {
 		if (!!error) {console.log(error);}
