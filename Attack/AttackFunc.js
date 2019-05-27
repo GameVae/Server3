@@ -1,5 +1,7 @@
 'use strict';
 var getInfo 				= require("./../Info/GetInfo.js");
+var positionRemove 			= require('./../Redis/Position/Position_Remove.js'); 
+// positionRemove.Test(5)
 // var move 					= require('./../Redis/Move/Move.js');
 // var moving_Attack 			= require('./../Unit/Moving_Attack.js');
 
@@ -208,6 +210,8 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 		}else{
 			client.hdel(stringHAttack,dataDefend);
 			client.hdel(stringHUnit,dataDefend);
+			//remove pos khi chet
+			positionRemove.PostionRemove(dataDefend);
 
 			updateAttackData (io,dataAttack);			
 			clearIntervalAttack (ID_User_Defend);
@@ -411,6 +415,7 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 			client.hexists(stringHAttack,dataCheck,function(error,result){
 				if (result==1) {
 					attackDataBool = true;
+
 					client.hget(stringHAttack,dataCheck,function (error,rows) {
 						var result = rows.split("/").filter(String);
 						dataDefendArray = result;
@@ -423,14 +428,17 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 				client.hmget(stringHUnit,dataDefendArray,function (error,rows) {
 					for (var i = 0; i < rows.length; i++) {
 						var result = JSON.parse(rows[i]);
-
-						if (posArray.includes(result.Position_Cell)) {
-							attackBool = true;
-							dataDefend = dataDefendArray[i];
-							setAttackData (Server_ID,dataDefend,dataAttack);
-							updateDataBaseAttack (Server_ID,dataAttack,dataDefend);							
-							break;
+						if (result.Position_Cell!=null) {
+							if (posArray.includes(result.Position_Cell)) {
+								attackBool = true;
+								dataDefend = dataDefendArray[i];
+								setAttackData (Server_ID,dataDefend,dataAttack);
+								updateDataBaseAttack (Server_ID,dataAttack,dataDefend);							
+								break;
+							}
 						}
+
+						
 					}
 					resolve();
 				});

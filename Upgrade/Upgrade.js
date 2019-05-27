@@ -28,6 +28,7 @@ var DictTimeOut={};
 // 	UpgradeType:'1',
 // 	Level:'1'
 // }
+
 /*level nào thì lấy tài nguyên level đó nâng cấp lên lv1=>lv2 lấy tài nguyên hao tốn cùng hàng lv1*/
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
@@ -208,7 +209,6 @@ function setTimerUpdateDatabase (timeOut,data) {
 				
 				//clearTimeout(stringTimeOut);
 				delete DictTimeOut[stringTimeOut];
-
 			}
 		});	
 	},timeOut,data);
@@ -228,7 +228,7 @@ function checkUnlock (dbUpgrade,data) {
 			if (!!error){DetailError = ('Upgrade.js: query tableQuery : '+ tableQuery); functions.WriteLogError(DetailError,2);}
 			
 			if (rows_tableQuery[0].Unlock_ID!=0) { 
-				returnUnlockID=rows_tableQuery[0].Unlock_ID;				
+				returnUnlockID = rows_tableQuery[0].Unlock_ID;				
 				var stringUpgrade = "UPDATE `"+data.ID_User+"_"+data.BaseNumber+"` SET `Level`= 1 WHERE `ID`= "+returnUnlockID;
 				dbUpgrade.query(stringUpgrade,function (error,result) {					
 					if (!!error){DetailError = ('Upgrade.js: query checkUnlock upgrade: '+ stringUpgrade); functions.WriteLogError(DetailError,2);}
@@ -237,8 +237,18 @@ function checkUnlock (dbUpgrade,data) {
 			}
 
 			checkUnitInMap (data,levelUpgrade,rows_tableQuery[0]);
+			// checkUpgradeResource(data,levelUpgrade,rows_tableQuery[0]);
 		});
 	});
+}
+function checkUpgradeResource (data,levelUpgrade,rows_tableQuery) {
+	console.log('Upgrade.js checkUpgradeResource')
+	console.log(data)
+	if (data.ID_Upgrade<15&&data.ID_Upgrade>1) {
+		if (data.UpgradeType==2) {
+			
+		}
+	}
 }
 
 function checkUnitInMap (data,levelUpgrade,rows_tableQuery) {

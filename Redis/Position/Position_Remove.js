@@ -17,6 +17,9 @@ var redis = require('redis');
 var client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
+exports.Test = function test (para) {
+	console.log(para);
+}
 function deleteHashKey (server_ID) {
 	var stringHkey = "s"+server_ID+"_pos";
 	client.del(stringHkey,function (error,rows) {

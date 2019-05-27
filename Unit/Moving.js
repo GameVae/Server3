@@ -82,44 +82,46 @@ function updateDataBase (data) {
 	db_position.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('Unit_Moving.js: query '+stringQuery); functions.WriteLogError(DetailError,2);}
 		// console.log("Attack_Unit_ID_Moving: "+rows[0].Attack_Unit_ID)
-		if (rows[0].Attack_Unit_ID!=null) {
-			updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0]);
-		}
-		if (data.Attack_Unit_ID=="NULL") {
-			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-			+"`Position_Cell`='"+data.Position_Cell+"',"
-			+"`Next_Cell`='"+data.Next_Cell+"',"
-			+"`End_Cell`='"+data.End_Cell+"',"
-			+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-			+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-			+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-			+"`Attack_Unit_ID`= NULL,"
-			+"`Status`='"+functions.UnitStatus.Move+
-			"' WHERE `ID`='"+data.ID+"'";
-		}else{
-			stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-			+"`Position_Cell`='"+data.Position_Cell+"',"
-			+"`Next_Cell`='"+data.Next_Cell+"',"
-			+"`End_Cell`='"+data.End_Cell+"',"
-			+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-			+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-			+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-			+"`Attack_Unit_ID`='"+ data.Attack_Unit_ID +"',"
-			+"`Status`='"+functions.UnitStatus.Move+
-			"' WHERE `ID`='"+data.ID+"'";
-		}
-		
-		// console.log(stringUpdate);
-
-		db_position.query(stringUpdate,function (error,result) {
-			if (!!error){DetailError = ('Unit_Moving.js: query '+stringUpdate); functions.WriteLogError(DetailError,2);}
-			LogChange='Unit_Moving.js: updateDataBase: '+stringUpdate;functions.LogChange(LogChange,2);
+		if (rows[0]!=undefined) {
+			if (rows[0].Attack_Unit_ID!=null) {
+				updateRedisAttack (data.Server_ID,rows[0].Attack_Unit_ID,rows[0]);
+			}
+			if (data.Attack_Unit_ID=="NULL") {
+				stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+				+"`Position_Cell`='"+data.Position_Cell+"',"
+				+"`Next_Cell`='"+data.Next_Cell+"',"
+				+"`End_Cell`='"+data.End_Cell+"',"
+				+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+				+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+				+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+				+"`Attack_Unit_ID`= NULL,"
+				+"`Status`='"+functions.UnitStatus.Move+
+				"' WHERE `ID`='"+data.ID+"'";
+			}else{
+				stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+				+"`Position_Cell`='"+data.Position_Cell+"',"
+				+"`Next_Cell`='"+data.Next_Cell+"',"
+				+"`End_Cell`='"+data.End_Cell+"',"
+				+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+				+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+				+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+				+"`Attack_Unit_ID`='"+ data.Attack_Unit_ID +"',"
+				+"`Status`='"+functions.UnitStatus.Move+
+				"' WHERE `ID`='"+data.ID+"'";
+			}
 			
-			var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
-			db_position.query(stringQuery,function (error,rowsUpdate) {
-				updateRedisData (data,rowsUpdate[0]);
-			});
-		});
+
+			db_position.query(stringUpdate,function (error,result) {
+				if (!!error){DetailError = ('Unit_Moving.js: query '+stringUpdate); functions.WriteLogError(DetailError,2);}
+				LogChange='Unit_Moving.js: updateDataBase: '+stringUpdate;functions.LogChange(LogChange,2);
+				
+				var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
+				db_position.query(stringQuery,function (error,rowsUpdate) {
+					updateRedisData (data,rowsUpdate[0]);
+				});
+			});	
+		}
+
 
 	});
 }
@@ -127,6 +129,12 @@ function updateRedisData (data,rowsData) {
 	var stringHkey ="s"+data.Server_ID+"_unit";
 	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	client.hset(stringHkey,stringKey,JSON.stringify(rowsData))
+	// client.hexists(stringHkey,stringKey,function (error,rowBool) {
+	// 	if (rowBool==1) {
+	// 		client.hset(stringHkey,stringKey,JSON.stringify(rowsData))
+	// 	}
+	// })
+	
 }
 
 function updateRedisAttack (Server_ID,ID_Defend,dataAttack) {

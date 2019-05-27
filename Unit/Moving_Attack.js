@@ -360,12 +360,15 @@ function getAttackData (io,data,stringKeyAttack) {
 			// console.log(stringKeyAttack);
 			stringHUnit = "s"+data.Server_ID+"_unit";
 			client.hget(stringHUnit,stringKeyAttack,function (error,rows) {
-				var result = JSON.parse(rows);
-				if (result.Status==functions.UnitStatus.Standby) {
-					attackBool = true;
-					attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKeyAttack);
-					resolve();
+				if (rows!=null) {
+					var result = JSON.parse(rows);
+					if (result.Status==functions.UnitStatus.Standby) {
+						attackBool = true;
+						attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKeyAttack);
+						resolve();
+					}
 				}
+				
 			})				
 		}
 	}).then(()=>new Promise((resolve,reject)=>{

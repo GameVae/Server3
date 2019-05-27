@@ -84,7 +84,8 @@ function sendUnitToMap (io,socket,dbDefend,dbUpgrade,data) {
 					data["Attack"]= returnValue.Attack;
 					data["Defend"]= returnValue.Defend;
 					insertPosition (io,socket,data,resultPostion);
-					updateBaseDefend (dbDefend,data);					
+					updateBaseDefend (dbDefend,data);
+			
 				});	
 			}else {
 				console.log("error send Unit => reload data");
@@ -191,14 +192,16 @@ function insertPosition (io,socket,data,Cellposition) {
 				// socket.broadcast.to(rowSocket[i]).emit('R_DEPLOY',{R_DEPLOY:dataDeploy});
 			}
 		})
-		// socket.emit("R_DEPLOY",{R_DEPLOY: dataDeploy});
+		var stringHUnit = "s"+data.Server_ID+"_unit";
+		var stringKeyUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+dataDeploy.ID; 
+		client.hset(stringHUnit,stringKeyUnit,JSON.stringify(dataDeploy));
 	});
 }
 function sendToClient (io,socket,socketID,dataDeploy) {
 		// socket.broadcast.to(socketID).emit('R_DEPLOY',{R_DEPLOY:dataDeploy});
 		// console.log(dataDeploy)
 		io.to(socketID).emit('R_DEPLOY',{R_DEPLOY:dataDeploy});
-}
+	}
 // test (1)
 // function test (Server_ID) {
 // 	var stringHKey = "s"+Server_ID+"_pos";

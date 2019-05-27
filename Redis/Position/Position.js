@@ -63,8 +63,6 @@ function getRangeUnit (row,server_ID) {
 	if (row.ID_Unit>30&&row.ID_Unit<35) {unitRange3 (row,server_ID);}
 }
 
-
-
 function unitRange1 (row,server_ID) {
 	// console.log(row,server_ID)
 	var posCenter = row.Position_Cell;

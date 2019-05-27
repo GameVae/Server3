@@ -81,6 +81,7 @@ function R_KICKOUT_GUILD (io,row,data) {
 			io.to(rows[0].Socket).emit('R_KICKOUT_GUILD',{R_KICKOUT_GUILD:data});
 		}
 	});
+
 }
 
 function updateUserInfo (data,Server_ID) {
@@ -224,14 +225,23 @@ function promoteMember (io,data) {
 
 function sendClientPromote (io,data,enumPromote) {
 	var queryGuild = "SELECT `ID_User` FROM `"+data.Guild_ID+"`";
-	var dataProMem = {
-		ID_Promote: data.ID_Promote,
-		PromotePosition: data.PromotePosition
-	}
 
 	switch (enumPromote) {
 		case 1:
+		var dataProMem = {
+			ID_Promote: data.ID_Promote,
+			PromotePosition: data.PromotePosition
+		}
+		db_all_guild.query(queryGuild,function (error,rows) {
+			if (!!error){DetailError = ('ManagerGuild.js: sendClientPromote_Member: '+ queryGuild);functions.WriteLogError(DetailError,2);}
+			if (rows.length>0) {
+				for (var i = 0; i < rows.length; i++) {
+					R_PROMOTE (io,dataProMem,rows[i].ID_User);	
+				}			
+			}
+		})
 		break;
+		
 		case 2:
 		var dataProLeader= {
 			ID_Promote: data.ID_User,
@@ -248,17 +258,11 @@ function sendClientPromote (io,data,enumPromote) {
 		break;
 	}
 
-	db_all_guild.query(queryGuild,function (error,rows) {
-		if (!!error){DetailError = ('ManagerGuild.js: sendClientPromote_Member: '+ queryGuild);functions.WriteLogError(DetailError,2);}
-		if (rows.length>0) {
-			for (var i = 0; i < rows.length; i++) {
-				R_PROMOTE (io,dataProMem,rows[i].ID_User)	
-			}			
-		}
-	})
+	
 }
 
 function R_PROMOTE (io,data,ID_User) {
+
 	var getSocket = "SELECT `Socket` FROM `user_info` WHERE `ID_User`='"+ID_User+"'";
 	db_all_user.query(queryGuild,function (error,rows) {
 		if (!!error){DetailError = ('ManagerGuild.js: R_PROMOTE: '+ getSocket);functions.WriteLogError(DetailError,2);}
@@ -266,6 +270,7 @@ function R_PROMOTE (io,data,ID_User) {
 		// socket.broadcast.to(rows[i].Socket).emit('R_PROMOTE',{R_PROMOTE:dataPro});
 	})
 }
+
 function updateGuildPosition (data) {
 	var updatePos ="UPDATE `"+data.Guild_ID+"` SET `GuildPosition`='"+data.PromotePosition+"' WHERE `ID_User`='"+data.ID_Promote+"'";
 	db_all_guild.query(updatePos,function (error,result) {

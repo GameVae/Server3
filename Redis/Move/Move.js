@@ -143,13 +143,16 @@ function checkAttackData (io,data) {
 	stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 
 	client.hget(stringHkey,stringKey,function (error,rows) {
-		var result = JSON.parse(rows);
-		// console.log("result.Attack_Unit_ID:"+result.Attack_Unit_ID)
-		if(result.Attack_Unit_ID!="NULL"){
+		if (rows!=null) {
+			var result = JSON.parse(rows);
+			// console.log("result.Attack_Unit_ID:"+result.Attack_Unit_ID)
+			if(result.Attack_Unit_ID!="null"){
 			// console.log(data,stringKey)
 			checkPositionAttackUnit (io,data,stringKey);
 		}
-	});
+	}
+
+});
 }
 //send move add unit
 function checkPositionAttackUnit (io,data,stringKey) {
@@ -243,26 +246,24 @@ function updateDatabase (data) {
 
 function updateRedisData (stringKey,updateData,Position_Cell) {
 	var stringHkey = "s"+updateData.Server_ID+"_unit";
-	client.hget(stringHkey,stringKey,function (error,rows) {
-		var result = JSON.parse(rows);
-		// console.log(result.Position_Cell)
-		// console.log(data.Position_Cell)
-		// console.log('updateRedisData')
-		// console.log(updateData,Position_Cell,rows)
-		if (result.Position_Cell!=Position_Cell) {
-			DetailError = ('Move.js: updateRedisData: position unit: '+stringKey); functions.WriteLogError(DetailError,2);
-		}else{
-			result.Position_Cell = updateData.Position_Cell;
-			result.Next_Cell = updateData.Next_Cell;
-			result.End_Cell = updateData.End_Cell;
-			result.TimeMoveNextCell = updateData.TimeMoveNextCell;
-			result.TimeFinishMove = updateData.TimeFinishMove;
-			result.ListMove = updateData.ListMove;
-			result.Status = updateData.Status;
-			//console.log(result);
-			client.hset(stringHkey,stringKey,JSON.stringify(result));			
+	client.hexists(stringHkey,stringKey,function (error,rowBool) {
+		if (rowBool==1) {
+			client.hget(stringHkey,stringKey,function (error,rows) {
+				var result = JSON.parse(rows);
+				result.Position_Cell = updateData.Position_Cell;
+				result.Next_Cell = updateData.Next_Cell;
+				result.End_Cell = updateData.End_Cell;
+				result.TimeMoveNextCell = updateData.TimeMoveNextCell;
+				result.TimeFinishMove = updateData.TimeFinishMove;
+				result.ListMove = updateData.ListMove;
+				result.Status = updateData.Status;
+
+				client.hset(stringHkey,stringKey,JSON.stringify(result));
+				
+			});
 		}
-	});
+	})
+	
 }
 
 function clearMoveTimeout (stringData) {

@@ -32,7 +32,7 @@ exports.Start = function start (io) {
 			managerGuild.S_KICKOUT_GUILD(io,data);
 		});
 		socket.on('S_PROMOTE',function (data) {
-			managerGuild.S_PROMOTE(socket,data);
+			managerGuild.S_PROMOTE(io,data);
 		});
 
 	});
