@@ -173,6 +173,79 @@ function calcTimeCheck (data) {
 // #begin checkCurrentPosition
 function checkCurrentPosition (io,data,pos) {
 	// console.log('checkCurrentPosition '+new Date().toISOString()+"_"+pos);
+	stringHPos = "s"+data.Server_ID+"_pos";
+	stringHUnit = "s"+data.Server_ID+"_unit";
+	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	
+	var unitBool = false;
+	var posBool = false;
+	/*
+	**Check vị trí tìm mảng unit => lấy list mới, check unit
+	*/
+	var listUnit = [];
+	var stringKeyAttack = [];
+	var listUnitReturn = [];
+	var listUnitAttack =[];
+
+	new Promise((resolve,reject)=>{
+		client.hget(stringHPos,pos,function(error,rowsUnit){
+			var listUnit = rowsUnit.split("/").filter(String);
+			for (var i = 0; i < listUnit.length; i++) {
+				if (listUnit[i].split("_")[2] != data.ID_User) {
+					listUnitReturn.push(listUnit[i]);
+				}
+			}
+			// console.log(listUnitReturn)
+			resolve();
+		});
+	}).then(()=>new Promise((resolve,reject)=>{
+		listUnitReturn.forEach(function (unit) {
+			new Promise((resolve,reject)=>{
+				friendData.CheckFriendData (data.ID_User,unit.split("_")[2],function (returnBool) {
+					checkBoolFriendData = returnBool;
+					resolve();
+				});
+			}).then(()=>new Promise((resolve,reject)=>{
+				guildData.CheckSameGuildID (data.ID_User,unit.split("_")[2],function (returnBool) {
+					checkBoolGuildData = returnBool;
+					resolve();
+				});
+			}).then(()=>new Promise((resolve,reject)=>{
+				if (checkBoolFriendData==false&&checkBoolGuildData==false) {
+					client.hget(stringHUnit,unit,function (error,rows) {
+						if (rows!=null) {
+							var result = JSON.parse(rows);
+							if (result.Status==6) {
+								attackBool = true;
+								listUnitAttack.push(unit)								
+							}
+						}
+						resolve();
+					})
+				}
+			}).then(()=>new Promise((resolve,reject)=>{
+				var stringValue="";
+				// console.log(listUnitAttack);
+				if (listUnitAttack.length>1) {
+					for (var i = 0; i < listUnitAttack.length; i++) {
+						stringValue += listUnitAttack[i]+"/"
+					}
+				}else {
+					stringValue = listUnitAttack[0]+"/";
+				}
+				console.log(stringValue);
+				client.hset(stringHAttack,stringKeyDefend,stringValue);
+				resolve();
+			})
+			)
+			)
+			)
+		});
+	})
+	)
+}
+function checkCurrentPosition2 (io,data,pos) {
+	// console.log('checkCurrentPosition '+new Date().toISOString()+"_"+pos);
 
 	stringHPos = "s"+data.Server_ID+"_pos";
 	stringHUnit = "s"+data.Server_ID+"_unit";
