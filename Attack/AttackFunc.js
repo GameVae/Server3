@@ -24,6 +24,32 @@ var stringHAttack, stringHUnit;
 var DictTimeInterval={};
 
 //#begin SetData
+exports.SetAttackDataList = function setAttackDataList2(Server_ID,stringKeyDefend,listAttack) {
+	// console.log(Server_ID,stringKeyDefend,stringKeyAttack)
+	// console.log(listAttack.length)
+	setAttackDataList(Server_ID,stringKeyDefend,listAttack);
+}
+function setAttackDataList (Server_ID,stringKeyDefend,listAttack) {
+	stringHAttack = "s"+Server_ID+"_attack";
+	stringHUnit = "s"+Server_ID+"_unit";
+	// console.log(Server_ID,ID_Defend,ID_Attack)
+	// for (var i = 0; i < listAttack.length; i++) {
+	// 	console.log(listAttack[i])
+	// 	setAttackData (Server_ID,ID_Defend,listAttack[i])
+	// }
+	// var length = 0;
+	// while (length<listAttack.length) {
+	// 	setAttackData(Server_ID,stringKeyDefend,listAttack[length]);
+	// 	length++;
+	// }
+	listAttack.forEach(function (unit) {
+		new Promise((resolve,reject)=>{
+			setAttackData (Server_ID,stringKeyDefend,unit);
+			resolve();
+		})
+	})
+	
+}
 exports.SetAttackData = function setAttackData2(Server_ID,stringKeyDefend,stringKeyAttack) {
 	// console.log(Server_ID,stringKeyDefend,stringKeyAttack)
 	setAttackData(Server_ID,stringKeyDefend,stringKeyAttack);
@@ -34,7 +60,7 @@ function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 	stringHUnit = "s"+Server_ID+"_unit";
 	// console.log(Server_ID,ID_Defend,ID_Attack)
 	client.hexists(stringHAttack,ID_Defend,function (error,resultBool) {
-		// console.log(resultBool)
+		console.log(resultBool,ID_Defend,ID_Attack)
 		if (resultBool==1) {
 			client.hget(stringHAttack,ID_Defend,function (error,result) {
 				var resultID = result.split("/").filter(String)
