@@ -20,6 +20,8 @@ client.select(functions.RedisData.TestUnit);
 
 var counter = 1.2;
 
+
+
 var stringHAttack, stringHUnit;
 var DictTimeInterval={};
 
@@ -390,10 +392,10 @@ exports.CheckAttackedUnit = function checkAttackedUnit2 (io,Server_ID,dataCheck)
 	checkAttackedUnit (io,Server_ID,dataCheck);
 }
 
-// checkAttackedUnit (null,1,'1_16_43_113')
+// checkAttackedUnit (null,1,'1_16_42_58')
 
 function checkAttackedUnit (io,Server_ID,dataCheck) {
-	// console.log("checkAttackedUnit: "+dataCheck)
+	// console.log("dataCheck: "+dataCheck)
 	var posArray = [];
 	var dataAttack = dataCheck;
 
@@ -408,16 +410,19 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 	
 	position_Check.GetPosition(dataCheck,function (returnPosArray) {
 		posArray = returnPosArray;
-		// console.log(posArray)
+		//console.log(posArray)
 		new Promise((resolve,reject)=>{
-			client.hget(stringHAttack,dataCheck,function (error,rows) {
-				if (rows!=null) {
-					attackDataBool=true;
-					var result = rows.split("/").filter(String);
-					dataDefendArray = result;
-					resolve();
-				}				
-			})
+			client.hexists(stringHAttack,dataCheck,function(error,result){
+				if (result==1) {
+					attackDataBool = true;
+
+					client.hget(stringHAttack,dataCheck,function (error,rows) {
+						var result = rows.split("/").filter(String);
+						dataDefendArray = result;
+						resolve();
+					})
+				}
+			})			
 		}).then(()=>new Promise((resolve,reject)=>{
 			if (attackDataBool==true) {
 				client.hmget(stringHUnit,dataDefendArray,function (error,rows) {
@@ -430,6 +435,11 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 							updateDataBaseAttack (Server_ID,dataAttack,dataDefend);							
 							break;
 						}
+						// if (result.Position_Cell!=null) {
+							
+						// }
+
+						
 					}
 					resolve();
 				});
@@ -465,20 +475,26 @@ function updateDataBaseAttack (Server_ID,dataAttack,dataDefend) {
 exports.RemoveRedisData = function removeRedisData2 (stringHkey,stringKeyDefend,ID_Attack) {
 	removeRedisData (stringHkey,stringKeyDefend,ID_Attack);
 }
+
 function removeRedisData (stringHkey,stringKeyDefend,ID_Attack) {
 	// console.log(stringKeyDefend,ID_Attack);
-	client.hget(stringHkey,stringKeyDefend,function (error,rows) {				
-		if (rows!=null) {
-			var result = rows.split("/").filter(String);
-			if (result.includes(ID_Attack)) {
-				var stringReplace = rows.replace(ID_Attack+"/","");
-				client.hset(stringHkey,stringKeyDefend,stringReplace);
-				if (stringReplace.length==0) {
-					client.hdel(stringHkey,stringKeyDefend);
+	client.hexists(stringHkey,stringKeyDefend,function (error,rowsCheck) {
+		if (rowsCheck==1) {
+			client.hget(stringHkey,stringKeyDefend,function (error,rows) {				
+				if (rows!=null) {
+					var result = rows.split("/").filter(String);
+					if (result.includes(ID_Attack)) {
+						var stringReplace = rows.replace(ID_Attack+"/","");
+						client.hset(stringHkey,stringKeyDefend,stringReplace);
+						if (stringReplace.length==0) {
+							client.hdel(stringHkey,stringKeyDefend);
+						}
+					}
 				}
-			}
+				
+				
+			})
 		}
 	})
-
 }
 // #end: removeRedisData

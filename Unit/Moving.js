@@ -144,43 +144,14 @@ function updateRedisAttack (Server_ID,ID_Defend,dataAttack) {
 	var stringHAttack = "s"+Server_ID+"_attack";
 	var stringKeyDefend = ID_Defend;
 	// var stringKeyDefend = Server_ID+"_"+dataDefend.ID_Unit+"_"+dataDefend.ID_User+"_"+ID_Defend;
-
-	client.hexists(stringHAttack,stringKeyDefend,function (error,result) {
-		if (result==1) {
-			client.hget(stringHAttack,stringKeyDefend,function (error,rows) {
-				var resultAttack = rows.split("/").filter(String);
-				if (resultAttack.includes(ID_Attack)) {
-					removeValue (stringHAttack,stringKeyDefend,rows,ID_Attack);
-				}
-				
-			});
-		}
-	})
-
-	// new Promise((resolve,reject)=>{
-	// 	var stringQuery = "SELECT `ID_Unit`,`ID_User` FROM `s"+Server_ID+"_unit` WHERE `ID` ='"+ID_Defend+"'";
-	// 	db_position.query(stringQuery,function (error,rows) {
-
-	// 		dataDefend = rows[0];
-	// 		resolve();
-	// 	});
-	// }).then(()=>new Promise((resolve,reject)=>{
-		
-	// 	var stringHAttack = "s"+Server_ID+"_attack";
-	// 	var stringKeyDefend = Server_ID+"_"+dataDefend.ID_Unit+"_"+dataDefend.ID_User+"_"+ID_Defend;
-	// 	client.hexists(stringHAttack,stringKeyDefend,function (error,result) {
-	// 		if (result==1) {
-	// 			client.hget(stringHAttack,stringKeyDefend,function (error,rows) {
-	// 				var resultAttack = rows.split("/").filter(String);
-	// 				if (resultAttack.includes(ID_Attack)) {
-	// 					removeValue (stringHAttack,stringKeyDefend,rows,ID_Attack);
-	// 				}
-	// 				resolve();
-	// 			});
-	// 		}
-	// 	})
-	// }));
-
+	client.hget(stringHAttack,stringKeyDefend,function (error,rows) {
+		if (rows!=null) {
+			var resultAttack = rows.split("/").filter(String);
+			if (resultAttack.includes(ID_Attack)) {
+				removeValue (stringHAttack,stringKeyDefend,rows,ID_Attack);
+			}
+		}				
+	});
 }
 
 function removeValue (stringHkey,stringKey,rows,ID_Key) {

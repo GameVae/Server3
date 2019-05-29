@@ -1,14 +1,11 @@
 'use strict';
 
-// var db_all_user		= require('./../Util/Database/Db_all_user.js');
-// var db_position				= require('./../Util/Database/Db_position.js');
-
-var functions 				= require('./../Util/Functions.js');
-// console.log(functions.TimeMove.Straight)
 var guildData				= require('./../Redis/Guild/GuildData.js');
 var friendData				= require('./../Redis/Friend/FriendData.js');
 
 var attackFunc 				= require('./../Attack/AttackFunc.js');
+
+var functions 				= require('./../Util/Functions.js');
 
 var DetailError,LogChange;
 var currentTime;
@@ -18,94 +15,35 @@ var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-var Promise = require('promise');
-
 var stringUnitMoving;
 var DictTimeMoveAttack = {};
 var stringHPos, stringHUnit,stringHAttack,stringHMoveAttack;
+var stringTimeout;
 
-// exports.Test = function test (param) {
-// 	console.log(param)
-// }
-
-exports.ClearMoveTimeout = function clearMoveTimeout2 (stringData) {
-	clearMoveTimeout (stringData)
-}
-
-function clearMoveTimeout (stringData) {
-	if (DictTimeMoveAttack[stringData]!=undefined) {
-		clearTimeout(DictTimeMoveAttack[stringData]);
-		delete DictTimeMoveAttack[stringData];
-	}
-}
+var Promise = require('promise');
 
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){			
-			// S_MOVE (io,socket,data.S_MOVE);		
 			S_MOVE_ATT (io,data.S_MOVE);		
 		});
 	});
 }
 
-// var S_MOVE_data = { 
-// 	Server_ID: 1,
-// 	ID: 47,
-// 	ID_Unit: 16,
-// 	ID_User: 42,
-// 	Position_Cell: '10,10,0',
-// 	Next_Cell: '11,9,0',
-// 	End_Cell: '12,8,0',
-// 	TimeMoveNextCell: '2019-04-24T04:26:39.137',
-// 	TimeFinishMove: '2019-04-24T04:26:41.799',
-// 	ListMove:
-// 	[ { Position_Cell: '11,9,0',
-// 	Next_Cell: '11,8,0',
-// 	TimeMoveNextCell: '2019-04-24T04:26:40.399' },
-// 	{ Position_Cell: '11,8,0',
-// 	Next_Cell: '12,8,0',
-// 	TimeMoveNextCell: '2019-04-24T04:26:41.799' } ],
-// 	Attack_Unit_ID: 'NULL' }
-
-var S_MOVE_data ={ Server_ID: 1,
-	ID: 57,
-	ID_Unit: 16,
-	ID_User: 42,
-	Position_Cell: '9,4,0',
-	Next_Cell: '10,5,0',
-	End_Cell: '12,9,0',
-	TimeMoveNextCell: '2019-05-03T02:12:24.645',
-	TimeFinishMove: '2019-05-03T02:12:29.693',
-	ListMove:
-	[ { Position_Cell: '10,5,0',
-	Next_Cell: '10,6,0',
-	TimeMoveNextCell: '2019-05-03T02:12:25.907' },
-	{ Position_Cell: '10,6,0',
-	Next_Cell: '11,7,0',
-	TimeMoveNextCell: '2019-05-03T02:12:27.169' },
-	{ Position_Cell: '11,7,0',
-	Next_Cell: '11,8,0',
-	TimeMoveNextCell: '2019-05-03T02:12:28.431' },
-	{ Position_Cell: '11,8,0',
-	Next_Cell: '12,9,0',
-	TimeMoveNextCell: '2019-05-03T02:12:29.693' } ],
-	Attack_Unit_ID: 'NULL' }
-//
-// S_MOVE_ATT (null,S_MOVE_data)
-
 function S_MOVE_ATT (io,data) {
-	
 	// console.log(data)
 	stringHMoveAttack = "s"+data.Server_ID+"_movingAttack";
 	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	// clearMoveTimeout ("Unit_Moving_"+stringUnitMoving);
-	clearMoveTimeout (stringUnitMoving);
+	stringTimeout = "Unit_Moving_"+stringUnitMoving;
+
+	// clearMoveTimeout (stringTimeout);
 	clearAttackUnit (stringUnitMoving);
 
 	new Promise((resolve,reject)=>{
 		client.hset(stringHMoveAttack,stringUnitMoving,JSON.stringify(data), function (error,rows) {
-			if (!!error) {console.log(error)}
-				resolve();
+			if (!!error) {console.log(error);}
+			resolve();
 		});
 	}).then(()=>new Promise((resolve,reject)=>{
 		client.hget(stringHMoveAttack,stringUnitMoving,function (error,rows) {
@@ -115,104 +53,40 @@ function S_MOVE_ATT (io,data) {
 		})
 	})
 	);
-
-
-	// var dataMove =  Object.create(data);
-
-	// dataMove = {
-	// 	Server_ID: data.Server_ID,
-	// 	ID: data.ID,
-	// 	ID_Unit: data.ID_Unit,
-	// 	ID_User: data.ID_User,
-	// 	Position_Cell: data.Position_Cell,
-	// 	Next_Cell: data.Next_Cell,
-	// 	End_Cell: data.End_Cell,
-	// 	TimeMoveNextCell: data.TimeMoveNextCell,
-	// 	TimeFinishMove: data.TimeFinishMove,
-	// 	ListMove: data.ListMove,
-	// 	Attack_Unit_ID: data.Attack_Unit_ID,
-	// }
-	// // console.log(dataMove);
-	// // console.log(data);
-	
-	// // checkCurrentPosition (io,dataMove,data.Position_Cell);
-	// checkTimeMoveAttack (io,dataMove);
-
-	
-	
-	// // stringUnitMoving = dataMove.Server_ID+"_"+dataMove.ID_Unit+"_"+dataMove.ID_User+"_"+dataMove.ID;
-	// // clearMoveTimeout2 (stringUnitMoving);
 }
 
-function clearAttackUnit (stringUnitMoving) {
-	stringHUnit = "s"+stringUnitMoving.split("_")[0]+"_unit";
-	stringHAttack = "s"+stringUnitMoving.split("_")[0]+"_attack";
-	
-	client.hexists(stringHUnit,stringUnitMoving,function (error,resultBool) {
-		if (resultBool==1) {
-			client.hget(stringHUnit,stringUnitMoving,function (error,rows){
-				var result = JSON.parse(rows);
-				// console.log('result.Attack_Unit_ID: '+result.Attack_Unit_ID)
-				if (result.Attack_Unit_ID!=null) {
-					// console.log(stringHAttack,result.Attack_Unit_ID,stringUnitMoving)
-					attackFunc.RemoveRedisData(stringHAttack,result.Attack_Unit_ID,stringUnitMoving);
-				}
-			})
-		}
-	})
-}
+// #begin checkTimeMoveAttack
 function checkTimeMoveAttack (io,data) {
 	// console.log(data)
 	stringHUnit = "s"+data.Server_ID+"_unit";
 	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	stringTimeout = "Unit_Moving_"+stringUnitMoving;
 
-	client.hexists(stringHUnit,stringUnitMoving,function (error,rowResult) {
-		if (rowResult==1) {
+	client.hget(stringHUnit,stringUnitMoving,function (error,rows){
+		if (rows!=null) {
 			checkCurrentPosition (io,data,data.Position_Cell);
-			
+
 			if (data.TimeMoveNextCell!=data.TimeFinishMove&&data.Next_Cell!=data.End_Cell) {
 				calcMove (io,data,stringUnitMoving);
 			}
-			else if (data.TimeMoveNextCell==data.TimeFinishMove&&data.Next_Cell==data.End_Cell) {
+			else{
+				
 				var timeOutLast = (functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime())*0.5;
-				DictTimeMoveAttack[stringUnitMoving] = setTimeout(function (io,data) {
+				DictTimeMoveAttack[stringTimeout] = setTimeout(function (io,data) {
 					data.TimeMoveNextCell = null;
 					data.TimeFinishMove = null;
 					checkCurrentPosition (io,data,data.End_Cell);
 				}, timeOutLast,io,data);
+
 			}
+		}else{
+			
+			clearMoveTimeout(stringTimeout);
 
-		}else {
-			clearMoveTimeout(stringUnitMoving);
 		}
-	});	
+	});
 }
-function checkTimeMoveAttack2 (io,data) {
-	// console.log(data)
-	stringHUnit = "s"+data.Server_ID+"_unit";
-	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-
-	client.hexists(stringHUnit,stringUnitMoving,function (error,rowResult) {
-		if (rowResult==1) {
-			checkCurrentPosition (io,data,data.Position_Cell);
-
-			if (data.TimeMoveNextCell!=data.TimeFinishMove&&data.Position_Cell!=data.End_Cell) {
-				calcMove (io,data,stringUnitMoving);
-			}else{
-				var timeOutLast = (functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime())*0.5;
-				DictTimeMoveAttack[stringUnitMoving] = setTimeout(function (io,data) {
-					data.TimeMoveNextCell = null;
-					data.TimeFinishMove = null;
-					checkCurrentPosition (io,data,data.End_Cell);
-				}, timeOutLast,io,data);
-			}							
-		}else {
-			clearMoveTimeout(stringUnitMoving);
-		}
-	});	
-}
-
-
+// #end checkTimeMoveAttack
 function calcMove (io,data,stringUnitMoving) {
 	// console.log('stringUnitMoving: '+stringUnitMoving)
 	var timeOut,timeNextCellAttack;
@@ -267,17 +141,13 @@ function calcMove (io,data,stringUnitMoving) {
 			timeNextCellAttack = nextCellTime;
 		}
 	}
-	// if (timeMoveObj.TimeMoveNextCell!=null&&timeMoveObj.TimeMoveNextCell==timeMoveObj.TimeFinishMove) {
-	// 	timeNextCellAttack = (functions.ExportTimeDatabase(timeMoveObj.TimeMoveNextCell) - functions.GetTime())*0.5;
-	// }
-	// console.log("timeNextCellAttack: "+timeNextCellAttack);
+	stringTimeout = "Unit_Moving_"+stringUnitMoving;
 
-	DictTimeMoveAttack[stringUnitMoving] = setTimeout(function (io,timeMoveObj) {
+	DictTimeMoveAttack[stringTimeout] = setTimeout(function (io,timeMoveObj) {
 		checkTimeMoveAttack (io,timeMoveObj)
 	}, timeNextCellAttack,io,timeMoveObj);
 
 }
-
 function calcTimeCheck (data) {
 	var timeCheck;
 	var Position_Cell_X = data.Position_Cell.split(',')[0];
@@ -296,9 +166,9 @@ function calcTimeCheck (data) {
 	}
 	return timeCheck;
 }
-
+// #begin checkCurrentPosition
 function checkCurrentPosition (io,data,pos) {
-	console.log(new Date().toISOString()+"_"+pos);
+	// console.log('checkCurrentPosition '+new Date().toISOString()+"_"+pos);
 
 	stringHPos = "s"+data.Server_ID+"_pos";
 	stringHUnit = "s"+data.Server_ID+"_unit";
@@ -307,58 +177,56 @@ function checkCurrentPosition (io,data,pos) {
 	var unitBool = false;
 	var posBool = false;
 
+	/*
+	**Check vị trí tìm mảng unit => lấy list mới, check unit
+	*/
+	var stringKeyAttack =[];
+
 	new Promise((resolve,reject)=>{
-		attackFunc.ClearIntervalAttack(stringUnitMoving);
-		resolve();
-	}).then(()=> new Promise((resolve,reject)=>{
-		client.hexists(stringHPos,pos,function (error,resultPos) {
-			if (resultPos==1) {
-				posBool = true;
-			}
+		client.hdel(stringHAttack,stringUnitMoving,function (error) {
+			if (!!error) {console.log('Moving_Attack.js: '+error);}
 			resolve();
 		});
+		
 	}).then(()=>new Promise((resolve,reject)=>{
-		if (posBool == true) {
-			client.hget(stringHPos,pos,function (error,rowsUnit) {
-				var unitResult = rowsUnit.split("/").filter(String);
-				for (var i = 0; i < unitResult.length; i++) {
-					var Attack_ID = unitResult[i].split("_")[2];
+		client.hget(stringHPos,pos,function(error,rowsUnit){
+			if (rowsUnit!=null) {
+				stringKeyAttack = rowsUnit.split("/").filter(String);
+				for (var i = 0; i < stringKeyAttack.length; i++) {
+					var Attack_ID = stringKeyAttack[i].split("_")[2];
 					if (Attack_ID!=data.ID_User) {
-						getAttackData (io,data,unitResult[i]);
-						// break;
+						checkAttackData (io,data,stringKeyAttack[i]);						
 					}
-				}
-			});
-		}
-	}))
-	);
+				}			
+			}else {
+				attackFunc.ClearIntervalAttack(stringUnitMoving);
+			}
+			resolve();
+		})
+	})
+	)
 
 }
-
-// getAttackData (S_MOVE_data,stringKeyAttack)
-function getAttackData (io,data,stringKeyAttack) {
-	// console.log(data,stringKeyAttack)
+function checkAttackData (io,data,stringKeyAttack) {
 	var checkBoolFriendData = false;
 	var checkBoolGuildData = false;
 	var attackBool = false;
-	var stringKeyDefend;	
+	var defendAliveBool = true;
+	var stringKeyDefend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	stringHUnit = "s"+data.Server_ID+"_unit";
 
 	new Promise((resolve,reject)=>{
 		friendData.CheckFriendData (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
 			checkBoolFriendData = returnBool;
 			resolve();
-		})
+		});
 	}).then(()=>new Promise((resolve,reject)=>{
 		guildData.CheckSameGuildID (data.ID_User,stringKeyAttack.split("_")[2],function (returnBool) {
 			checkBoolGuildData = returnBool;
 			resolve();
-		})						
+		});
 	}).then(()=>new Promise((resolve,reject)=>{
-		// console.log(checkBoolFriendData,checkBoolGuildData)
 		if (checkBoolFriendData==false&&checkBoolGuildData==false) {
-			stringKeyDefend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-			// console.log(stringKeyAttack);
-			stringHUnit = "s"+data.Server_ID+"_unit";
 			client.hget(stringHUnit,stringKeyAttack,function (error,rows) {
 				if (rows!=null) {
 					var result = JSON.parse(rows);
@@ -367,18 +235,33 @@ function getAttackData (io,data,stringKeyAttack) {
 						attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKeyAttack);
 						resolve();
 					}
-				}
-				
-			})				
+				}				
+			})
 		}
 	}).then(()=>new Promise((resolve,reject)=>{
-		if (attackBool == true) {
-			// console.log('stringKeyDefend:'+stringKeyDefend)
-			// console.log(data.TimeFinishMove)
-			if (data.TimeFinishMove==null) {
-				// console.log(data);
-				// console.log('hrer')
-				attackFunc.CheckAttackedUnit(io,data.Server_ID,stringKeyDefend);
+		if (attackBool == true) {			
+			if ((data.TimeFinishMove == null && data.Attack_Unit_ID=='NULL')||
+				(data.TimeFinishMove == null && data.Attack_Unit_ID==null)||
+				(data.TimeFinishMove == null && data.Attack_Unit_ID=="NULL")) {			
+				new Promise((resolve,reject)=>{
+					client.hget(stringHUnit,stringKeyDefend,function (error,rows) {
+						if (rows!=null) {
+							var result = JSON.parse(rows);
+							result.Position_Cell = result.End_Cell;
+							client.hset(stringHUnit,stringKeyDefend,JSON.stringify(result));
+						}else {
+							defendAliveBool = false;
+						}
+						resolve();
+					})
+				}).then(()=>new Promise((resolve,reject)=>{
+					console.log(data)
+					console.log('defendAliveBool '+defendAliveBool)
+					if (defendAliveBool==true) {
+						attackFunc.CheckAttackedUnit(io,data.Server_ID,stringKeyDefend);
+					}
+					resolve();
+				}))				
 			}			
 			attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend);
 			resolve();
@@ -388,23 +271,34 @@ function getAttackData (io,data,stringKeyAttack) {
 	)		
 }
 
-// convertTimeMove (S_MOVE_data)
-function convertTimeMove (data) {
-	var returnData=data;
-	currentTime = functions.GetTime();
-	if (returnData.TimeMoveNextCell!=null) {
-		returnData.TimeMoveNextCell = functions.ExportTimeDatabase(returnData.TimeMoveNextCell) - currentTime;
-	}
-	if (returnData.TimeFinishMove!=null) {
-		returnData.TimeFinishMove = functions.ExportTimeDatabase(returnData.TimeFinishMove) - currentTime;
-	}
-	var ListMove = returnData.ListMove;
+// #end checkCurrentPosition
+// #begin ClearMoveTimeout
+exports.ClearMoveTimeout = function clearMoveTimeout2 (stringData) {
+	stringTimeout = "Unit_Moving_"+stringData;
+	clearMoveTimeout (stringTimeout);
 
-	if (ListMove.length>0) {
-		for (var i = 0; i < ListMove.length; i++) {
-			ListMove[i].TimeMoveNextCell = functions.ExportTimeDatabase(ListMove[i].TimeMoveNextCell) - currentTime;
-		}
-	}
-	// console.log(returnData)
-	return returnData;
 }
+function clearMoveTimeout (stringData) {
+	//stringData ="Unit_Moving_"+...
+	if (DictTimeMoveAttack[stringData]!=undefined) {
+		clearTimeout(DictTimeMoveAttack[stringData]);
+		delete DictTimeMoveAttack[stringData];
+	}
+}
+// #end ClearMoveTimeout
+
+// #begin clearAttackUnit
+function clearAttackUnit (stringUnitMoving) {
+	stringHUnit = "s"+stringUnitMoving.split("_")[0]+"_unit";
+	stringHAttack = "s"+stringUnitMoving.split("_")[0]+"_attack";
+
+	client.hget(stringHUnit,stringUnitMoving,function (error,rows){
+		if (rows!=null) {
+			var result = JSON.parse(rows);
+			if (result.Attack_Unit_ID!=null) {					
+				attackFunc.RemoveRedisData(stringHAttack,result.Attack_Unit_ID,stringUnitMoving);
+			}
+		}		
+	});
+}
+// #end clearAttackUnit
