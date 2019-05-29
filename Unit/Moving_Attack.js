@@ -41,6 +41,9 @@ function S_MOVE_ATT (io,data) {
 	clearAttackUnit (stringUnitMoving);
 
 	new Promise((resolve,reject)=>{
+		clearMoveTimeout (stringTimeout);
+		resolve();
+	}).then(()=>new Promise((resolve,reject)=>{
 		client.hset(stringHMoveAttack,stringUnitMoving,JSON.stringify(data), function (error,rows) {
 			if (!!error) {console.log(error);}
 			resolve();
@@ -50,9 +53,9 @@ function S_MOVE_ATT (io,data) {
 			var result = JSON.parse(rows);
 			checkTimeMoveAttack(io,result);
 			resolve();
-		})
-	})
-	);
+		});
+	}))
+	)
 }
 
 // #begin checkTimeMoveAttack
@@ -69,12 +72,12 @@ function checkTimeMoveAttack (io,data) {
 			if (data.TimeMoveNextCell!=data.TimeFinishMove&&data.Next_Cell!=data.End_Cell) {
 				calcMove (io,data,stringUnitMoving);
 			}
-			else{
-				
+			else{				
 				var timeOutLast = (functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime())*0.5;
 				DictTimeMoveAttack[stringTimeout] = setTimeout(function (io,data) {
 					data.TimeMoveNextCell = null;
 					data.TimeFinishMove = null;
+					data.Position_Cell = data.End_Cell;
 					checkCurrentPosition (io,data,data.End_Cell);
 				}, timeOutLast,io,data);
 
@@ -255,8 +258,8 @@ function checkAttackData (io,data,stringKeyAttack) {
 						resolve();
 					})
 				}).then(()=>new Promise((resolve,reject)=>{
-					console.log(data)
-					console.log('defendAliveBool '+defendAliveBool)
+					// console.log(data)
+					// console.log('defendAliveBool '+defendAliveBool)
 					if (defendAliveBool==true) {
 						attackFunc.CheckAttackedUnit(io,data.Server_ID,stringKeyDefend);
 					}
