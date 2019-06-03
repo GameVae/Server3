@@ -186,7 +186,7 @@ function checkCurrentPosition (io,data,pos) {
 	var stringKeyAttack = [];
 	var listUnitReturn = [];
 	var listUnitAttack =[];
-
+	var checkBoolGuildData = false, checkBoolFriendData = false;
 	new Promise((resolve,reject)=>{
 		client.hget(stringHPos,pos,function(error,rowsUnit){
 			var listUnit = rowsUnit.split("/").filter(String);
@@ -234,9 +234,11 @@ function checkCurrentPosition (io,data,pos) {
 					stringValue = listUnitAttack[0]+"/";
 				}
 				console.log(stringValue);
-				client.hset(stringHAttack,stringKeyDefend,stringValue);
+				client.hset(stringHAttack,stringUnitMoving,stringValue);
 				resolve();
-			})
+			}).then(()=>new Promise((resolve,reject)=>{
+				attackFunc.AttackInterval(io,data.Server_ID,stringUnitMoving)
+			}))
 			)
 			)
 			)

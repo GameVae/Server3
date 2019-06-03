@@ -1032,249 +1032,369 @@
 var guildData				= require('./Redis/Guild/GuildData.js');
 var friendData				= require('./Redis/Friend/FriendData.js');
 var attackFunc 				= require('./Attack/AttackFunc.js');
-var redis 				= require("redis"),
-client 					= redis.createClient();
+var redis 					= require("redis"),
+
+client 						= redis.createClient();
 client.select(2);
 var Promise = require('promise');
 
-// var listTest = ['1_16_43_144','1_16_43_14','1_16_42_67']
-test2 ()
+var dtAttack = ['1_16_44_150','1_16_43_147','1_16_43_144'];
 
-function test2 () {
-	var stringHUnit ="s1_unit";
-	var stringHAttack ="s1_attack"
-	var listUnitReturn=[];
-	var listUnitAttack=[];
-	var data={
-		Server_ID: 1,
-		ID_Unit: 16,
-		ID_User: 44,
-		ID: 148
-	}
-	var stringHPos ="s1_pos";
-	var pos ='298,4,0';
-	var stringKeyDefend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+
+checkPositionAfterAttack(1,dtAttack)
+
+function checkPositionAfterAttack (server_ID,dataAttack) {
+	// console.log(server_ID,dataAttack,dataDefend)
+	var stringHPos = "s"+server_ID+"_pos";
+	var stringHUnit = "s"+server_ID+"_unit";
+	var resultUnit;	
+	var arrayUnit = {};
+	var arrayUnitPos = [];
+	var posUnit =[]
+	var resultUnitPos;
+	var unit;
+	var dataDefend;
+	// lấy rangePos từ dataAttack
+	var addAttackBool = true;
+	var checkBoolFriendData = false, checkBoolGuildData = false;
 
 	new Promise((resolve,reject)=>{
-		client.hget(stringHPos,pos,function(error,rowsUnit){
-			var listUnit = rowsUnit.split("/").filter(String);
-			for (var i = 0; i < listUnit.length; i++) {
-				if (listUnit[i].split("_")[2]!=data.ID_User) {
-					listUnitReturn.push(listUnit[i])
-				}
+		client.hmget(stringHUnit,dataAttack,function (error,rows) {
+			arrayUnit = rows;//nhung Unit da tan cong unit cũ
+			// console.log(arrayUnit)
+			for (var i = 0; i < rows.length; i++) {
+				arrayUnitPos.push(JSON.parse(rows[i]).Position_Cell)
 			}
-			// console.log(listUnitReturn)
+			// console.log(arrayUnitPos);//[ '299,4,0', '298,3,0', '297,4,0' ]
 			resolve();
 		})
-	}).then(()=>new Promise((resolve,reject)=>{
-		// console.log(listUnitReturn)
-		listUnitReturn.forEach(function (unit) {
-			new Promise((resolve,reject)=>{
-				friendData.CheckFriendData (data.ID_User,unit.split("_")[2],function (returnBool) {
-					checkBoolFriendData = returnBool;
-					resolve();
-				})
-			}).then(()=>new Promise((resolve,reject)=>{
-				guildData.CheckSameGuildID (data.ID_User,unit.split("_")[2],function (returnBool) {
-					checkBoolGuildData = returnBool;
-					resolve();
-				})						
-			}).then(()=>new Promise((resolve,reject)=>{
-				if (checkBoolFriendData==false&&checkBoolGuildData==false) {
+	}).then(()=> new Promise((resolve,reject)=>{
+		client.hmget(stringHPos,arrayUnitPos,function(error,rowsPos){
+			// console.log(rowsPos);
+			/* lấy vị trí pos của những Unit đó để tìm những Unit đang trỏ về vị trí đó
+			*/
+			for (var i = 0; i < rowsPos.length; i++) {
+				posUnit.push(rowsPos[i].split("/").filter(String));
+			}
+			// dtAttack = ['1_16_44_150','1_16_43_147','1_16_43_144']
+			// [ '1_16_44_150/1_16_44_148/',
+			// '1_16_43_147/1_16_43_144/',
+			// '1_16_43_147/1_16_43_144/' ]
+			// console.log(posUnit)
+			// [ [ '1_16_44_150', '1_16_44_148' ],
+			// [ '1_16_43_147', '1_16_43_144' ],
+			// [ '1_16_43_147', '1_16_43_144' ] ]
+			resolve();
+		});
+	}).then(()=> new Promise((resolve,reject)=>{
+		for (var i = 0; i < posUnit.length; i++) {
+			unit = dataAttack[i];
+			var posUnitElement;
+
+			if (posUnit[i].length>1) {
+				for (var j = 0;j < posUnit[i].length; j++) {
+					posUnitElement =posUnit[i][j];
+					
+					if (unit.split("_")[2]!=posUnitElement.split("_")[2]) {
+						if (unit.split("_")[3]==posUnitElement.split("_")[3]) {
+
+						}else {
+							getPosition của unit và check position của posUnitElement
+						}
+					}
+
+				new Promise((resolve,reject)=>{
 					client.hget(stringHUnit,unit,function (error,rows) {
-						if (rows!=null) {
-							var result = JSON.parse(rows);
-							if (result.Status==6) {
-								attackBool = true;
-								listUnitAttack.push(unit)								
-							}
+						var result = JSON.parse(rows);
+						if (result.Attack_Unit_ID!=null) {
+							addAttackBool = false;
 						}
 						resolve();
 					})
-				}
-			}).then(()=>new Promise((resolve,reject)=>{
-				var stringValue="";
-				// console.log(listUnitAttack);
-				if (listUnitAttack.length>1) {
-					for (var i = 0; i < listUnitAttack.length; i++) {
-						stringValue += listUnitAttack[i]+"/"
+
+				}).then(()=> new Promise((resolve,reject)=>{
+					if (addAttackBool == true) {
+						friendData.CheckFriendData (unit.split("_")[2],posUnitElement.split("_")[2],function (returnBool) {
+							checkBoolFriendData = returnBool;
+							resolve();
+						});
 					}
-					console.log(stringValue);
-				}
-				client.hset(stringHAttack,stringKeyDefend,stringValue)
-				
-			})
-			)
-			)			
-			)
+				}).then(()=> new Promise((resolve,reject)=>{
+					if (addAttackBool == true) {
+						guildData.CheckSameGuildID (unit.split("_")[2],posUnitElement.split("_")[2],function (returnBool) {
+							checkBoolGuildData = returnBool;
+							resolve();
+						});
+					}						
+				}).then(()=>new Promise((resolve,reject)=>{
+					console.log(checkBoolFriendData,checkBoolGuildData,addAttackBool)
+					if ((checkBoolFriendData==false&&checkBoolGuildData==false)&&addAttackBool==true) {
+							// console.log(checkBoolFriendData,checkBoolGuildData)
+							// add Data
+						}
+						resolve();
+					}))
+				)
+				)					
+			}
 
+			resolve();
+		}			
+	}
 
-		})	
-	})
+})
 	)
-
-}
-function test () {
-	var stringHUnit ="s1_unit";
-	var listUnitReturn=[];
-	var listUnitAttack=[];
-	var data={ID_User:42}
-	var stringHPos ="s1_pos";
-	var pos ='301,4,0';
-
-	// new Promise((resolve,reject)=>{
-	// 	client.hget(stringHPos,pos,function(error,rowsUnit){
-	// 		var listUnit = rowsUnit.split("/").filter(String);
-	// 		for (var i = 0; i < listUnit.length; i++) {
-	// 			if (listUnit[i].split("_")[2]!=data.ID_User) {
-	// 				listUnitReturn.push(listUnit[i])
-	// 			}
-	// 		}
-	// 		resolve();
-
-	// 	});
-	// }).then(()=>new Promise((resolve,reject)=>{
-	// 	console.log(listUnitReturn)
-	// 	// setUnitAttack (stringHUnit,listUnitReturn,data,function (returnList) {
-	// 	// 	// listUnitAttack = returnList;
-	// 	// 	// console.log(listUnitAttack)
-	// 	// 	// resolve();
-	// 	// })
-
-	// 	// client.hmget(stringHUnit,listUnitReturn,function (error,rows) {
-	// 	// 	for (var i = 0; i < rows.length; i++) {
-	// 	// 		var resultUnit = JSON.parse(rows[i]);
-	// 	// 		new Promise((resolve,reject)=>{
-	// 	// 			friendData.CheckFriendData (data.ID_User,listUnitReturn[i].split("_")[2],function (returnBool) {
-	// 	// 				checkBoolFriendData = returnBool;
-	// 	// 				resolve();
-	// 	// 			});
-	// 	// 		}).then(()=>new Promise((resolve,reject)=>{
-	// 	// 			guildData.CheckSameGuildID (data.ID_User,listUnitReturn[i].split("_")[2],function (returnBool) {
-	// 	// 				checkBoolGuildData = returnBool;
-	// 	// 				resolve();
-	// 	// 			});
-	// 	// 		}).then(()=>new Promise((resolve,reject)=>{
-	// 	// 			if (checkBoolFriendData==false&&checkBoolGuildData==false) {
-	// 	// 				if (result.Status==6) {
-	// 	// 					attackBool = true;							
-	// 	// 					listAttackUnit.push(listUnitReturn[i]);
-	// 	// 			}
-	// 	// 		}
-	// 	// 		resolve();
-	// 	// 	}))
-
-	// 	// 		)
-	// 	// 	}
-
-	// 	// })
-
-	// })
-	// )
+	)
 	
 }
-function setUnitAttack (stringHUnit,listUnitReturn,data,returnList) {
-	var listAttack =[]
-	var checkBoolFriendData = false;
-	var checkBoolGuildData = false;
-	var length =0;
-	while (length<listUnitReturn.length) {
-		console.log(listUnitReturn[length])
-		length++;
-	}
-	// console.log(stringHUnit,listUnitReturn,data)
 
+function checkNoneAttackedUnit(server_ID,resultUnit,unitAttack) {
+// lấy pos của unit => tìm mảng Unit đối ứng range => chạy vòng for lấy unit
 
-
-	// client.hmget(stringHUnit,listUnitReturn,function (error,rows) {
-		
-	// 	for (var i = 0; i < rows.length; i++) {
-
-	// 		var resultUnit = JSON.parse(rows[i]);
-	// 		var unitAttack = listUnitReturn[i];
-
-	// 		// console.log('unitAttack '+unitAttack)
-
-	// 		new Promise((resolve,reject)=>{
-	// 			console.log('unitAttack '+unitAttack)
-	// 			friendData.CheckFriendData (data.ID_User,unitAttack.split("_")[2],function (returnBool) {
-	// 				checkBoolFriendData = returnBool;
-	// 				console.log("checkBoolFriendData " +checkBoolFriendData)
-	// 				resolve();
-	// 			});
-	// 		}).then(()=>new Promise((resolve,reject)=>{
-	// 			console.log('unitAttack '+unitAttack)
-	// 			guildData.CheckSameGuildID (data.ID_User,unitAttack.split("_")[2],function (returnBool) {
-	// 				checkBoolGuildData = returnBool;
-	// 				console.log("checkBoolGuildData " +checkBoolGuildData)
-	// 				resolve();
-	// 			});
-	// 		}).then(()=>new Promise((resolve,reject)=>{
-	// 			console.log(checkBoolFriendData,checkBoolGuildData)
-	// 			if (checkBoolFriendData==false&&checkBoolGuildData==false) {
-	// 				if (resultUnit.Status==6) {
-	// 					attackBool = true;							
-	// 					listAttack.push(unitAttack);
-	// 					console.log(listAttack)
-
-	// 				}
-	// 			}
-
-	// 			returnList(listAttack)
-	// 			resolve();
-	// 		}))
-	// 		)
-	// 	}
-	// })
 
 }
-function setUnitAttack2 (stringHUnit,listUnitReturn,data,returnList) {
-	var listAttack =[]
-	var checkBoolFriendData = false;
-	var checkBoolGuildData = false;
-	// console.log(stringHUnit,listUnitReturn,data)
+
+// var listTest = ['1_16_43_144','1_16_43_14','1_16_42_67']
+// test2 ()
+
+// function test2 () {
+// 	var stringHUnit ="s1_unit";
+// 	var stringHAttack ="s1_attack"
+// 	var listUnitReturn=[];
+// 	var listUnitAttack=[];
+// 	var data={
+// 		Server_ID: 1,
+// 		ID_Unit: 16,
+// 		ID_User: 44,
+// 		ID: 148
+// 	}
+// 	var stringHPos ="s1_pos";
+// 	var pos ='298,4,0';
+// 	var stringKeyDefend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+
+// 	new Promise((resolve,reject)=>{
+// 		client.hget(stringHPos,pos,function(error,rowsUnit){
+// 			var listUnit = rowsUnit.split("/").filter(String);
+// 			for (var i = 0; i < listUnit.length; i++) {
+// 				if (listUnit[i].split("_")[2]!=data.ID_User) {
+// 					listUnitReturn.push(listUnit[i])
+// 				}
+// 			}
+// 			// console.log(listUnitReturn)
+// 			resolve();
+// 		})
+// 	}).then(()=>new Promise((resolve,reject)=>{
+// 		// console.log(listUnitReturn)
+// 		listUnitReturn.forEach(function (unit) {
+// 			new Promise((resolve,reject)=>{
+// 				friendData.CheckFriendData (data.ID_User,unit.split("_")[2],function (returnBool) {
+// 					checkBoolFriendData = returnBool;
+// 					resolve();
+// 				})
+// 			}).then(()=>new Promise((resolve,reject)=>{
+// 				guildData.CheckSameGuildID (data.ID_User,unit.split("_")[2],function (returnBool) {
+// 					checkBoolGuildData = returnBool;
+// 					resolve();
+// 				})						
+// 			}).then(()=>new Promise((resolve,reject)=>{
+// 				if (checkBoolFriendData==false&&checkBoolGuildData==false) {
+// 					client.hget(stringHUnit,unit,function (error,rows) {
+// 						if (rows!=null) {
+// 							var result = JSON.parse(rows);
+// 							if (result.Status==6) {
+// 								attackBool = true;
+// 								listUnitAttack.push(unit)								
+// 							}
+// 						}
+// 						resolve();
+// 					})
+// 				}
+// 			}).then(()=>new Promise((resolve,reject)=>{
+// 				var stringValue="";
+// 				// console.log(listUnitAttack);
+// 				if (listUnitAttack.length>1) {
+// 					for (var i = 0; i < listUnitAttack.length; i++) {
+// 						stringValue += listUnitAttack[i]+"/"
+// 					}
+// 					console.log(stringValue);
+// 				}
+// 				client.hset(stringHAttack,stringKeyDefend,stringValue)
+
+// 			}).then(()=>new Promise((resolve,reject)=>{
+
+// 			})
+// 			)
+// 			)
+// 			)			
+// 			)
+
+
+// 		})	
+// 	})
+// 	)
+
+// }
+// function test () {
+// 	var stringHUnit ="s1_unit";
+// 	var listUnitReturn=[];
+// 	var listUnitAttack=[];
+// 	var data={ID_User:42}
+// 	var stringHPos ="s1_pos";
+// 	var pos ='301,4,0';
+
+// 	// new Promise((resolve,reject)=>{
+// 	// 	client.hget(stringHPos,pos,function(error,rowsUnit){
+// 	// 		var listUnit = rowsUnit.split("/").filter(String);
+// 	// 		for (var i = 0; i < listUnit.length; i++) {
+// 	// 			if (listUnit[i].split("_")[2]!=data.ID_User) {
+// 	// 				listUnitReturn.push(listUnit[i])
+// 	// 			}
+// 	// 		}
+// 	// 		resolve();
+
+// 	// 	});
+// 	// }).then(()=>new Promise((resolve,reject)=>{
+// 	// 	console.log(listUnitReturn)
+// 	// 	// setUnitAttack (stringHUnit,listUnitReturn,data,function (returnList) {
+// 	// 	// 	// listUnitAttack = returnList;
+// 	// 	// 	// console.log(listUnitAttack)
+// 	// 	// 	// resolve();
+// 	// 	// })
+
+// 	// 	// client.hmget(stringHUnit,listUnitReturn,function (error,rows) {
+// 	// 	// 	for (var i = 0; i < rows.length; i++) {
+// 	// 	// 		var resultUnit = JSON.parse(rows[i]);
+// 	// 	// 		new Promise((resolve,reject)=>{
+// 	// 	// 			friendData.CheckFriendData (data.ID_User,listUnitReturn[i].split("_")[2],function (returnBool) {
+// 	// 	// 				checkBoolFriendData = returnBool;
+// 	// 	// 				resolve();
+// 	// 	// 			});
+// 	// 	// 		}).then(()=>new Promise((resolve,reject)=>{
+// 	// 	// 			guildData.CheckSameGuildID (data.ID_User,listUnitReturn[i].split("_")[2],function (returnBool) {
+// 	// 	// 				checkBoolGuildData = returnBool;
+// 	// 	// 				resolve();
+// 	// 	// 			});
+// 	// 	// 		}).then(()=>new Promise((resolve,reject)=>{
+// 	// 	// 			if (checkBoolFriendData==false&&checkBoolGuildData==false) {
+// 	// 	// 				if (result.Status==6) {
+// 	// 	// 					attackBool = true;							
+// 	// 	// 					listAttackUnit.push(listUnitReturn[i]);
+// 	// 	// 			}
+// 	// 	// 		}
+// 	// 	// 		resolve();
+// 	// 	// 	}))
+
+// 	// 	// 		)
+// 	// 	// 	}
+
+// 	// 	// })
+
+// 	// })
+// 	// )
+
+// }
+// function setUnitAttack (stringHUnit,listUnitReturn,data,returnList) {
+// 	var listAttack =[]
+// 	var checkBoolFriendData = false;
+// 	var checkBoolGuildData = false;
+// 	var length =0;
+// 	while (length<listUnitReturn.length) {
+// 		console.log(listUnitReturn[length])
+// 		length++;
+// 	}
+// 	// console.log(stringHUnit,listUnitReturn,data)
 
 
 
-	// client.hmget(stringHUnit,listUnitReturn,function (error,rows) {
-		
-	// 	for (var i = 0; i < rows.length; i++) {
+// 	// client.hmget(stringHUnit,listUnitReturn,function (error,rows) {
 
-	// 		var resultUnit = JSON.parse(rows[i]);
-	// 		var unitAttack = listUnitReturn[i];
+// 	// 	for (var i = 0; i < rows.length; i++) {
 
-	// 		// console.log('unitAttack '+unitAttack)
+// 	// 		var resultUnit = JSON.parse(rows[i]);
+// 	// 		var unitAttack = listUnitReturn[i];
 
-	// 		new Promise((resolve,reject)=>{
-	// 			console.log('unitAttack '+unitAttack)
-	// 			friendData.CheckFriendData (data.ID_User,unitAttack.split("_")[2],function (returnBool) {
-	// 				checkBoolFriendData = returnBool;
-	// 				console.log("checkBoolFriendData " +checkBoolFriendData)
-	// 				resolve();
-	// 			});
-	// 		}).then(()=>new Promise((resolve,reject)=>{
-	// 			console.log('unitAttack '+unitAttack)
-	// 			guildData.CheckSameGuildID (data.ID_User,unitAttack.split("_")[2],function (returnBool) {
-	// 				checkBoolGuildData = returnBool;
-	// 				console.log("checkBoolGuildData " +checkBoolGuildData)
-	// 				resolve();
-	// 			});
-	// 		}).then(()=>new Promise((resolve,reject)=>{
-	// 			console.log(checkBoolFriendData,checkBoolGuildData)
-	// 			if (checkBoolFriendData==false&&checkBoolGuildData==false) {
-	// 				if (resultUnit.Status==6) {
-	// 					attackBool = true;							
-	// 					listAttack.push(unitAttack);
-	// 					console.log(listAttack)
+// 	// 		// console.log('unitAttack '+unitAttack)
 
-	// 				}
-	// 			}
+// 	// 		new Promise((resolve,reject)=>{
+// 	// 			console.log('unitAttack '+unitAttack)
+// 	// 			friendData.CheckFriendData (data.ID_User,unitAttack.split("_")[2],function (returnBool) {
+// 	// 				checkBoolFriendData = returnBool;
+// 	// 				console.log("checkBoolFriendData " +checkBoolFriendData)
+// 	// 				resolve();
+// 	// 			});
+// 	// 		}).then(()=>new Promise((resolve,reject)=>{
+// 	// 			console.log('unitAttack '+unitAttack)
+// 	// 			guildData.CheckSameGuildID (data.ID_User,unitAttack.split("_")[2],function (returnBool) {
+// 	// 				checkBoolGuildData = returnBool;
+// 	// 				console.log("checkBoolGuildData " +checkBoolGuildData)
+// 	// 				resolve();
+// 	// 			});
+// 	// 		}).then(()=>new Promise((resolve,reject)=>{
+// 	// 			console.log(checkBoolFriendData,checkBoolGuildData)
+// 	// 			if (checkBoolFriendData==false&&checkBoolGuildData==false) {
+// 	// 				if (resultUnit.Status==6) {
+// 	// 					attackBool = true;							
+// 	// 					listAttack.push(unitAttack);
+// 	// 					console.log(listAttack)
 
-	// 			returnList(listAttack)
-	// 			resolve();
-	// 		}))
-	// 		)
-	// 	}
-	// })
+// 	// 				}
+// 	// 			}
 
-}
+// 	// 			returnList(listAttack)
+// 	// 			resolve();
+// 	// 		}))
+// 	// 		)
+// 	// 	}
+// 	// })
+
+// }
+// function setUnitAttack2 (stringHUnit,listUnitReturn,data,returnList) {
+// 	var listAttack =[]
+// 	var checkBoolFriendData = false;
+// 	var checkBoolGuildData = false;
+// 	// console.log(stringHUnit,listUnitReturn,data)
+
+
+
+// 	// client.hmget(stringHUnit,listUnitReturn,function (error,rows) {
+
+// 	// 	for (var i = 0; i < rows.length; i++) {
+
+// 	// 		var resultUnit = JSON.parse(rows[i]);
+// 	// 		var unitAttack = listUnitReturn[i];
+
+// 	// 		// console.log('unitAttack '+unitAttack)
+
+// 	// 		new Promise((resolve,reject)=>{
+// 	// 			console.log('unitAttack '+unitAttack)
+// 	// 			friendData.CheckFriendData (data.ID_User,unitAttack.split("_")[2],function (returnBool) {
+// 	// 				checkBoolFriendData = returnBool;
+// 	// 				console.log("checkBoolFriendData " +checkBoolFriendData)
+// 	// 				resolve();
+// 	// 			});
+// 	// 		}).then(()=>new Promise((resolve,reject)=>{
+// 	// 			console.log('unitAttack '+unitAttack)
+// 	// 			guildData.CheckSameGuildID (data.ID_User,unitAttack.split("_")[2],function (returnBool) {
+// 	// 				checkBoolGuildData = returnBool;
+// 	// 				console.log("checkBoolGuildData " +checkBoolGuildData)
+// 	// 				resolve();
+// 	// 			});
+// 	// 		}).then(()=>new Promise((resolve,reject)=>{
+// 	// 			console.log(checkBoolFriendData,checkBoolGuildData)
+// 	// 			if (checkBoolFriendData==false&&checkBoolGuildData==false) {
+// 	// 				if (resultUnit.Status==6) {
+// 	// 					attackBool = true;							
+// 	// 					listAttack.push(unitAttack);
+// 	// 					console.log(listAttack)
+
+// 	// 				}
+// 	// 			}
+
+// 	// 			returnList(listAttack)
+// 	// 			resolve();
+// 	// 		}))
+// 	// 		)
+// 	// 	}
+// 	// })
+
+// }
