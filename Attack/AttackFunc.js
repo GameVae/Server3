@@ -157,7 +157,7 @@ function clearIntervalAttack (ID_User_Defend) {
 			client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
 				if (rows!=null) {
 
-					var result = JSON.parse(rows).split("/").filter(String);
+					var result = rows.split("/").filter(String);
 					client.hmget(stringHUnit,result,function (error,resultUnitAttack) {
 						for (var i = 0; i < resultUnitAttack.length; i++) {
 							var stringUnitResult =  JSON.parse(resultUnitAttack[i]);
@@ -165,9 +165,7 @@ function clearIntervalAttack (ID_User_Defend) {
 							if (stringUnitResult!=null) {
 								stringUnitResult.Attack_Unit_ID = null;
 								client.hset(stringHUnit,unitID,JSON.stringify(stringUnitResult))
-
 							}
-
 						}
 						resolve();
 					});

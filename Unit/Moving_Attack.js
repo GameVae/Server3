@@ -179,6 +179,7 @@ function checkCurrentPosition (io,data,pos) {
 	
 	var unitBool = false;
 	var posBool = false;
+	var attackBool = false;
 	/*
 	**Check vị trí tìm mảng unit => lấy list mới, check unit
 	*/
@@ -189,42 +190,48 @@ function checkCurrentPosition (io,data,pos) {
 	var checkBoolGuildData = false, checkBoolFriendData = false;
 	new Promise((resolve,reject)=>{
 		client.hget(stringHPos,pos,function(error,rowsUnit){
-			var listUnit = rowsUnit.split("/").filter(String);
-			for (var i = 0; i < listUnit.length; i++) {
-				if (listUnit[i].split("_")[2] != data.ID_User) {
-					listUnitReturn.push(listUnit[i]);
+			if (rowsUnit!=null) {
+				var listUnit = rowsUnit.split("/").filter(String);
+				for (var i = 0; i < listUnit.length; i++) {
+					if (listUnit[i].split("_")[2] != data.ID_User) {
+						listUnitReturn.push(listUnit[i]);
+					}
 				}
+			}else{
+				attackFunc.ClearIntervalAttack(stringUnitMoving);
 			}
+			
 			// console.log(listUnitReturn)
 			resolve();
 		});
 	}).then(()=>new Promise((resolve,reject)=>{
-		listUnitReturn.forEach(function (unit) {
-			new Promise((resolve,reject)=>{
-				friendData.CheckFriendData (data.ID_User,unit.split("_")[2],function (returnBool) {
-					checkBoolFriendData = returnBool;
-					resolve();
-				});
-			}).then(()=>new Promise((resolve,reject)=>{
-				guildData.CheckSameGuildID (data.ID_User,unit.split("_")[2],function (returnBool) {
-					checkBoolGuildData = returnBool;
-					resolve();
-				});
-			}).then(()=>new Promise((resolve,reject)=>{
-				if (checkBoolFriendData==false&&checkBoolGuildData==false) {
-					client.hget(stringHUnit,unit,function (error,rows) {
-						if (rows!=null) {
-							var result = JSON.parse(rows);
-							if (result.Status==6) {
-								attackBool = true;
-								listUnitAttack.push(unit)								
-							}
-						}
+		if (listUnitReturn.length>0) {
+			listUnitReturn.forEach(function (unit) {
+				new Promise((resolve,reject)=>{
+					friendData.CheckFriendData (data.ID_User,unit.split("_")[2],function (returnBool) {
+						checkBoolFriendData = returnBool;
 						resolve();
-					})
-				}
-			}).then(()=>new Promise((resolve,reject)=>{
-				var stringValue="";
+					});
+				}).then(()=>new Promise((resolve,reject)=>{
+					guildData.CheckSameGuildID (data.ID_User,unit.split("_")[2],function (returnBool) {
+						checkBoolGuildData = returnBool;
+						resolve();
+					});
+				}).then(()=>new Promise((resolve,reject)=>{
+					if (checkBoolFriendData==false&&checkBoolGuildData==false) {
+						client.hget(stringHUnit,unit,function (error,rows) {
+							if (rows!=null) {
+								var result = JSON.parse(rows);
+								if (result.Status==6) {
+									attackBool = true;
+									listUnitAttack.push(unit)								
+								}
+							}
+							resolve();
+						})
+					}
+				}).then(()=>new Promise((resolve,reject)=>{
+					var stringValue="";
 				// console.log(listUnitAttack);
 				if (listUnitAttack.length>1) {
 					for (var i = 0; i < listUnitAttack.length; i++) {
@@ -237,12 +244,17 @@ function checkCurrentPosition (io,data,pos) {
 				client.hset(stringHAttack,stringUnitMoving,stringValue);
 				resolve();
 			}).then(()=>new Promise((resolve,reject)=>{
-				attackFunc.AttackInterval(io,data.Server_ID,stringUnitMoving)
+				if (attackBool==true) {					
+					attackFunc.AttackInterval(io,data.Server_ID,stringUnitMoving)
+				}
+				
 			}))
 			)
-			)
-			)
-		});
+				)
+				)
+			});
+		}
+		
 	})
 	)
 }
