@@ -80,6 +80,7 @@ function checkTimeMoveAttack (io,data) {
 					data.TimeFinishMove = null;
 					data.Position_Cell = data.End_Cell;
 					checkCurrentPosition (io,data,data.End_Cell);
+					// checkAttackData (io,data,stringUnitMoving);
 				}, timeOutLast,io,data);
 
 			}
@@ -190,6 +191,7 @@ function checkCurrentPosition (io,data,pos) {
 	var checkBoolGuildData = false, checkBoolFriendData = false;
 	new Promise((resolve,reject)=>{
 		client.hget(stringHPos,pos,function(error,rowsUnit){
+
 			if (rowsUnit!=null) {
 				var listUnit = rowsUnit.split("/").filter(String);
 				for (var i = 0; i < listUnit.length; i++) {
@@ -232,27 +234,29 @@ function checkCurrentPosition (io,data,pos) {
 					}
 				}).then(()=>new Promise((resolve,reject)=>{
 					var stringValue="";
-				// console.log(listUnitAttack);
-				if (listUnitAttack.length>1) {
-					for (var i = 0; i < listUnitAttack.length; i++) {
-						stringValue += listUnitAttack[i]+"/"
+					// console.log(listUnitAttack);
+					if (listUnitAttack.length>1) {
+						for (var i = 0; i < listUnitAttack.length; i++) {
+							stringValue += listUnitAttack[i]+"/"
+						}
+					}else {
+						stringValue = listUnitAttack[0]+"/";
 					}
-				}else {
-					stringValue = listUnitAttack[0]+"/";
-				}
-				console.log(stringValue);
-				client.hset(stringHAttack,stringUnitMoving,stringValue);
-				resolve();
-			}).then(()=>new Promise((resolve,reject)=>{
-				if (attackBool==true) {					
-					attackFunc.AttackInterval(io,data.Server_ID,stringUnitMoving)
-				}
-				
-			}))
-			)
+					// console.log(stringValue);
+					client.hset(stringHAttack,stringUnitMoving,stringValue);
+					resolve();
+				}).then(()=>new Promise((resolve,reject)=>{
+					if (attackBool==true) {					
+						attackFunc.AttackInterval(io,data.Server_ID,stringUnitMoving)
+					}
+
+				}))
+				)
 				)
 				)
 			});
+		}else{
+			attackFunc.ClearIntervalAttack(stringUnitMoving);
 		}
 		
 	})
@@ -315,10 +319,8 @@ function checkCurrentPosition2 (io,data,pos) {
 	)
 
 }
-function checkAttackData (io,data,listUnit) {
 
-}
-function checkAttackData2 (io,data,stringKeyAttack) {
+function checkAttackData (io,data,stringKeyAttack) {
 	var checkBoolFriendData = false;
 	var checkBoolGuildData = false;
 	var attackBool = false;
