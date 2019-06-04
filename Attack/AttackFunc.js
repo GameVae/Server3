@@ -49,7 +49,7 @@ var DictTimeInterval={};
 // 			resolve();
 // 		})
 // 	})
-	
+
 // }
 exports.SetAttackData = function setAttackData2(Server_ID,stringKeyDefend,stringKeyAttack) {
 	// console.log(Server_ID,stringKeyDefend,stringKeyAttack)
@@ -120,8 +120,8 @@ function attackInterval (io,Server_ID,ID_User_Defend){
 		}
 		);
 	}else {
-		DictTimeInterval[ID_User_Defend] = setInterval(function (ID_User_Defend) {
-			
+		var stringInterval = "Attacking_"+ID_User_Defend;
+		DictTimeInterval[stringInterval] = setInterval(function (ID_User_Defend) {			
 			client.hexists(stringHUnit,ID_User_Defend,function (error,rows) {
 				if (rows==0) {
 					clearIntervalAttack (ID_User_Defend);					
@@ -149,9 +149,10 @@ exports.ClearIntervalAttack = function clearIntervalAttack2 (ID_User_Defend) {
 }
 
 function clearIntervalAttack (ID_User_Defend) {
-	if (DictTimeInterval[ID_User_Defend]!=undefined) {
-		clearInterval(DictTimeInterval[ID_User_Defend]);
-		delete DictTimeInterval[ID_User_Defend];
+	var stringInterval = "Attacking_"+ID_User_Defend;
+	if (DictTimeInterval[stringInterval]!=undefined) {
+		clearInterval(DictTimeInterval[stringInterval]);
+		delete DictTimeInterval[stringInterval];
 		
 		new Promise((resolve,reject)=>{
 			client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
@@ -534,14 +535,17 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 			if (attackDataBool==true) {
 				client.hmget(stringHUnit,dataDefendArray,function (error,rows) {
 					for (var i = 0; i < rows.length; i++) {
-						var result = JSON.parse(rows[i]);
-						if (posArray.includes(result.Position_Cell)) {
-							attackBool = true;
-							dataDefend = dataDefendArray[i];
-							setAttackData (Server_ID,dataDefend,dataAttack);
-							updateDataBaseAttack (Server_ID,dataAttack,dataDefend);							
-							break;
+						if (rows[i]!=null) {
+							var result = JSON.parse(rows[i]);
+							if (posArray.includes(result.Position_Cell)) {
+								attackBool = true;
+								dataDefend = dataDefendArray[i];
+								setAttackData (Server_ID,dataDefend,dataAttack);
+								updateDataBaseAttack (Server_ID,dataAttack,dataDefend);							
+								break;
+							}
 						}
+						
 					}
 					resolve();
 				});

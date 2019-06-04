@@ -276,8 +276,6 @@ function checkCurrentPosition (io,data,pos) {
 	var attackingBool = false;
 	var getAttackBool = false;
 	var arrayUnitResult = [];
-	var arrayPos = [];
-
 	/*
 	**Check vị trí tìm mảng unit => lấy list mới, check unit
 	*/
@@ -298,9 +296,8 @@ function checkCurrentPosition (io,data,pos) {
 				}
 			}else{
 				attackFunc.ClearIntervalAttack(stringUnitMoving);
-			}
+			}			
 			
-			// console.log(listUnitReturn)
 			resolve();
 		});
 	}).then(()=>new Promise((resolve,reject)=>{
@@ -348,20 +345,6 @@ function checkCurrentPosition (io,data,pos) {
 						resolve();
 					}
 				}).then(()=>new Promise((resolve,reject)=>{
-					// if (data.Status == functions.UnitStatus.Standby) {
-					// 	client.hget(stringHUnit,stringUnitMoving,function (error,rows) {
-					// 		// console.log(stringHUnit,stringUnitMoving,rows)
-					// 		if (rows!=null) {
-					// 			var result = JSON.parse(rows);
-					// 			if (result.Attack_Unit_ID==null) {
-					// 				attackingBool = true;
-					// 				// defendUnit = result;
-					// 			}
-					// 		}
-					// 		resolve();	
-					// 	})
-					// }
-
 					if (attackBool==true&&data.End_Cell==data.Position_Cell) {
 						client.hget(stringHUnit,stringUnitMoving,function (error,rows) {
 							// console.log(stringHUnit,stringUnitMoving,rows)
@@ -391,8 +374,8 @@ function checkCurrentPosition (io,data,pos) {
 				}).then(()=>new Promise((resolve,reject)=>{
 					if (arrayUnitResult.length>0) {
 						position_Check.GetPosition(stringUnitMoving,function (returnPosArray) {
-							// arrayPos = returnPosArray;	
-							console.log('arrayPos: '+arrayPos)
+
+							console.log('returnPosArray: '+returnPosArray)
 
 							if (arrayUnitResult.length>0) {
 								new Promise((resolve,reject)=>{
@@ -438,13 +421,14 @@ function checkCurrentPosition (io,data,pos) {
 				)
 				)
 				)
-});
-}else{
-	attackFunc.ClearIntervalAttack(stringUnitMoving);
-}
+			});
+		}else{
+			attackFunc.ClearIntervalAttack(stringUnitMoving);
+		}
 
-})
+	})
 )
+
 }
 function checkCurrentPosition2 (io,data,pos) {
 	// console.log('checkCurrentPosition '+new Date().toISOString()+"_"+pos);
