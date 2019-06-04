@@ -375,7 +375,7 @@ function checkCurrentPosition (io,data,pos) {
 					if (arrayUnitResult.length>0) {
 						position_Check.GetPosition(stringUnitMoving,function (returnPosArray) {
 
-							console.log('returnPosArray: '+returnPosArray)
+							// console.log('returnPosArray: '+returnPosArray)
 
 							if (arrayUnitResult.length>0) {
 								new Promise((resolve,reject)=>{

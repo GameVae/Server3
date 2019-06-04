@@ -61,7 +61,7 @@ function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 	stringHUnit = "s"+Server_ID+"_unit";
 	// console.log(Server_ID,ID_Defend,ID_Attack)
 	client.hexists(stringHAttack,ID_Defend,function (error,resultBool) {
-		console.log(resultBool,ID_Defend,ID_Attack)
+		// console.log(resultBool,ID_Defend,ID_Attack)
 		if (resultBool==1) {
 			client.hget(stringHAttack,ID_Defend,function (error,result) {
 				var resultID = result.split("/").filter(String)
@@ -134,9 +134,12 @@ function attackInterval (io,Server_ID,ID_User_Defend){
 					// })
 					clearIntervalAttack (ID_User_Defend);
 				}else{
-					client.hget(stringHAttack,ID_User_Defend,function (error,rows) {			
-						var dataAttack = rows.split("/").filter(String);
-						getAttackCalc (io,Server_ID,dataAttack,ID_User_Defend);			
+					client.hget(stringHAttack,ID_User_Defend,function (error,rows) {	
+						if (rows!=null) {
+							var dataAttack = rows.split("/").filter(String);
+							getAttackCalc (io,Server_ID,dataAttack,ID_User_Defend);	
+						}		
+						
 					});					
 				}
 			})
