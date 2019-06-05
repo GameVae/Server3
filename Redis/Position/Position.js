@@ -46,16 +46,18 @@ function getPosition (server_ID) {
 	
 }
 
-function deleteHashKey (server_ID) {
+
+exports.DeletePosKey = function deleteHashKey2 (server_ID,resolve) {
+	deleteHashKey (server_ID,resolve);
+}
+function deleteHashKey (server_ID,resolve) {
 	var stringHkey = "s"+server_ID+"_pos";
 	client.del(stringHkey,function (error,result) {
 		if (!!error) {console.log(error);}
+		resolve()
 	});
-}
-exports.DeletePosKey = function deleteHashKey2 (server_ID) {
-	deleteHashKey (server_ID);
-}
 
+}
 function getRangeUnit (row,server_ID) {
 	if (row.ID_Unit>15&&row.ID_Unit<20) {unitRange1 (row,server_ID);}
 	if (row.ID_Unit>20&&row.ID_Unit<25) {unitRange2 (row,server_ID);}

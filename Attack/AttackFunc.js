@@ -260,6 +260,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			
 			if (def.Quality <= 0) {
 				def.Quality = 0;
+				attackGetPos.CheckPositionAfterAttack (io,server_ID,dataAttack);
 				for (var i = 0; i < rows.length; i++) {
 					var resultAttack = JSON.parse(rows[i]);
 					resultAttack.Status = 6;
@@ -288,7 +289,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			updateAttackData (io,dataAttack);			
 			clearIntervalAttack (ID_User_Defend);
 			
-			attackGetPos.CheckPositionAfterAttack (io,server_ID,dataAttack);
+			
 			move.ClearMoveTimeout(ID_User_Defend);
 			moving_Attack.ClearMoveTimeout(stringClearUnitMoving);
 		}
@@ -454,52 +455,55 @@ function checkDataAttack (io,dataCheck) {
 	db_position.query(stringQuery,function(error,rows){
 		if (!!error) {console.log(error);}
 		// console.log(rows[0])
-		if (rows[0].Status!=functions.UnitStatus.Base){
-			
-			if (rows[0].AttackedBool!=1) {
+		if (rows!=null) {
+			if (rows[0].Status!=functions.UnitStatus.Base){
+
+				if (rows[0].AttackedBool!=1) {
+					stringUpdate = "UPDATE `s"+dataCheck.toString().split("_")[0]+"_unit` SET "
+					+"`Status`='"+functions.UnitStatus.Standby
+					+"',`Attack_Unit_ID`= NULL"
+					+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
+
+					client.hget(stringHUnit,dataCheck,function (error,rows) {
+						if (!!error) {console.log(error);}
+						var result = JSON.parse(rows);
+						result.Status = functions.UnitStatus.Standby;
+						result.Attack_Unit_ID = null;
+
+						client.hset(stringHUnit,dataCheck,JSON.stringify(result));
+					});
+				}else{
+					stringUpdate = "UPDATE `s"+dataCheck.toString().split("_")[0]+"_unit` SET "
+					+"`Attack_Unit_ID`= NULL"
+					+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
+
+					checkAttackedUnit (io,dataCheck.toString().split("_")[0],dataCheck);
+
+					// checkAttackedUnit(rows[0],dataCheck);
+				}
+			}else {
 				stringUpdate = "UPDATE `s"+dataCheck.toString().split("_")[0]+"_unit` SET "
-				+"`Status`='"+functions.UnitStatus.Standby
+				+"`Status`='"+functions.UnitStatus.Base
 				+"',`Attack_Unit_ID`= NULL"
 				+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
 
 				client.hget(stringHUnit,dataCheck,function (error,rows) {
 					if (!!error) {console.log(error);}
 					var result = JSON.parse(rows);
-					result.Status = functions.UnitStatus.Standby;
+					result.Status = functions.UnitStatus.Base;
 					result.Attack_Unit_ID = null;
-
 					client.hset(stringHUnit,dataCheck,JSON.stringify(result));
 				});
-			}else{
-				stringUpdate = "UPDATE `s"+dataCheck.toString().split("_")[0]+"_unit` SET "
-				+"`Attack_Unit_ID`= NULL"
-				+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
-
 				checkAttackedUnit (io,dataCheck.toString().split("_")[0],dataCheck);
-
-				// checkAttackedUnit(rows[0],dataCheck);
+				// checkAttackedUnit(io,Server_ID,rows[0],dataCheck);
+				// checkAttackedData(io,Server_ID,rows[0],dataCheck);
 			}
-		}else {
-			stringUpdate = "UPDATE `s"+dataCheck.toString().split("_")[0]+"_unit` SET "
-			+"`Status`='"+functions.UnitStatus.Base
-			+"',`Attack_Unit_ID`= NULL"
-			+" WHERE `ID`='"+dataCheck.toString().split("_")[3]+"'";
-
-			client.hget(stringHUnit,dataCheck,function (error,rows) {
+			// console.log(stringUpdate)
+			db_position.query(stringUpdate,function(error,result){
 				if (!!error) {console.log(error);}
-				var result = JSON.parse(rows);
-				result.Status = functions.UnitStatus.Base;
-				result.Attack_Unit_ID = null;
-				client.hset(stringHUnit,dataCheck,JSON.stringify(result));
 			});
-			checkAttackedUnit (io,dataCheck.toString().split("_")[0],dataCheck);
-			// checkAttackedUnit(io,Server_ID,rows[0],dataCheck);
-			// checkAttackedData(io,Server_ID,rows[0],dataCheck);
+
 		}
-		// console.log(stringUpdate)
-		db_position.query(stringUpdate,function(error,result){
-			if (!!error) {console.log(error);}
-		})
 	})
 }
 exports.CheckAttackedUnit = function checkAttackedUnit2 (io,Server_ID,dataCheck) {
