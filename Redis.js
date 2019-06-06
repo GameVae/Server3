@@ -15,8 +15,9 @@ var positionData 	= require("./Redis/Position/Position.js");
 // positionData.DeletePosKey(1)
 // positionData.DeletePosKey(1);
 getUnitDataPos (1);
-unitData.GetUnitData(client,1);
+
 getUnitMight (client);
+unitData.GetUnitData(client,1);
 
 function getUnitDataPos (server_ID) {
 	// console.log('server_ID: '+server_ID)

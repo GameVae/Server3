@@ -18,9 +18,10 @@ exports.RedisData ={
 	TestUnit : 2,
 }
 
+
 exports.CaseUnitAttack={
 	NoneAttack 	: 	0,
-	Attackted 	: 	1,	
+	Attacked 	: 	1,	
 }
 var Vectorcity = 2;
 var StraightLine = Vectorcity*1400;

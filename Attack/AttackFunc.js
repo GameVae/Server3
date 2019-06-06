@@ -11,10 +11,9 @@ var db_position 			= require('./../Util/Database/Db_position.js');
 
 var attackGetPos 			= require('./AttackGetPos.js');
 
-var Promise 				= require('promise');
-
 var functions 				= require('./../Util/Functions.js');
 
+var Promise 				= require('promise');
 var redis 					= require("redis"),
 client 						= redis.createClient();
 client.select(functions.RedisData.TestUnit);
@@ -260,17 +259,23 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			
 			if (def.Quality <= 0) {
 				def.Quality = 0;
-				attackGetPos.CheckPositionAfterAttack (io,server_ID,dataAttack);
+				// attackGetPos.CheckPositionAfterAttack (io,server_ID,dataAttack);
 				for (var i = 0; i < rows.length; i++) {
-					var resultAttack = JSON.parse(rows[i]);
-					resultAttack.Status = 6;
-					resultAttack.Attack_Unit_ID = null;
-					var stringAttack = server_ID+"_"+resultAttack.ID_Unit+"_"+resultAttack.ID_User+"_"+resultAttack.ID;
-					client.hset(stringHUnit,stringAttack,JSON.stringify(resultAttack));
+					if (rows!=null) {
+						var resultAttack = JSON.parse(rows[i]);
+						resultAttack.Status = 6;
+						resultAttack.Attack_Unit_ID = null;
+						var stringAttack = server_ID+"_"+resultAttack.ID_Unit+"_"+resultAttack.ID_User+"_"+resultAttack.ID;
+						// client.hset(stringHUnit,stringAttack,JSON.stringify(resultAttack));//chinh sua
+						client.hset(stringHUnit,stringAttack,JSON.stringify(resultAttack),function (error,result) {
+						//check dataAttack attacking
+						// attackGetPos.CheckUnitAttack(io,server_ID,stringAttack)
+					});
+					}
 				}
 			}
 			def.Hea_cur = Number(def.Hea_cur);
-			
+
 			resolve();
 		});
 	}).then(()=> new Promise((resolve,reject)=>{

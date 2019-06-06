@@ -6,13 +6,12 @@
 // var move 					= require('./../Redis/Move/Move.js');
 // var moving_Attack 			= require('./../Unit/Moving_Attack.js');
 
-// var attackFunc 				= require('./AttackFunc.js')
+var attackFunc 				= require('./AttackFunc.js')
 var friendData 				= require('./../Redis/Friend/FriendData.js');
 var guildData 				= require('./../Redis/Guild/GuildData.js');
-
 var position_Check			= require('./../Redis/Position/Position_Check.js');
 
-// var db_position 			= require('./../Util/Database/Db_position.js');
+var db_position 			= require('./../Util/Database/Db_position.js');
 
 var Promise 				= require('promise');
 
@@ -22,116 +21,9 @@ var redis 					= require("redis"),
 client 						= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-var stringHAttack, stringHUnit,stringHPos;
+var stringHAttack, stringHUnit;
 
 
-exports.CheckUnitAttack = function checkUnitAttack2 (io,Server_ID,dataAttack) {
-	checkUnitAttack (io,Server_ID,dataAttack);
-}
-
-function checkUnitAttack (io,Server_ID,dataAttack) {
-	stringHPos = "s"+Server_ID+"_pos";
-	stringHUnit = "s"+Server_ID+"_unit";
-	stringHAttack = "s"+Server_ID+"_attack";
-
-	var caseAttack = functions.CaseUnitAttack.NoneAttack;
-
-	var arrayAttackUnit = [];
-	new Promise((resolve,reject)=>{
-		client.hget(stringHAttack,dataAttack,function (error,rowsAttack) {
-			if (rowsAttack!=null) {
-				caseAttack = functions.CaseUnitAttack.Attacked;
-				arrayAttackUnit = rowsAttack.split("/").filter(String);
-			}
-			resolve();
-		})
-	}).then(()=>new Promise((resolve,reject)=>{
-		switch (caseAttack) {
-			case functions.CaseUnitAttack.NoneAttack:
-			checkUnitNoneAttack (io,Server_ID,dataAttack);
-			break;
-			case functions.CaseUnitAttack.Attacked:
-			checkUnitAttacked (io,Server_ID,dataAttack,arrayAttackUnit);
-			break;
-		}
-		resolve();
-
-	}))
-}
-
-checkUnitNoneAttack (null,1,'1_16_43_223')
-function checkUnitNoneAttack (io,Server_ID,dataAttack) {
-	stringHPos = "s"+Server_ID+"_pos";
-	var posArray = []
-	var resultArray = [];
-	new Promise((resolve,reject)=>{
-		position_Check.GetPosition(dataAttack,function (returnPosArray) {
-			posArray = returnPosArray;
-
-			resolve();
-		});
-	}).then(()=>new Promise((resolve,reject)=>{
-		// console.log(posArray)
-		client.hmget(stringHPos,posArray,function (error,rows) {
-			for (var i = 0; i < rows.length; i++) {
-				resultArray.push(rows[i].split("/").filter(String));
-
-			}
-			// console.log(resultArray)
-			// console.log(resultArray.length)
-			for (var i = 0; i < resultArray.length; i++) {
-				if (resultArray.length>1) {
-					console.log('hre')
-					console.log(resultArray[i])
-				}
-			}
-		})
-	})
-	)
-
-}
-
-// checkUnitAttacked (null,1,'1_16_44_222',null)
-function checkUnitAttacked (io,Server_ID,dataAttack,arrayAttackUnit) {
-	// unit dang tan cong minh
-	var unitPosArray = [];
-	var unitAttack = {};
-
-	var getUnitAttack =null;
-	var canAttackBool = false;
-	new Promise((resolve,reject)=>{
-		position_Check.GetPosition(dataAttack,function (returnPosArray) {
-			unitPosArray = returnPosArray;
-			resolve();
-		});
-	}).then(()=>new Promise((resolve,reject)=>{
-		client.hmget(stringHUnit,arrayAttackUnit,function (error,rows) {
-
-			for (var i = 0; i < rows.length; i++) {
-				unitAttack = JSON.parse(rows[i])
-				if (unitPosArray.includes(unitAttack.Position_Cell)) {
-					getUnitAttack = arrayAttackUnit[i];
-					break;
-				}
-			}
-			resolve();
-		});
-	}).then(()=>new Promise((resolve,reject)=>{
-		if (getUnitAttack!=null) {
-			attackFunc.SetAttackData(Server_ID,getUnitAttack,dataAttack);
-			canAttackBool = true;
-		}
-		resolve();
-	}).then(()=>new Promise((resolve,reject)=>{
-		if (canAttackBool == true) {
-			attackFunc.AttackInterval(io,Server_ID,getUnitAttack);
-		}
-		resolve();
-	}))
-	)
-	)
-}
-//
 exports.CheckPositionAfterAttack = function checkPositionAfterAttack2(io,server_ID,dataAttack){
 	checkPositionAfterAttack(io,server_ID,dataAttack);
 }
