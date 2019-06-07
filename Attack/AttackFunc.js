@@ -273,6 +273,9 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			if (def.Quality <= 0) {
 				def.Quality = 0;
 				// attackGetPos.CheckPositionAfterAttack (io,server_ID,dataAttack);
+				client.hdel(stringHAttack,dataDefend);
+				client.hdel(stringHUnit,dataDefend);
+
 				for (var i = 0; i < rows.length; i++) {
 					if (rows!=null) {
 						var resultAttack = JSON.parse(rows[i]);
@@ -281,9 +284,11 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 						var stringAttack = server_ID+"_"+resultAttack.ID_Unit+"_"+resultAttack.ID_User+"_"+resultAttack.ID;
 						// client.hset(stringHUnit,stringAttack,JSON.stringify(resultAttack));//chinh sua
 						client.hset(stringHUnit,stringAttack,JSON.stringify(resultAttack),function (error,result) {
-						//check dataAttack attacking
-						// attackGetPos.CheckUnitAttack(io,server_ID,stringAttack)
-					});
+							// attackGetPos.CheckUnitAttack(io,server_ID,stringAttack)
+						});
+						if (rows[i]!=null) {
+							attackGetPos.CheckUnitAttack(io,server_ID,stringAttack)
+						}
 					}
 				}
 			}
@@ -299,8 +304,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 		if (def.Quality > 0) {
 			client.hset(stringHUnit,dataDefend,JSON.stringify(def));
 		}else{
-			client.hdel(stringHAttack,dataDefend);
-			client.hdel(stringHUnit,dataDefend);
+			
 			//remove pos khi chet
 			positionRemove.PostionRemove(dataDefend);
 

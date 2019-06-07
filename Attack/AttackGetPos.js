@@ -108,11 +108,14 @@ function checkUnitAttacked (io,Server_ID,dataAttack,arrayAttackUnit) {
 		client.hmget(stringHUnit,arrayAttackUnit,function (error,rows) {
 
 			for (var i = 0; i < rows.length; i++) {
-				unitAttack = JSON.parse(rows[i])
-				if (unitPosArray.includes(unitAttack.Position_Cell)) {
-					getUnitAttack = arrayAttackUnit[i];
-					break;
+				if (rows[i]!=null) {
+					unitAttack = JSON.parse(rows[i])
+					if (unitPosArray.includes(unitAttack.Position_Cell)) {
+						getUnitAttack = arrayAttackUnit[i];
+						break;
+					}
 				}
+				
 			}
 			resolve();
 		});
