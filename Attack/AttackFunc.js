@@ -101,7 +101,8 @@ function attackInterval (io,Server_ID,ID_User_Defend){
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
 	// console.log(ID_User_Defend)
-	if (DictTimeInterval[ID_User_Defend]!=undefined) {
+	var stringInterval = "Attacking_"+ID_User_Defend;
+	if (DictTimeInterval[stringInterval]!=undefined) {
 		client.hexists(stringHUnit,ID_User_Defend,function (error,rows) {
 			if (rows==0) {
 				clearIntervalAttack (ID_User_Defend);
@@ -151,9 +152,14 @@ exports.ClearIntervalAttack = function clearIntervalAttack2 (ID_User_Defend) {
 }
 
 function clearIntervalAttack (ID_User_Defend) {	
-	if (DictTimeInterval[ID_User_Defend]!=undefined) {
-		clearInterval(DictTimeInterval[ID_User_Defend]);
-		delete DictTimeInterval[ID_User_Defend];	
+	var stringInterval = "Attacking_"+ID_User_Defend;
+	if (DictTimeInterval[stringInterval]!=undefined) {
+		clearInterval(DictTimeInterval[stringInterval]);
+		delete DictTimeInterval[stringInterval];	
+
+		stringHAttack = "s"+ID_User_Defend.split("_")[0]+"_attack";
+		stringHUnit = "s"+ID_User_Defend.split("_")[0]+"_unit";
+
 		client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
 			if (rows!=null) {
 				var result = rows.split("/").filter(String);
