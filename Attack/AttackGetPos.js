@@ -59,7 +59,7 @@ function checkUnitAttack (io,Server_ID,dataAttack) {
 	}))
 }
 
-checkUnitNoneAttack (null,1,'1_16_43_223')
+// checkUnitNoneAttack (null,1,'1_16_43_223')
 function checkUnitNoneAttack (io,Server_ID,dataAttack) {
 	stringHPos = "s"+Server_ID+"_pos";
 	var posArray = []

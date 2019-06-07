@@ -150,7 +150,32 @@ exports.ClearIntervalAttack = function clearIntervalAttack2 (ID_User_Defend) {
 	clearIntervalAttack (ID_User_Defend);
 }
 
-function clearIntervalAttack (ID_User_Defend) {
+function clearIntervalAttack (ID_User_Defend) {	
+	if (DictTimeInterval[ID_User_Defend]!=undefined) {
+		clearInterval(DictTimeInterval[ID_User_Defend]);
+		delete DictTimeInterval[ID_User_Defend];	
+		client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
+			if (rows!=null) {
+				var result = rows.split("/").filter(String);
+				client.hmget(stringHUnit,result,function (error,resultUnitAttack) {
+					for (var i = 0; i < resultUnitAttack.length; i++) {
+						var stringUnitResult =  JSON.parse(resultUnitAttack[i]);
+						var unitID = result[i];
+						if (stringUnitResult!=null) {
+							stringUnitResult.Attack_Unit_ID = null;
+							client.hset(stringHUnit,unitID,JSON.stringify(stringUnitResult))
+						}
+					}					
+				});
+
+			}
+		})
+		client.hdel(stringHAttack,ID_User_Defend);			
+	}
+}
+function clearIntervalAttack3 (ID_User_Defend) {
+	
+
 	var stringInterval = "Attacking_"+ID_User_Defend;
 	if (DictTimeInterval[stringInterval]!=undefined) {
 		clearInterval(DictTimeInterval[stringInterval]);
@@ -182,23 +207,6 @@ function clearIntervalAttack (ID_User_Defend) {
 		
 		
 	}
-	// var stringClearUnitMoving = "Unit_Moving_"+ID_User_Defend
-	// move.ClearMoveTimeout(ID_User_Defend);
-	// moving_Attack.ClearMoveTimeout(stringClearUnitMoving);
-
-	// if (DictTimeInterval[ID_User_Defend]!=undefined) {
-	// 	clearInterval(DictTimeInterval[ID_User_Defend]);
-	// 	delete DictTimeInterval[ID_User_Defend];
-	// 	stringHAttack = "s"+ID_User_Defend.split("_")[0]+"_attack"
-	// 	client.hdel(stringHAttack ,ID_User_Defend);
-	// 	// move.ClearMoveTimeout(ID_User_Defend);
-	// 	// moving_Attack.ClearMoveTimeout(ID_User_Defend);
-
-	// 	// stringHAttack = "s"+ID_User_Defend.split("_")[0]+"_attack";
-
-	// 	// removeRedisData(stringHkey,ID_User_Defend,ID_Attack)
-
-	// }
 }
 
 // getAttackCalc (null,1,[ '1_16_9_43' ],'1_16_42_54');
@@ -212,17 +220,22 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 	var CounterMul = [];
 	var QualityLost = 0;
 	var tempObj={};
+	var defendAliveBool=false;
 	// console.log(dataAttack,dataDefend)
 	
 	new Promise((resolve,reject)=>{
 		client.hget(stringHUnit,dataDefend,function (error,rows) {
-			def = JSON.parse(rows);
+			if (rows!=null) {
+				def = JSON.parse(rows);
+				defendAliveBool = true;
+			}
+			
 			resolve();
 		});
 	}).then(()=> new Promise((resolve,reject)=>{
 		client.hmget(stringHUnit,dataAttack,function (error,rows) {
 			for (var i = 0; i < rows.length; i++) {
-				if (rows[i]!=null) {
+				if (rows[i]!=null&&defendAliveBool==true) {
 					var result = JSON.parse(rows[i]);
 					CounterMul[i] = checkCounter(result,def);
 					// console.log(result)			
