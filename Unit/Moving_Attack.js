@@ -423,7 +423,7 @@ function checkCurrentPosition (io,data,pos) {
 				)
 			});
 		}else{
-			attackFunc.ClearIntervalAttack(stringUnitMoving);
+			// attackFunc.ClearIntervalAttack(stringUnitMoving);
 		}
 
 	})

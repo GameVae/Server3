@@ -6,13 +6,14 @@
 // var move 					= require('./../Redis/Move/Move.js');
 // var moving_Attack 			= require('./../Unit/Moving_Attack.js');
 
-// var attackFunc 				= require('./AttackFunc.js')
+var attackFunc 				= require('./AttackFunc.js')
+
 var friendData 				= require('./../Redis/Friend/FriendData.js');
 var guildData 				= require('./../Redis/Guild/GuildData.js');
 
 var position_Check			= require('./../Redis/Position/Position_Check.js');
 
-// var db_position 			= require('./../Util/Database/Db_position.js');
+var db_position 			= require('./../Util/Database/Db_position.js');
 
 var Promise 				= require('promise');
 
@@ -88,17 +89,14 @@ function checkUnitNoneAttack (io,Server_ID,dataAttack) {
 		})
 	})
 	)
-
 }
 
-// checkUnitAttacked (null,1,'1_16_44_222',null)
 function checkUnitAttacked (io,Server_ID,dataAttack,arrayAttackUnit) {
 	// unit dang tan cong minh
 	var unitPosArray = [];
 	var unitAttack = {};
 
 	var getUnitAttack =null;
-	var canAttackBool = false;
 	new Promise((resolve,reject)=>{
 		position_Check.GetPosition(dataAttack,function (returnPosArray) {
 			unitPosArray = returnPosArray;
@@ -112,27 +110,54 @@ function checkUnitAttacked (io,Server_ID,dataAttack,arrayAttackUnit) {
 					unitAttack = JSON.parse(rows[i])
 					if (unitPosArray.includes(unitAttack.Position_Cell)) {
 						getUnitAttack = arrayAttackUnit[i];
+						attackFunc.SetAttackData (Server_ID,getUnitAttack,dataAttack)
+						resolve();
 						break;
 					}
-				}
-				
-			}
-			resolve();
+				}				
+			}			
 		});
-	}).then(()=>new Promise((resolve,reject)=>{
-		if (getUnitAttack!=null) {
-			attackFunc.SetAttackData(Server_ID,getUnitAttack,dataAttack);
-			canAttackBool = true;
-		}
+	}).then(()=>new Promise((resolve,reject)=>{		
+		attackFunc.AttackInterval(io,Server_ID,getUnitAttack);
 		resolve();
-	}).then(()=>new Promise((resolve,reject)=>{
-		if (canAttackBool == true) {
-			attackFunc.AttackInterval(io,Server_ID,getUnitAttack);
-		}
-		resolve();
-	}))
+	})
 	)
 	)
+}
+
+function setAttackData (Server_ID,ID_Defend,ID_Attack,resolve) {
+	stringHAttack = "s"+Server_ID+"_attack";
+	stringHUnit = "s"+Server_ID+"_unit";
+	// console.log(Server_ID,ID_Defend,ID_Attack)
+	var stringUpdate = "UPDATE `s"+Server_ID+"_unit` SET `Attack_Unit_ID` ='"+ID_Defend+"' WHERE `ID`='"+ID_Attack.split("_")[3]+"'; "+
+	"UPDATE `s"+Server_ID+"_unit` SET `AttackedBool` = '1' WHERE `ID` = '"+ID_Defend.split("_")[3]+"'"
+	db_position.query(stringUpdate,function (error,result) {
+		if (!!error) {console.log('AttackFunc.js setAttackData '+stringUpdate);}
+	})
+	client.hexists(stringHAttack,ID_Defend,function (error,resultBool) {
+		// console.log(resultBool,ID_Defend,ID_Attack)
+		if (resultBool==1) {
+			client.hget(stringHAttack,ID_Defend,function (error,result) {
+				var resultID = result.split("/").filter(String)
+				// console.log("resultID: "+resultID);
+				if (!resultID.includes(ID_Attack)) {
+					addValue (stringHAttack,ID_Defend,result,ID_Attack);
+				}
+			});
+		}else{
+			addValue (stringHAttack,ID_Defend,"",ID_Attack);
+		}
+		client.hget(stringHUnit,ID_Defend,function (error,rows) {
+			var result = JSON.parse(rows)
+			result.Attack_Unit_ID = ID_Attack;
+			client.hset(stringHUnit,ID_Defend,JSON.stringify(result))
+			resolve();	
+		});
+	})
+
+	
+
+	
 }
 //
 exports.CheckPositionAfterAttack = function checkPositionAfterAttack2(io,server_ID,dataAttack){
@@ -321,7 +346,7 @@ function checkAndGetDataAttack (io,unit,posUnitElement) {
 	)
 }
 
-function setAttackData (Server_ID,ID_Defend,ID_Attack) {
+function setAttackData2 (Server_ID,ID_Defend,ID_Attack) {
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
 	// console.log(Server_ID,ID_Defend,ID_Attack)
@@ -332,8 +357,8 @@ function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 	});
 	
 	client.hexists(stringHAttack,ID_Defend,function (error,resultBool) {
-		console.log('AttackGetPos.js setAttackData')
-		console.log(resultBool,ID_Defend,ID_Attack)
+		// console.log('AttackGetPos.js setAttackData')
+		// console.log(resultBool,ID_Defend,ID_Attack)
 		if (resultBool==1) {
 			client.hget(stringHAttack,ID_Defend,function (error,result) {
 				var resultID = result.split("/").filter(String)

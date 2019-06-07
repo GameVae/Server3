@@ -100,57 +100,114 @@ exports.AttackInterval = function attackInterval2(io,Server_ID,stringKeyDefend) 
 function attackInterval (io,Server_ID,ID_User_Defend){
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
-	// console.log(ID_User_Defend)
-	if (DictTimeInterval[ID_User_Defend]!=undefined) {
-		client.hexists(stringHUnit,ID_User_Defend,function (error,rows) {
-			if (rows==0) {
-				clearIntervalAttack (ID_User_Defend);
-			}	
-		});
+	var stringInterval = "Attacking_"+ID_User_Defend;
+	if (DictTimeInterval[stringInterval]!=undefined) {
 
-		client.hexists(stringHAttack,ID_User_Defend,function (error,rows) {
-			if (rows==0) {
-				clearIntervalAttack (ID_User_Defend);
-				// new Promise((resolve,reject)=>{
-				// 	//check position
-				// })
-				
-			}
-		}
-		);
-	}else {
-		var stringInterval = "Attacking_"+ID_User_Defend;
-		DictTimeInterval[stringInterval] = setInterval(function (ID_User_Defend) {			
-			client.hexists(stringHUnit,ID_User_Defend,function (error,rows) {
-				if (rows==0) {
+	}else{		
+		DictTimeInterval[stringInterval] = setInterval(function (stringHUnit,stringHAttack,io,Server_ID,ID_User_Defend) {			
+			client.hget(stringHUnit,ID_User_Defend,function (error,rows) {
+				if (rows==null) {
 					clearIntervalAttack (ID_User_Defend);					
 				}
 			});
-			client.hexists(stringHAttack,ID_User_Defend,function (error,rows) {
-				if (rows==0) {
-					// new Promise((resolve,reject)=>{
-					// 	//check position
-					// })
+			client.hget(stringHAttack,ID_User_Defend,function (error,rows) {	
+				if (rows!=null) {
+
+					var dataAttack = rows.split("/").filter(String);
+					getAttackCalc (io,Server_ID,dataAttack,ID_User_Defend);	
+				}else {
 					clearIntervalAttack (ID_User_Defend);
-				}else{
-					client.hget(stringHAttack,ID_User_Defend,function (error,rows) {	
-						if (rows!=null) {
-							var dataAttack = rows.split("/").filter(String);
-							getAttackCalc (io,Server_ID,dataAttack,ID_User_Defend);	
-						}		
-						
-					});					
-				}
-			})
-		}, 1000, ID_User_Defend);
+				}	
+			});	
+
+		}, 1000, stringHUnit,stringHAttack,io,Server_ID,ID_User_Defend);
 	}
+	
 }
+
 
 exports.ClearIntervalAttack = function clearIntervalAttack2 (ID_User_Defend) {
 	clearIntervalAttack (ID_User_Defend);
 }
+// function clearIntervalAttack21 (ID_User_Defend) {	
+// 	var stringInterval = "Attacking_"+ID_User_Defend
+// 	if (DictTimeInterval[stringInterval]!=undefined) {
+// 		clearInterval(DictTimeInterval[stringInterval]);
+// 		delete DictTimeInterval[stringInterval];
 
+// 		client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
+// 			if (rows!=null) {
+// 				var result = rows.split("/").filter(String);
+// 				client.hmget(stringHUnit,result,function (error,resultUnitAttack) {
+// 					for (var i = 0; i < resultUnitAttack.length; i++) {
+// 						var stringUnitResult =  JSON.parse(resultUnitAttack[i]);
+// 						var unitID = result[i];
+// 						if (stringUnitResult!=null) {
+// 							stringUnitResult.Attack_Unit_ID = null;
+// 							client.hset(stringHUnit,unitID,JSON.stringify(stringUnitResult))
+// 						}
+// 					}					
+// 				});
+
+// 			}
+// 		})
+// 		client.hdel(stringHAttack,ID_User_Defend);			
+// 	}
+// }
 function clearIntervalAttack (ID_User_Defend) {	
+	var stringInterval = "Attacking_"+ID_User_Defend
+	if (DictTimeInterval[stringInterval]!=undefined) {
+		clearInterval(DictTimeInterval[stringInterval]);
+		// clearTimeout(DictTimeInterval[stringInterval])
+		delete DictTimeInterval[stringInterval];
+
+		client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
+			if (rows!=null) {
+				var result = rows.split("/").filter(String);
+				client.hmget(stringHUnit,result,function (error,resultUnitAttack) {
+					for (var i = 0; i < resultUnitAttack.length; i++) {
+						var stringUnitResult =  JSON.parse(resultUnitAttack[i]);
+						var unitID = result[i];
+						if (stringUnitResult!=null) {
+							stringUnitResult.Attack_Unit_ID = null;
+							client.hset(stringHUnit,unitID,JSON.stringify(stringUnitResult))
+						}
+					}					
+				});
+
+			}
+		})
+		client.hdel(stringHAttack,ID_User_Defend);			
+	}
+}
+
+function clearIntervalAttack3 (ID_User_Defend) {	
+	var stringInterval = "Attacking_"+ID_User_Defend
+	if (DictTimeInterval[stringInterval]!=undefined) {
+		clearInterval(DictTimeInterval[stringInterval]);
+		delete DictTimeInterval[stringInterval];
+
+		client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
+			if (rows!=null) {
+				var result = rows.split("/").filter(String);
+				client.hmget(stringHUnit,result,function (error,resultUnitAttack) {
+					for (var i = 0; i < resultUnitAttack.length; i++) {
+						var stringUnitResult =  JSON.parse(resultUnitAttack[i]);
+						var unitID = result[i];
+						if (stringUnitResult!=null) {
+							stringUnitResult.Attack_Unit_ID = null;
+							client.hset(stringHUnit,unitID,JSON.stringify(stringUnitResult))
+						}
+					}					
+				});
+
+			}
+		})
+		client.hdel(stringHAttack,ID_User_Defend);			
+	}
+}
+function clearIntervalAttack3 (ID_User_Defend) {	
+	// var stringInterval = "Attacking_"+ID_User_Defend
 	if (DictTimeInterval[ID_User_Defend]!=undefined) {
 		clearInterval(DictTimeInterval[ID_User_Defend]);
 		delete DictTimeInterval[ID_User_Defend];	
@@ -173,7 +230,7 @@ function clearIntervalAttack (ID_User_Defend) {
 		client.hdel(stringHAttack,ID_User_Defend);			
 	}
 }
-function clearIntervalAttack3 (ID_User_Defend) {
+function clearIntervalAttack4(ID_User_Defend) {
 	
 
 	var stringInterval = "Attacking_"+ID_User_Defend;
@@ -275,9 +332,12 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 				// attackGetPos.CheckPositionAfterAttack (io,server_ID,dataAttack);
 				client.hdel(stringHAttack,dataDefend);
 				client.hdel(stringHUnit,dataDefend);
+				updateAttackData (io,dataAttack);
+
 
 				for (var i = 0; i < rows.length; i++) {
 					if (rows!=null) {
+						
 						var resultAttack = JSON.parse(rows[i]);
 						resultAttack.Status = 6;
 						resultAttack.Attack_Unit_ID = null;
@@ -285,10 +345,11 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 						// client.hset(stringHUnit,stringAttack,JSON.stringify(resultAttack));//chinh sua
 						client.hset(stringHUnit,stringAttack,JSON.stringify(resultAttack),function (error,result) {
 							// attackGetPos.CheckUnitAttack(io,server_ID,stringAttack)
+							attackGetPos.CheckUnitAttack(io,server_ID,stringAttack);
 						});
-						if (rows[i]!=null) {
-							attackGetPos.CheckUnitAttack(io,server_ID,stringAttack)
-						}
+
+
+						
 					}
 				}
 			}
@@ -308,12 +369,12 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			//remove pos khi chet
 			positionRemove.PostionRemove(dataDefend);
 
-			updateAttackData (io,dataAttack);			
+
 			clearIntervalAttack (ID_User_Defend);
 			
 			
 			move.ClearMoveTimeout(ID_User_Defend);
-			moving_Attack.ClearMoveTimeout(stringClearUnitMoving);
+			moving_Attack.ClearMoveTimeout(ID_User_Defend);
 		}
 		resolve();
 	}).then(()=>new Promise((resolve,reject)=>{
