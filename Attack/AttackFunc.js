@@ -624,7 +624,7 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 					var result = rows.split("/").filter(String);
 					dataDefendArray = result;
 					resolve();
-				}				
+				}
 			})
 		}).then(()=>new Promise((resolve,reject)=>{
 			if (attackDataBool==true) {
@@ -640,7 +640,6 @@ function checkAttackedUnit (io,Server_ID,dataCheck) {
 								break;
 							}
 						}
-						
 					}
 					resolve();
 				});
