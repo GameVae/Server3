@@ -74,13 +74,18 @@ function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 		}
 	})
 
+	client.hget(stringHUnit,ID_Attack,function (error,rows) {
+		var result = JSON.parse(rows)
+		result.Attack_Unit_ID = ID_Defend;
+		result.Status = functions.UnitStatus.Attack_Unit;
+		client.hset(stringHUnit,ID_Attack,JSON.stringify(result))		
+	});
 	client.hget(stringHUnit,ID_Defend,function (error,rows) {
 		var result = JSON.parse(rows)
-		result.Attack_Unit_ID = ID_Attack;
+		result.AttackedBool = 1; 
 		client.hset(stringHUnit,ID_Defend,JSON.stringify(result))		
 	});
-
-	var stringUpdate = "UPDATE `s"+Server_ID+"_unit` SET `Attack_Unit_ID` ='"+ID_Defend+"' WHERE `ID`='"+ID_Attack.split("_")[3]+"'; "+
+	var stringUpdate = "UPDATE `s"+Server_ID+"_unit` SET `Status`='"+functions.UnitStatus.Attack_Unit+"',`Attack_Unit_ID` ='"+ID_Defend+"' WHERE `ID`='"+ID_Attack.split("_")[3]+"'; "+
 	"UPDATE `s"+Server_ID+"_unit` SET`AttackedBool` = '1' WHERE `ID` = '"+ID_Defend.split("_")[3]+"'"
 	db_position.query(stringUpdate,function (error,result) {
 		if (!!error) {console.log('AttackFunc.js setAttackData '+stringUpdate);}

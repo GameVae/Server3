@@ -60,6 +60,24 @@ function S_MOVE_ATT (io,data) {
 	)
 }
 
+// #begin clearAttackUnit
+function clearAttackUnit (stringUnitMoving) {
+	stringHUnit = "s"+stringUnitMoving.split("_")[0]+"_unit";
+	stringHAttack = "s"+stringUnitMoving.split("_")[0]+"_attack";
+	stringTimeout = "Unit_Moving_"+stringUnitMoving;
+
+	client.hget(stringHUnit,stringUnitMoving,function (error,rows){
+		if (rows!=null) {
+			var result = JSON.parse(rows);
+			if (result.Attack_Unit_ID!=null) {					
+				attackFunc.RemoveRedisData(stringHAttack,result.Attack_Unit_ID,stringUnitMoving);
+			}
+		}else{
+			clearMoveTimeout (stringTimeout);
+		}
+	});
+}
+// #end clearAttackUnit
 // #begin checkTimeMoveAttack
 function checkTimeMoveAttack (io,data) {
 	// console.log(data)
@@ -70,7 +88,6 @@ function checkTimeMoveAttack (io,data) {
 	client.hget(stringHUnit,stringUnitMoving,function (error,rows){
 		if (rows!=null) {
 			checkCurrentPosition (io,data,data.Position_Cell);
-
 			if (data.TimeMoveNextCell!=data.TimeFinishMove&&data.Next_Cell!=data.End_Cell) {
 				calcMove (io,data,stringUnitMoving);
 			}
@@ -567,19 +584,3 @@ function clearMoveTimeout (stringData) {
 	}
 }
 // #end ClearMoveTimeout
-
-// #begin clearAttackUnit
-function clearAttackUnit (stringUnitMoving) {
-	stringHUnit = "s"+stringUnitMoving.split("_")[0]+"_unit";
-	stringHAttack = "s"+stringUnitMoving.split("_")[0]+"_attack";
-
-	client.hget(stringHUnit,stringUnitMoving,function (error,rows){
-		if (rows!=null) {
-			var result = JSON.parse(rows);
-			if (result.Attack_Unit_ID!=null) {					
-				attackFunc.RemoveRedisData(stringHAttack,result.Attack_Unit_ID,stringUnitMoving);
-			}
-		}		
-	});
-}
-// #end clearAttackUnit
