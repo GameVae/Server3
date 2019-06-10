@@ -101,7 +101,7 @@ function addValue (stringHkey,ID_Defend,data,ID_Attack) {
 exports.AttackInterval = function attackInterval2(io,Server_ID,stringKeyDefend) {
 	attackInterval(io,Server_ID,stringKeyDefend);
 }
-
+// var
 function attackInterval (io,Server_ID,ID_User_Defend){
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
