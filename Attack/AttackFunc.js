@@ -114,6 +114,12 @@ function attackInterval (io,Server_ID,ID_User_Defend){
 				if (rows==null) {
 					clearIntervalAttack (ID_User_Defend);					
 				}
+				if (rows==undefined) {
+					clearIntervalAttack (ID_User_Defend);
+					client.hdel(stringHAttack,ID_User_Defend,function (error) {
+						if (!!error) {console.log('AttackFunc.js clear hdel '+ID_User_Defend)}
+					});
+				}
 			});
 			client.hget(stringHAttack,ID_User_Defend,function (error,rows) {	
 				if (rows!=null) {
@@ -338,6 +344,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 				client.hdel(stringHAttack,dataDefend);
 				client.hdel(stringHUnit,dataDefend);
 				updateAttackData (io,dataAttack);
+				updateDefendData (dataDefend);
 
 
 				for (var i = 0; i < rows.length; i++) {
@@ -374,10 +381,8 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			//remove pos khi chet
 			positionRemove.PostionRemove(dataDefend);
 
-
 			clearIntervalAttack (ID_User_Defend);
-			
-			
+
 			move.ClearMoveTimeout(ID_User_Defend);
 			moving_Attack.ClearMoveTimeout(ID_User_Defend);
 		}
@@ -432,7 +437,17 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 // */
 
 // }
-
+function updateDefendData (server_ID,stringDefend) {
+	stringHUnit ="s"+server_ID+"_unit";
+	stringHAttack ="s"+server_ID+"_attack";
+	var stringQuery ="SELECT `Attack_Unit_ID` FROM `s"+server_ID+"_unit` WHERE `ID` ='"+stringDefend.split("_")[3]+"'"
+	db_position.query(stringQuery,function (error,rows) {
+		if (!!error) {console.log('AttackFunc.js updateDefendData '+ stringQuery);}
+		if (rows!=undefined) {
+			removeRedisData (stringHAttack,rows[0].Attack_Unit_ID,stringDefend);
+		}
+	})
+}
 function updateDataBaseQuality (server_ID,dataUpdate) {
 	var stringUpdate;
 	if (dataUpdate.Quality > 0) {

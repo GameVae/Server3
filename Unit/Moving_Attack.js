@@ -128,77 +128,77 @@ function checkTimeMoveAttack (io,data) {
 }
 // #end checkTimeMoveAttack
 
-function checkLastPosAttack (io,data) {
-	stringHAttack = "s"+data.Server_ID+"_attack";
-	stringHUnit = "s"+data.Server_ID+"_unit";
-	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+// function checkLastPosAttack (io,data) {
+// 	stringHAttack = "s"+data.Server_ID+"_attack";
+// 	stringHUnit = "s"+data.Server_ID+"_unit";
+// 	stringUnitMoving = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 
-	var attackingBool = false;
-	var getAttackBool = false;
-	var defendUnit = {};
-	var arrayUnitResult = [];
-	var arrayPos=[];
+// 	var attackingBool = false;
+// 	var getAttackBool = false;
+// 	var defendUnit = {};
+// 	var arrayUnitResult = [];
+// 	var arrayPos=[];
 
-	new Promise((resolve,reject)=>{
-		client.hget(stringHUnit,stringUnitMoving,function (error,rows) {
-			console.log(stringHUnit,stringUnitMoving,rows)
-			if (rows!=null) {
-				var result = JSON.parse(rows);
-				if (result.Attack_Unit_ID==null) {
-					attackingBool = true;
-					defendUnit = result;
-				}
-			}
-			resolve();	
-		})
-	}).then(()=>new Promise((resolve,reject)=>{
-		console.log(stringHAttack,stringUnitMoving)
-		if (attackingBool == true) {			
-			client.hget(stringHAttack,stringUnitMoving,function (error,rows) {
-				console.log(stringHAttack,stringUnitMoving,rows)
-				if (rows!=null) {
-					arrayUnitResult = rows.split("/").filter(String);
-					console.log('Moving_Attack.js');
-					console.log(arrayUnitResult);
-				}
-				resolve();
-			})
-		}		
-	}).then(()=>new Promise((resolve,reject)=>{
-		if (arrayUnitResult.length>0) {
-			position_Check.GetPosition(stringUnitMoving,function (returnPosArray) {
-				arrayPos = returnPosArray;	
-				console.log('arrayPos: '+arrayPos)			
-				resolve();
-			})
-		}
-	}).then(()=>new Promise((resolve,reject)=>{
-		if (arrayUnitResult.length>0) {
-			client.hmget(stringHUnit,arrayUnitResult,function (error,rowsUnit) {
-				for (var i = 0; i < rowsUnit.length; i++) {
-					var resultUnit = JSON.parse(rowsUnit[i]);
-					if (arrayPos.includes(resultUnit.Position_Cell)) {
-						console.log('Moving_Attack.js');
-						console.log(arrayUnitResult[i]);
-						getAttackBool= true;
-						attackFunc.SetAttackData(data.Server_ID,arrayUnitResult[i],stringUnitMoving);
-						break;
-					}
-				}
-				resolve();
-			})
-		}
-	}).then(()=>new Promise((resolve,reject)=>{
-		if (getAttackBool == true) {
-			attackFunc.AttackInterval(io,data.Server_ID,stringUnitMoving);
-		}
-		resolve();
-	}))
-	)
-	)
-	)
+// 	new Promise((resolve,reject)=>{
+// 		client.hget(stringHUnit,stringUnitMoving,function (error,rows) {
+// 			console.log(stringHUnit,stringUnitMoving,rows)
+// 			if (rows!=null) {
+// 				var result = JSON.parse(rows);
+// 				if (result.Attack_Unit_ID==null) {
+// 					attackingBool = true;
+// 					defendUnit = result;
+// 				}
+// 			}
+// 			resolve();	
+// 		})
+// 	}).then(()=>new Promise((resolve,reject)=>{
+// 		console.log(stringHAttack,stringUnitMoving)
+// 		if (attackingBool == true) {			
+// 			client.hget(stringHAttack,stringUnitMoving,function (error,rows) {
+// 				console.log(stringHAttack,stringUnitMoving,rows)
+// 				if (rows!=null) {
+// 					arrayUnitResult = rows.split("/").filter(String);
+// 					console.log('Moving_Attack.js');
+// 					console.log(arrayUnitResult);
+// 				}
+// 				resolve();
+// 			})
+// 		}		
+// 	}).then(()=>new Promise((resolve,reject)=>{
+// 		if (arrayUnitResult.length>0) {
+// 			position_Check.GetPosition(stringUnitMoving,function (returnPosArray) {
+// 				arrayPos = returnPosArray;	
+// 				console.log('arrayPos: '+arrayPos)			
+// 				resolve();
+// 			})
+// 		}
+// 	}).then(()=>new Promise((resolve,reject)=>{
+// 		if (arrayUnitResult.length>0) {
+// 			client.hmget(stringHUnit,arrayUnitResult,function (error,rowsUnit) {
+// 				for (var i = 0; i < rowsUnit.length; i++) {
+// 					var resultUnit = JSON.parse(rowsUnit[i]);
+// 					if (arrayPos.includes(resultUnit.Position_Cell)) {
+// 						console.log('Moving_Attack.js');
+// 						console.log(arrayUnitResult[i]);
+// 						getAttackBool= true;
+// 						attackFunc.SetAttackData(data.Server_ID,arrayUnitResult[i],stringUnitMoving);
+// 						break;
+// 					}
+// 				}
+// 				resolve();
+// 			})
+// 		}
+// 	}).then(()=>new Promise((resolve,reject)=>{
+// 		if (getAttackBool == true) {
+// 			attackFunc.AttackInterval(io,data.Server_ID,stringUnitMoving);
+// 		}
+// 		resolve();
+// 	}))
+// 	)
+// 	)
+// 	)
 	
-}
+// }
 // #Begin calcMove
 function calcMove (io,data,stringUnitMoving) {
 	// console.log('stringUnitMoving: '+stringUnitMoving)
