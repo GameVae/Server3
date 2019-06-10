@@ -344,7 +344,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 				client.hdel(stringHAttack,dataDefend);
 				client.hdel(stringHUnit,dataDefend);
 				updateAttackData (io,dataAttack);
-				updateDefendData (dataDefend);
+				updateDefendData (server_ID,dataDefend);
 
 
 				for (var i = 0; i < rows.length; i++) {
@@ -438,6 +438,8 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 
 // }
 function updateDefendData (server_ID,stringDefend) {
+	// console.log('updateDefendData')
+	// console.log(stringDefend)
 	stringHUnit ="s"+server_ID+"_unit";
 	stringHAttack ="s"+server_ID+"_attack";
 	var stringQuery ="SELECT `Attack_Unit_ID` FROM `s"+server_ID+"_unit` WHERE `ID` ='"+stringDefend.split("_")[3]+"'"

@@ -4,7 +4,7 @@
 // var positionRemove 			= require('./../Redis/Position/Position_Remove.js'); 
 // positionRemove.Test(5)
 // var move 					= require('./../Redis/Move/Move.js');
-// var moving_Attack 			= require('./../Unit/Moving_Attack.js');
+var moving_Attack 			= require('./../Unit/Moving_Attack.js');
 
 var attackFunc 				= require('./AttackFunc.js')
 
@@ -62,33 +62,83 @@ function checkUnitAttack (io,Server_ID,dataAttack) {
 
 // checkUnitNoneAttack (null,1,'1_16_43_223')
 function checkUnitNoneAttack (io,Server_ID,dataAttack) {
-	stringHPos = "s"+Server_ID+"_pos";
-	var posArray = []
-	var resultArray = [];
-	new Promise((resolve,reject)=>{
-		position_Check.GetPosition(dataAttack,function (returnPosArray) {
-			posArray = returnPosArray;
-
-			resolve();
-		});
-	}).then(()=>new Promise((resolve,reject)=>{
-		// console.log(posArray)
-		client.hmget(stringHPos,posArray,function (error,rows) {
-			for (var i = 0; i < rows.length; i++) {
-				resultArray.push(rows[i].split("/").filter(String));
-
+	stringHUnit = "s"+Server_ID+"_unit";
+	client.hget(stringHUnit,dataAttack,function (error,rowsPos) {		
+		if (rowsPos!=null) {
+			var ID_Unit = dataAttack.split("_")[1];
+			var ID_User = dataAttack.split("_")[2];
+			var ID = dataAttack.split("_")[3];
+			var pos = JSON.parse(rowsPos).Position_Cell;
+			var data = {
+				Server_ID: Server_ID,
+				ID_Unit: ID_Unit,
+				ID_User: ID_User,
+				ID: ID,
+				Position_Cell: pos
 			}
-			// console.log(resultArray)
-			// console.log(resultArray.length)
-			for (var i = 0; i < resultArray.length; i++) {
-				if (resultArray.length>1) {
-					console.log('hre')
-					console.log(resultArray[i])
-				}
-			}
-		})
+			// console.log('checkUnitNoneAttack')
+			// console.log(data);
+			moving_Attack.CheckCurrentPosition(io,data,data.Position_Cell);			
+		}
 	})
-	)
+
+
+	// new Promise((resolve,reject)=>{
+	// 	position_Check.GetPosition(dataAttack,function (returnPosArray) {
+	// 		posArray = returnPosArray;
+
+	// 		resolve();
+	// 	});
+	// }).then(()=>new Promise((resolve,reject)=>{
+	// 	// console.log(posArray)
+	// 	client.hmget(stringHPos,posArray,function (error,rows) {
+	// 		for (var i = 0; i < rows.length; i++) {
+	// 			resultArray.push(rows[i].split("/").filter(String));
+	// 		}
+	// 		resolve();
+	// 		// console.log(resultArray)
+	// 		// console.log(resultArray.length)			
+	// 	})
+	// }).then(()=>new Promise((resolve,reject)=>{
+	// 	client.hmget(stringHUnit,dataAttack,function (error,rowsPos) {
+	// 		console.log('AttackGetPos.js');
+	// 		console.log(dataAttack)
+	// 		console.log(rowsPos)
+	// 		for (var i = 0; i < dataAttack.length; i++) {
+	// 			var unit = dataAttack[i];
+	// 			var pos = JSON.parse(rowsPos[i]).Position_Cell;
+
+	// 			var data ={
+	// 				Server_ID: unit.split("_")[0],
+	// 		// 		ID_Unit: unit.split("_")[1],
+	// 		// 		ID_User: unit.split("_")[2],
+	// 		// 		ID: unit.split("_")[3],
+	// 		// 		Position_Cell: JSON.parse(rowsPos[i]).Position_Cell,
+	// 	}
+	// }
+
+	// 		// for (var i = 0; i < dataAttack.length; i++) {
+	// 		// 	var unit = dataAttack[i];
+
+	// 		// 	var data = {
+	// 		// 		Server_ID: unit.split("_")[0],
+	// 		// 		ID_Unit: unit.split("_")[1],
+	// 		// 		ID_User: unit.split("_")[2],
+	// 		// 		ID: unit.split("_")[3],
+	// 		// 		Position_Cell: JSON.parse(rowsPos[i]).Position_Cell,
+	// 		// 	}
+	// 		// 	console.log(data)
+	// 		// 	moving_Attack.CheckCurrentPosition(io,data,data.Position_Cell)
+	// 		// 	// console.log('hre')
+	// 		// 	// console.log(resultArray[i])
+	// 		// 	//check current pos
+
+	// 		// }
+	// 		resolve();
+	// 	})
+	// })
+	// )
+	// )
 }
 
 function checkUnitAttacked (io,Server_ID,dataAttack,arrayAttackUnit) {

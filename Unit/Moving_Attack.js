@@ -281,6 +281,10 @@ function calcTimeCheck (data) {
 }
 // #End calcMove
 // #begin checkCurrentPosition
+exports.CheckCurrentPosition = function checkCurrentPosition2 (io,data,pos) {
+	checkCurrentPosition (io,data,pos);
+}
+
 function checkCurrentPosition (io,data,pos) {
 	// console.log('checkCurrentPosition '+new Date().toISOString()+"_"+pos);
 	stringHPos = "s"+data.Server_ID+"_pos";
