@@ -174,41 +174,6 @@ function checkUnitAttacked (io,Server_ID,dataAttack,arrayAttackUnit) {
 	)
 	)
 }
-
-function setAttackData (Server_ID,ID_Defend,ID_Attack,resolve) {
-	stringHAttack = "s"+Server_ID+"_attack";
-	stringHUnit = "s"+Server_ID+"_unit";
-	// console.log(Server_ID,ID_Defend,ID_Attack)
-	var stringUpdate = "UPDATE `s"+Server_ID+"_unit` SET `Attack_Unit_ID` ='"+ID_Defend+"' WHERE `ID`='"+ID_Attack.split("_")[3]+"'; "+
-	"UPDATE `s"+Server_ID+"_unit` SET `AttackedBool` = '1' WHERE `ID` = '"+ID_Defend.split("_")[3]+"'"
-	db_position.query(stringUpdate,function (error,result) {
-		if (!!error) {console.log('AttackFunc.js setAttackData '+stringUpdate);}
-	})
-	client.hexists(stringHAttack,ID_Defend,function (error,resultBool) {
-		// console.log(resultBool,ID_Defend,ID_Attack)
-		if (resultBool==1) {
-			client.hget(stringHAttack,ID_Defend,function (error,result) {
-				var resultID = result.split("/").filter(String)
-				// console.log("resultID: "+resultID);
-				if (!resultID.includes(ID_Attack)) {
-					addValue (stringHAttack,ID_Defend,result,ID_Attack);
-				}
-			});
-		}else{
-			addValue (stringHAttack,ID_Defend,"",ID_Attack);
-		}
-		client.hget(stringHUnit,ID_Defend,function (error,rows) {
-			var result = JSON.parse(rows)
-			result.Attack_Unit_ID = ID_Attack;
-			client.hset(stringHUnit,ID_Defend,JSON.stringify(result))
-			resolve();	
-		});
-	})
-
-	
-
-	
-}
 //
 exports.CheckPositionAfterAttack = function checkPositionAfterAttack2(io,server_ID,dataAttack){
 	checkPositionAfterAttack(io,server_ID,dataAttack);

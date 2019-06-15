@@ -16,6 +16,7 @@ exports.RedisData ={
 	Data0 : 0,
 	Data1 : 1,
 	TestUnit : 2,
+	Server: 2,
 }
 
 
@@ -30,12 +31,17 @@ var DiagonalLine = Vectorcity*1262;
 // var DiagonalTime = 1262;
 var StraightTime = StraightLine / Vectorcity;
 var DiagonalTime = DiagonalLine / Vectorcity;
-
+exports.CaseMove = {	
+	Straight : 1,
+	Diagonal : 2,
+}
 exports.TimeMove ={
 	Straight : StraightTime,
 	Diagonal : DiagonalTime,
 }
-
+exports.Test = function(para){
+	console.log(para)
+}
 exports.WriteLogError = function(detailError,intLocationFile){
 	console.log(getTimeNow()+": Error "+detailError);
 	fs.appendFile(getStringErrorFile (intLocationFile), "\r\n "+ getTimeNow() +": "+detailError, (err) => {

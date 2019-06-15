@@ -21,24 +21,6 @@ var DictTimeInterval = {};
 
 var stringHAttack,stringHUnit;
 
-// move.Test(2)
-// var dataA ={
-// 	"ID":9,"ID_Unit":16,"Level":1,"ID_User":9,"BaseNumber":1,"Quality":3,"Hea_cur":5.2,"Health":5.2,"Attack":2.15,"Defend":1.1,"Position_Cell":"489,80,0","Next_Cell":null,"End_Cell":null,"TimeMoveNextCell":null,"ListMove":null,"Status":0,"Attack_Base_ID":null,"Attack_Unit_ID":null,"Attacked_ID":0
-// }
-
-// var dataB={
-// 	"ID":10,"ID_Unit":16,"Level":1,"ID_User":9,"BaseNumber":1,"Quality":2,"Hea_cur":5.2,"Health":5.2,"Attack":2.15,"Defend":1.1,"Position_Cell":"489,81,0","Next_Cell":null,"End_Cell":null,"TimeMoveNextCell":null,"ListMove":null,"Status":6,"Attack_Base_ID":null,"Attack_Unit_ID":null,"Attacked_ID":0
-// }
-
-// AttackCalc (dataA,dataB,function (returnValue) {
-// 	console.log(returnValue);
-// });
-
-//AttackCalc (dataA,dataB)
-// var attack = ["1_16_9_9","1_16_9_10"];
-// //var attack = "1_16_9_8"
-// var defend = "1_16_9_11";
-
 exports.Test = function test (argument) {
 	console.log(argument)
 }
