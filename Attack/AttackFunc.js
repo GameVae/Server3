@@ -59,37 +59,56 @@ function setAttackData (Server_ID,ID_Defend,ID_Attack) {
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
 	// console.log(Server_ID,ID_Defend,ID_Attack)
-	client.hexists(stringHAttack,ID_Defend,function (error,resultBool) {
-		// console.log(resultBool,ID_Defend,ID_Attack)
-		if (resultBool==1) {
-			client.hget(stringHAttack,ID_Defend,function (error,result) {
-				var resultID = result.split("/").filter(String)
-				// console.log("resultID: "+resultID);
-				if (!resultID.includes(ID_Attack)) {
-					addValue (stringHAttack,ID_Defend,result,ID_Attack);
+	var defendAliveBool = false;
+	var attackAliveBool = false;
+	new Promise((resolve,reject)=>{
+		client.hget(stringHUnit,ID_Defend,function (error,rows){
+			if (rows!=null) {
+				defendAliveBool = true;
+				var result = JSON.parse(rows);
+				result.AttackedBool = 1; 
+				client.hset(stringHUnit,ID_Defend,JSON.stringify(result));
+			}
+			resolve();
+		})
+	}).then(()=>new Promise((resolve,reject)=>{
+		client.hget(stringHAttack,ID_Defend,function (error,result){
+			if (defendAliveBool==true) {
+				if (result!=null) {
+					var resultID = result.split("/").filter(String)
+					// console.log("resultID: "+resultID);
+					if (!resultID.includes(ID_Attack)) {
+						addValue (stringHAttack,ID_Defend,result,ID_Attack);
+					}
+				}else {
+					addValue (stringHAttack,ID_Defend,"",ID_Attack);
 				}
+			}
+			resolve();
+		})
+	}).then(()=>new Promise((resolve,reject)=>{
+		client.hget(stringHUnit,ID_Attack,function (error,rows) {
+			if (rows!=null) {
+				attackAliveBool = true;
+				var result = JSON.parse(rows);
+				result.Attack_Unit_ID = ID_Defend;
+				result.Status = functions.UnitStatus.Attack_Unit;
+				client.hset(stringHUnit,ID_Attack,JSON.stringify(result))	
+			}
+			resolve();	
+		});
+	}).then(()=>new Promise((resolve,reject)=>{
+		if (defendAliveBool==true&&attackAliveBool==true) {
+			var stringUpdate = "UPDATE `s"+Server_ID+"_unit` SET `Status`='"+functions.UnitStatus.Attack_Unit+"',`Attack_Unit_ID` ='"+ID_Defend+"' WHERE `ID`='"+ID_Attack.split("_")[3]+"'; "+
+			"UPDATE `s"+Server_ID+"_unit` SET`AttackedBool` = '1' WHERE `ID` = '"+ID_Defend.split("_")[3]+"'"
+			db_position.query(stringUpdate,function (error,result) {
+				if (!!error) {console.log('AttackFunc.js setAttackData '+stringUpdate);}
+				resolve();
 			});
-		}else{
-			addValue (stringHAttack,ID_Defend,"",ID_Attack);
 		}
-	})
-
-	client.hget(stringHUnit,ID_Attack,function (error,rows) {
-		var result = JSON.parse(rows)
-		result.Attack_Unit_ID = ID_Defend;
-		result.Status = functions.UnitStatus.Attack_Unit;
-		client.hset(stringHUnit,ID_Attack,JSON.stringify(result))		
-	});
-	client.hget(stringHUnit,ID_Defend,function (error,rows) {
-		var result = JSON.parse(rows)
-		result.AttackedBool = 1; 
-		client.hset(stringHUnit,ID_Defend,JSON.stringify(result))		
-	});
-	var stringUpdate = "UPDATE `s"+Server_ID+"_unit` SET `Status`='"+functions.UnitStatus.Attack_Unit+"',`Attack_Unit_ID` ='"+ID_Defend+"' WHERE `ID`='"+ID_Attack.split("_")[3]+"'; "+
-	"UPDATE `s"+Server_ID+"_unit` SET`AttackedBool` = '1' WHERE `ID` = '"+ID_Defend.split("_")[3]+"'"
-	db_position.query(stringUpdate,function (error,result) {
-		if (!!error) {console.log('AttackFunc.js setAttackData '+stringUpdate);}
-	})
+	}))
+	)
+	)	
 }
 
 function addValue (stringHkey,ID_Defend,data,ID_Attack) {
@@ -173,12 +192,12 @@ function clearIntervalAttack (ID_User_Defend) {
 						}
 
 					}
-
+					client.hdel(stringHAttack,ID_User_Defend);
 				});
 			}
 		})
 	}
-	client.hdel(stringHAttack,ID_User_Defend);
+	
 }
 // function clearIntervalAttack4 (ID_User_Defend) {	
 // 	var stringInterval = "Attacking_"+ID_User_Defend
@@ -304,6 +323,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 				client.hdel(stringHUnit,dataDefend);
 				updateAttackData (io,dataAttack);
 				updateDefendData (server_ID,dataDefend);
+				clearIntervalAttack (dataDefend);
 
 
 				for (var i = 0; i < rows.length; i++) {
@@ -354,7 +374,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			//remove pos khi chet
 			positionRemove.PostionRemove(dataDefend);
 
-			clearIntervalAttack (ID_User_Defend);
+			
 
 			move.ClearMoveTimeout(ID_User_Defend);
 			moving_Attack.ClearMoveTimeout(ID_User_Defend);
