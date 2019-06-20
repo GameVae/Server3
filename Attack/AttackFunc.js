@@ -141,36 +141,15 @@ exports.ClearIntervalAttack = function clearIntervalAttack2 (ID_User_Defend) {
 	clearIntervalAttack (ID_User_Defend);
 }
 
-function clearIntervalAttack4 (ID_User_Defend) {	
-	var stringInterval = "Attacking_"+ID_User_Defend
-	if (DictTimeInterval[stringInterval]!=undefined) {
-		clearInterval(DictTimeInterval[stringInterval]);
-		// clearTimeout(DictTimeInterval[stringInterval])
-		delete DictTimeInterval[stringInterval];
-
-		client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
-			if (rows!=null) {
-				var result = rows.split("/").filter(String);
-				client.hmget(stringHUnit,result,function (error,resultUnitAttack) {
-					for (var i = 0; i < resultUnitAttack.length; i++) {
-						var stringUnitResult =  JSON.parse(resultUnitAttack[i]);
-						var unitID = result[i];
-						if (stringUnitResult!=null) {
-							stringUnitResult.Attack_Unit_ID = null;
-							client.hset(stringHUnit,unitID,JSON.stringify(stringUnitResult))
-						}
-					}					
-				});
-
-			}
-		})
-		client.hdel(stringHAttack,ID_User_Defend);			
-	}
-}
 function clearIntervalAttack (ID_User_Defend) {	
 	var stringInterval = "Attacking_"+ID_User_Defend;
 	var server_ID = ID_User_Defend.split("_")[0]
 	stringHAttack ="s"+server_ID+"_attack";
+
+	var stringUpdate = "UPDATE `s"+server_ID+"_unit` SET `Attack_Unit_ID` = NULL, `Status`='"+functions.UnitStatus.Standby+"' WHERE `Attack_Unit_ID`='"+ID_User_Defend+"'";
+	db_position.query(stringUpdate,function (error,result) {
+		if (!!error) {console.log('AttackFunc.js '+error);}	
+	})
 
 	if (DictTimeInterval[stringInterval]!=undefined) {
 		clearInterval(DictTimeInterval[stringInterval]);
@@ -187,18 +166,8 @@ function clearIntervalAttack (ID_User_Defend) {
 							var unitID = result[i];
 							if (stringUnitResult!=null) {
 								stringUnitResult.Attack_Unit_ID = null;
-								stringUnitResult.Status = functions.UnitStatus.Standby;
-								client.hset(stringHUnit,unitID,JSON.stringify(stringUnitResult))
-
-								var stringUpdate = "UPDATE `s"+server_ID+"_unit` SET `Attack_Unit_ID` = NULL, `Status`='"+functions.UnitStatus.Standby+"' WHERE `ID`='"+unitID.split("_")[3]+"'"
-								db_position.query(stringUpdate,function (error,result) {
-									if (!!error) {console.log('AttackFunc.js '+error);}
-									if (i==resultUnitAttack.length) {
-										// console.log('AttackFunc.js')
-										// console.log(resultUnitAttack.length)										
-										client.hdel(stringHAttack,ID_User_Defend);
-									}
-								})
+								stringUnitResult.Status = functions.UnitStatus.Standby;								
+								client.hset(stringHUnit,unitID,JSON.stringify(stringUnitResult));
 
 							}
 						}
@@ -208,9 +177,37 @@ function clearIntervalAttack (ID_User_Defend) {
 				});
 			}
 		})
-
 	}
+	client.hdel(stringHAttack,ID_User_Defend);
 }
+// function clearIntervalAttack4 (ID_User_Defend) {	
+// 	var stringInterval = "Attacking_"+ID_User_Defend
+// 	if (DictTimeInterval[stringInterval]!=undefined) {
+// 		clearInterval(DictTimeInterval[stringInterval]);
+// 		// clearTimeout(DictTimeInterval[stringInterval])
+// 		delete DictTimeInterval[stringInterval];
+
+// 		client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
+// 			if (rows!=null) {
+// 				var result = rows.split("/").filter(String);
+// 				client.hmget(stringHUnit,result,function (error,resultUnitAttack) {
+// 					for (var i = 0; i < resultUnitAttack.length; i++) {
+// 						var stringUnitResult =  JSON.parse(resultUnitAttack[i]);
+// 						var unitID = result[i];
+// 						if (stringUnitResult!=null) {
+// 							stringUnitResult.Attack_Unit_ID = null;
+// 							client.hset(stringHUnit,unitID,JSON.stringify(stringUnitResult))
+// 						}
+// 					}					
+// 				});
+
+// 			}
+// 		})
+// 		client.hdel(stringHAttack,ID_User_Defend);			
+// 	}
+// }
+
+
 // function clearIntervalAttack3 (ID_User_Defend) {	
 // 	var stringInterval = "Attacking_"+ID_User_Defend
 // 	if (DictTimeInterval[stringInterval]!=undefined) {
@@ -274,7 +271,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 
 				}else{
 					Attack = Attack + 0;
-					
+					dataAttack.splice(dataAttack.indexOf(dataAttack[i]), 1);
 					removeRedisData (stringHAttack,dataDefend,dataAttack[i]);
 				}
 			}			

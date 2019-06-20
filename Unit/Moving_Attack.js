@@ -59,10 +59,9 @@ exports.Moving_Attack = function moving_Attack2(io,socket,data) {
 		ListMove: data.ListMove,
 		Attack_Unit_ID: data.Attack_Unit_ID
 	}
-	checkMovePos (io,data,stringUnit)
-
-
+	checkMovePos (io,data,stringUnit);
 }
+
 function checkMovePos (io,data,stringKey) {
 	// console.log(data)
 	var posCheck = data.Position_Cell;
@@ -97,10 +96,10 @@ function checkMovePos (io,data,stringKey) {
 			case functions.CaseMove.Diagonal:
 			// console.log('functions.CaseMove.Diagonal');
 			if (timeNext == functions.TimeMove.Diagonal) {
-				console.log('timeNext == functions.TimeMove.Diagonal');
+				// console.log('timeNext == functions.TimeMove.Diagonal');
 				timeOut = functions.TimeMove.Diagonal*0.5;
 			}else{
-				console.log('timeNext != functions.TimeMove.Diagonal');
+				// console.log('timeNext != functions.TimeMove.Diagonal');
 				timeOut =  timeNext - (functions.TimeMove.Diagonal*0.5);
 			}
 			break;
@@ -110,7 +109,7 @@ function checkMovePos (io,data,stringKey) {
 		// console.log(timeOut);
 		// clearTimeout(DictMoveAttack[stringMoveAttack])
 
-		DictMoveAttack[stringMoveAttack]=setTimeout(function setDel(io,data,stringKey) {
+		DictMoveAttack[stringMoveAttack]=setTimeout(function (io,data,stringKey) {
 			var updateData = data;
 			
 			if (data.ListMove.length>0) {
