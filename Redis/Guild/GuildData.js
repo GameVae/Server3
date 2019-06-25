@@ -58,15 +58,33 @@ exports.RemoveValueGuild = function removeValueGuild (stringID_User) {
 	var stringHkey = "all_guilds";
 	client.hdel(stringHkey,stringID_User);
 }
+exports.CheckListGuildData = function checkListGuildData2 (List_ID_Unit_User,ID_Player,returnListUnit) {
+	var stringHkey = "all_guilds";
+	var listIDUnitAttack = [];
+	var listIDUser = [];
+	// listIDUnitAttack.push(ID_Player);
+	var listUnitAttack = [];
 
-// function checkSameGuildID (ID_User1,ID_User2,returnBool) {
-// 	var checkBool = false;
-// 	var stringHkey = "all_guilds";
-// 	// console.log(ID_User1,ID_User2)
-// 	client.hmget(stringHkey,ID_User1,ID_User2, function (error,rows) {
-	
-// 		if (rows[0]==rows[1]&&rows[0]!=null) {checkBool = true;}
-// 		// var boolCheck = rows.every((val,i,arr)=> val===rows[0])
-// 		returnBool(checkBool);
-// 	})
-// }
+	for (var i = 0; i < List_ID_Unit_User.length; i++) {
+		var unitId = List_ID_Unit_User[i].split("_")[2];
+		listIDUser.push(unitId);
+	}
+
+	client.hmget(stringHkey,listIDUser,function (error,rows) {		
+		if (rows!=null) {
+			for (var i = 0; i < rows.length; i++) {
+				if (rows[i]!=null) {
+					var result = rows[i].split("/").filter(String);
+					if (!result.includes(ID_Player)) {
+						listUnitAttack.push(List_ID_Unit_User[i]);
+					}
+				}else{
+					listUnitAttack.push(List_ID_Unit_User[i]);
+				}				
+			}			
+		}else{ 
+			listUnitAttack = List_ID_Unit_User;
+		}
+		returnListUnit(listUnitAttack);
+	});
+}

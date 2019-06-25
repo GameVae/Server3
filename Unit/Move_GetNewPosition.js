@@ -47,7 +47,7 @@ function sendGetNewPos(io,data) {
 			// sendGetNewPos2(index.IO,data);		
 			DictTimeOut['sendNewPos'] = setTimeout(function (io,data) {
 				// console.log(rowsSocket[0])
-				sendGetNewPos2(io,data);
+				sendGetNewPos(io,data);
 			}, 1000, io,data);
 		}
 	});	
@@ -101,7 +101,7 @@ function redisRemoveSocket (io,data) {
 		if (resultBool==1) {
 			client.hdel(stringHkey,stringKey,function (error,result) {
 				if (!!error) {console.log(error);}
-				sendGetNewPos2(io,data);
+				sendGetNewPos(io,data);
 			});
 		}
 	})

@@ -19,6 +19,10 @@ exports.RedisData ={
 	Server: 2,
 }
 
+exports.CaseClearAttack ={
+	Full 		:1,
+	ClearUnit 	:2,
+}
 
 exports.CaseUnitAttack={
 	NoneAttack 	: 	0,

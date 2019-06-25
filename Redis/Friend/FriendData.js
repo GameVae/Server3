@@ -4,7 +4,7 @@ var functions 					= require('./../../Util/Functions.js');
 
 var redis = require("redis"),
 client = redis.createClient();
-client.select(functions.RedisData.TestUnit)
+client.select(functions.RedisData.TestUnit);
 
 exports.GetFriendData = function getFriendData () {
 	// var stringHkey = "all_friends";
@@ -77,8 +77,8 @@ exports.RemoveValueFriend = function removeValueFriend (stringKey,ID_Key) {
 	var stringHkey = "all_friends";
 	removeValue (stringHkey,stringKey,ID_Key);
 }
-function removeValue (stringHkey,stringKey,ID_Key) {
-	
+
+function removeValue (stringHkey,stringKey,ID_Key) {	
 	client.hget(stringHkey,stringKey,function (error,rows) {
 		var result = rows.split("/");
 		if (result.includes(ID_Key)) {
@@ -91,18 +91,113 @@ function removeValue (stringHkey,stringKey,ID_Key) {
 	});
 }
 
-exports.CheckFriendData = function checkFriendData (ID_User,ID_Player,returnBool) {
+exports.CheckFriendData = function checkFriendData2 (ID_User,ID_Player,returnBool) {
+	checkFriendData (ID_User,ID_Player,returnBool)	
+}
+
+function checkFriendData (ID_User,ID_Player,returnBool) {
 	var checkBool = false;
 	var stringHkey = "all_friends";
-	client.hexists(stringHkey,ID_User,function (error,resultBool) {
-		if (resultBool==1) {
-			client.hget(stringHkey,ID_User,function (error,rows) {
-				var result = rows.split("/");
-				if (result.includes(ID_Player)) {checkBool = true;}
-				returnBool(checkBool);
-			});
-		}else{
-			returnBool(checkBool);
+	client.hget(stringHkey,ID_User,function (error,rows) {
+		if (rows!=null) {
+			var result = rows.split("/").filter(String);
+			if (result.includes(ID_Player)) {checkBool = true;}
 		}
+		returnBool(checkBool);
+	});
+	// client.hexists(stringHkey,ID_User,function (error,resultBool) {
+	// 	if (resultBool==1) {
+	// 		client.hget(stringHkey,ID_User,function (error,rows) {
+	// 			var result = rows.split("/");
+	// 			if (result.includes(ID_Player)) {checkBool = true;}
+	// 			returnBool(checkBool);
+	// 		});
+	// 	}else{
+	// 		returnBool(checkBool);
+	// 	}
+	// }); 
+}
+exports.CheckListFriendData = function checkListFriendData2 (List_ID_User,ID_Player,returnListUnit) {
+	var stringHkey = "all_friends";
+	var listBoolFriend = [];
+	var listIDUnitAttack = [];
+	var listUnitAttack = [];
+	// console.log('FriendData.js checkListFriendData')
+	// console.log(List_ID_User,ID_Player)
+
+	for (var i = 0; i < List_ID_User.length; i++) {
+		var unitId = List_ID_User[i].split("_")[2];
+		listIDUnitAttack.push(unitId);
+	}
+
+	client.hmget(stringHkey,listIDUnitAttack,function (error,rows) {			
+		if (rows!=null) {
+			for (var i = 0; i < rows.length; i++) {
+				if (rows[i]!=null) {
+					var result = rows[i].split("/").filter(String);
+					if (!result.includes(ID_Player)) {
+						listUnitAttack.push(List_ID_User[i]);
+					}
+				}else{
+					listUnitAttack.push(List_ID_User[i]);
+				}				
+			}			
+		}
+		if (rows==null){
+			listUnitAttack = List_ID_User;
+		}
+		// console.log('listUnitAttack')
+		// console.log(listUnitAttack)
+		returnListUnit(listUnitAttack);
 	});
 }
+
+
+// exports.CheckListFriendData = function checkListFriendData2 (List_ID_User,ID_Player,returnListUnit) {
+// 	checkListFriendData (List_ID_User,ID_Player,function (returnList) {
+// 		console.log('FriendData.js returnList')
+// 		console.log(returnList)
+// 		returnListUnit(returnList);
+// 	})
+// }
+// // var list_ID_User = [12,3]
+// function checkListFriendData (List_ID_Unit_User,ID_Player,returnListUnit) {
+// 	// var checkBool = false;
+// 	var stringHkey = "all_friends";
+// 	var listBoolFriend = [];
+// 	var listIDUnitAttack = [];
+// 	var listUnitAttack = [];
+// 	console.log('FriendData.js checkListFriendData')
+// 	console.log(List_ID_Unit_User,ID_Player)
+
+// 	for (var i = 0; i < List_ID_Unit_User.length; i++) {
+// 		var unitId = List_ID_Unit_User.split("_")[2];
+// 		listIDUnitAttack.push(unitId);
+// 	}
+
+// 	client.hmget(stringHkey,listIDUnitAttack,function (error,rows) {		
+// 		console.log('rows')
+// 		console.log(rows)
+// 		if (rows!=null) {
+// 			for (var i = 0; i < rows.length; i++) {
+// 				if (rows[i]!=null) {
+// 					var result = rows[i].split("/").filter(String);
+// 					if (!result.includes(ID_Player)) {
+// 						listUnitAttack.push(List_ID_Unit_User[i]);
+// 					}
+// 				}else{
+// 					listUnitAttack.push(List_ID_Unit_User[i]);
+// 				}				
+// 			}			
+// 		}else{
+// 			listUnitAttack = List_ID_Unit_User;
+// 		}
+// 		if (rows==undefined){
+// 			listUnitAttack = List_ID_Unit_User;
+// 		}
+// 		console.log('listUnitAttack')
+// 		console.log(listUnitAttack)
+// 		returnListUnit(listUnitAttack);
+// 	});
+
+// }

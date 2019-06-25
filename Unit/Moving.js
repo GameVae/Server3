@@ -368,7 +368,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 				}else{
 					var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET"+
 					" `Position_Cell`='"+data.Next_Cell
-					+"',`Next_Cell`= NULL,`End_Cell`=NULL,`TimeMoveNextCell`=NULL,`TimeFinishMove`=NULL,`ListMove`=NULL,`Status`='"+functions.UnitStatus.Standby+"' "+
+					+"',`Next_Cell`= NULL,`End_Cell`=NULL,`TimeMoveNextCell`= NULL,`TimeFinishMove`=NULL,`ListMove`=NULL,`Status`='"+functions.UnitStatus.Standby+"' "+
 					"WHERE `ID`='"+data.ID+"'";
 					db_position.query(stringUpdate,function (error,result) {
 						if (!!error){DetailError = ('Move.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,2);}
@@ -381,8 +381,12 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 					updateDataMove.TimeMoveNextCell = null;
 					updateDataMove.TimeFinishMove = null;
 					updateDataMove.Status = 6;
-					
+
+					// attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell);
+
 					positionAdd.AddPosition(updateDataMove);
+
+
 				}
 				updateRedisDataPosition (stringKey,updateDataMove,Position_Cell);
 			})						
@@ -482,8 +486,10 @@ function updateDataBase (io,data) {
 		if (rows[0]!=undefined) {
 			if (rows[0].Attack_Unit_ID!=null) {
 				updateRedisAttack (data,rows[0].Attack_Unit_ID,rows[0]);
-				var ID_Defend = Server_ID+"_"+rows[0].ID_Unit+"_"+rows[0].ID_User+"_"+rows[0].ID;
-				attackFunc.RemoveAttackRedis(Server_ID,ID_Defend,ID_Attack);
+				var ID_Defend = data.Server_ID+"_"+rows[0].ID_Unit+"_"+rows[0].ID_User+"_"+rows[0].ID;
+				var ID_Attack = rows[0].Attack_Unit_ID;
+				attackFunc.RemoveRedisData(data.Server_ID,ID_Defend,ID_Attack);
+
 			}
 			if (data.Attack_Unit_ID=="NULL") {
 				stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "

@@ -1,91 +1,137 @@
-var functions = require('./Util/Functions.js')
-var DictMoveAttack={};
+// var st = '1_16_44_527/1_16_44_505/1_16_44_504/1_16_43_575/'
+// var result = st.split("/").filter(String)
+// console.log(result)
 
-var dataTest = { Server_ID: 1,
-	ID: 551,
-	ID_Unit: 16,
-	ID_User: 43,
-	Position_Cell: '291,0,0',
-	Next_Cell: '290,0,0',
-	End_Cell: '287,0,0',
-	TimeMoveNextCell: '2019-06-17T03:33:38.749',//10:07
-	TimeFinishMove: '2019-06-17T03:33:42.949',
-	ListMove: 
-	[ { Position_Cell: '290,0,0',
-	Next_Cell: '289,0,0',
-	TimeMoveNextCell: '2019-06-17T03:33:40.149' },
-	{ Position_Cell: '289,0,0',
-	Next_Cell: '288,0,0',
-	TimeMoveNextCell: '2019-06-17T03:33:41.549' },
-	{ Position_Cell: '288,0,0',
-	Next_Cell: '287,0,0',
-	TimeMoveNextCell: '2019-06-17T03:33:42.949' } ] }
-//
-checkMovePos (dataTest)
-function checkMovePos (data) {
-	// console.log(data)
-	var posCheck = data.Position_Cell;
-	var timeNext = 0, timeOut = 0;
-	var Position_Cell_X,Position_Cell_Y,Next_Cell_X,Next_Cell_Y;
-	// var stringKey = "5"
-	// var stringMoveAttack = "Moving_Attack_5";
-	checkCurrentPos (posCheck);
-	
-	if (data.TimeMoveNextCell!=null) {
-		Position_Cell_X = data.Position_Cell.toString().split(",")[0];
-		Position_Cell_Y = data.Position_Cell.toString().split(",")[1];
-		Next_Cell_X = data.Next_Cell.toString().split(",")[0];
-		Next_Cell_Y = data.Next_Cell.toString().split(",")[1];
-		var caseMove = functions.CaseMove.Straight;	
+var redis = require("redis"),
+client = redis.createClient();
+client.select(2)
 
-		if (Position_Cell_X!=Next_Cell_X&&Position_Cell_Y!=Next_Cell_Y) {caseMove = functions.CaseMove.Diagonal;}
+// var Promise = require('promise');
 
-		timeNext = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
+// var arrayUnitInPos2 = [ '1_16_44_527', '1_16_44_526', '1_16_43_580' ]
+//  test (arrayUnitInPos2)
+// function test (arrayUnitInPos) {
 
-		switch (caseMove) {
-			case functions.CaseMove.Straight:
-			if (timeNext == functions.TimeMove.Straight) {
-				// console.log('timeNext == functions.TimeMove.Straight');
-				timeOut = functions.TimeMove.Straight*0.5;
-			}else{
-				// console.log('timeNext != functions.TimeMove.Straight');
-				timeOut =  timeNext - (functions.TimeMove.Straight*0.5);
-			}
-			break;
+// 	for (var i = 0; i < arrayUnitInPos.length; i++) {
+// 		if (arrayUnitInPos[i].split("_")[2] == 43) {
+// 			console.log('arrayUnitInPos[i]')
+// 			console.log(arrayUnitInPos[i])
+// 			arrayUnitInPos.splice(arrayUnitInPos.indexOf(arrayUnitInPos[i], 1))
+// 		}
+// 	}	
+// 	console.log(arrayUnitInPos)
+// }
+var data = { ID: 506,
+  ID_Unit: 16,
+  ID_User: 44,
+  BaseNumber: 1,
+  Level: 1,
+  Quality: 6,
+  Hea_cur: 5.2,
+  Health: 5.2,
+  Attack: 2.15,
+  Defend: 1.1,
+  Position_Cell: '299,9,0',
+  Next_Cell: null,
+  End_Cell: null,
+  TimeMoveNextCell: null,
+  TimeFinishMove: null,
+  ListMove: null,
+  Status: 6,
+  Attack_Base_ID: null,
+  Attack_Unit_ID: null,
+  AttackedBool: 0 }
+if(data.Attack_Unit_ID==null){console.log('here')}
 
-			case functions.CaseMove.Diagonal:			
-			if (timeNext == functions.TimeMove.Diagonal) {
-				// console.log('timeNext == functions.TimeMove.Diagonal');
-				timeOut = functions.TimeMove.Diagonal*0.5;
-			}else{
-				// console.log('timeNext != functions.TimeMove.Diagonal');
-				timeOut =  timeNext - (functions.TimeMove.Diagonal*0.5);
-			}
-			break;
-		}
-		DictMoveAttack['Moving_Attack_5']=setTimeout(function (data) {
-			var updateData = data;
-			if (data.ListMove.length>0) {
-				updateData.Position_Cell = data.Next_Cell;
-				updateData.Next_Cell = data.ListMove[0].Next_Cell;
-				updateData.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
-				updateData.ListMove.shift();
-			}else{
-				updateData.Position_Cell = data.End_Cell;
-				updateData.TimeMoveNextCell=null;
-			}
-			checkMovePos (updateData);
-		},timeOut,data);
+// listIDUnitAttack = arrayUnitInPos;
+// console.log('listIDUnitAttack1')
+// console.log(listIDUnitAttack)
 
-	}else {
-		// if (data.End_Cell!=null) {posCheck=data.End_Cell;}	
-		// checkCurrentPos (posCheck);
-	}
+// if (listIDUnitAttack.length==0) {
+// 	attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full);
+// }
+// resolve();
 
+// var list_ID_User = ['1_16_44_510','1_16_44_531','1_16_43_579']
+// testProMise (list_ID_User)
+// function testProMise (para) {
+// 	var stringGet;
+// 	new Promise((resolve,reject)=>{
+// 		test(list_ID_User,function (callbackHere) {
+// 			stringGet = callbackHere;
+// 			resolve();
+// 		})
+// 	}).then(()=>new Promise((resolve,reject)=>{
+// 		console.log(stringGet)
+// 	}))
+// }
 
+// function test (para,callbackHere) {
+// 	var stringHkey = "Htest";
+// 	var stringKey = "test_"+para;
+// 	client.hset(stringHkey,stringKey,para.toString(),function (error) {
+// 		// console.log('here: '+para)
+// 		callbackHere(para)
+// 	})
+// }
+// checkListFriendData (list_ID_User,43,function (returnListUnit) {
+// 	console.log(returnListUnit)	
+// })
+// // function checkListFriendData (List_ID_User,ID_Player,returnListBool) {
+// // 	var checkBool = false;
+// // 	var stringHkey = "all_friends";
+// // 	var listBoolFriend=[];
+// // 	client.hmget(stringHkey,List_ID_User,function (error,rows) {
+// // 		// console.log(rows)		
+// // 		for (var i = 0; i < rows.length; i++) {
+// // 			if (rows[i]!=null) {
+// // 				var result = rows[i].split("/").filter(String);
+// // 				if (result.includes(ID_Player)) {checkBool=true;}	
+// // 			}
+// // 			listBoolFriend.push(checkBool);
+// // 		}
+// // 		returnListBool(listBoolFriend);
+// // 	});
+// // }
+// function checkListFriendData (List_ID_User,ID_Player,returnListUnit) {
+// 	// var checkBool = false;
+// 	var stringHkey = "s1_unit";
+// 	var listUnitIDAttack = [];
+// 	var listUnitAttck  = [];
+// 	for (var i = 0; i < List_ID_User.length; i++) {
+// 		listUnitIDAttack.push(List_ID_User[i].split("_")[2]);
+// 	}
 
+// 	console.log (listUnitIDAttack)
 
-}
-function checkCurrentPos (pos) {
-	console.log(pos)
-}
+// 	client.hmget(stringHkey,listUnitIDAttack,function (error,rows) {
+// 		if (rows!=null) {			
+// 			for (var i = 0; i < rows.length; i++) {
+
+// 				if (rows[i]!=null) {
+// 					var result = rows[i].split("/").filter(String);
+// 					if (!result.includes(ID_Player)) {						
+// 						listUnitAttck.push(List_ID_User[i]);
+// 					}
+// 				}else{
+// 					listUnitAttck.push(List_ID_User[i]);
+// 				}
+// 			}
+
+// 		}
+// 		returnListUnit(listUnitAttck);
+// 	});
+// 	// console.log(listCheck.length)
+// 	// client.hmget(stringHkey,listCheck,function (error,rows) {
+// 	// 	console.log(rows)		
+// 	// 	for (var i = 0; i < rows.length; i++) {
+// 	// 		if (rows[i]!=null) {
+// 	// 			var result = rows[i].split("/").filter(String);
+// 	// 			if (result.includes(ID_Player)) {
+// 	// 				checkBool=true;}	
+// 	// 		}
+// 	// 		listBoolFriend.push(checkBool);
+// 	// 	}
+// 	// 	returnListBool(listBoolFriend);
+// 	// });
+// }
