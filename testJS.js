@@ -6,9 +6,9 @@ var redis = require("redis"),
 client = redis.createClient();
 client.select(2)
 
-// var Promise = require('promise');
+var Promise = require('promise');
 
-// var arrayUnitInPos2 = [ '1_16_44_527', '1_16_44_526', '1_16_43_580' ]
+var arrayUnitInPos2 = [ '1_16_44_527', '1_16_44_526', '1_16_43_580' ]
 //  test (arrayUnitInPos2)
 // function test (arrayUnitInPos) {
 
@@ -21,27 +21,27 @@ client.select(2)
 // 	}	
 // 	console.log(arrayUnitInPos)
 // }
-var data = { ID: 506,
-  ID_Unit: 16,
-  ID_User: 44,
-  BaseNumber: 1,
-  Level: 1,
-  Quality: 6,
-  Hea_cur: 5.2,
-  Health: 5.2,
-  Attack: 2.15,
-  Defend: 1.1,
-  Position_Cell: '299,9,0',
-  Next_Cell: null,
-  End_Cell: null,
-  TimeMoveNextCell: null,
-  TimeFinishMove: null,
-  ListMove: null,
-  Status: 6,
-  Attack_Base_ID: null,
-  Attack_Unit_ID: null,
-  AttackedBool: 0 }
-if(data.Attack_Unit_ID==null){console.log('here')}
+// var data = { ID: 506,
+//   ID_Unit: 16,
+//   ID_User: 44,
+//   BaseNumber: 1,
+//   Level: 1,
+//   Quality: 6,
+//   Hea_cur: 5.2,
+//   Health: 5.2,
+//   Attack: 2.15,
+//   Defend: 1.1,
+//   Position_Cell: '299,9,0',
+//   Next_Cell: null,
+//   End_Cell: null,
+//   TimeMoveNextCell: null,
+//   TimeFinishMove: null,
+//   ListMove: null,
+//   Status: 6,
+//   Attack_Base_ID: null,
+//   Attack_Unit_ID: null,
+//   AttackedBool: 0 }
+// if(data.Attack_Unit_ID==null){console.log('here')}
 
 // listIDUnitAttack = arrayUnitInPos;
 // console.log('listIDUnitAttack1')

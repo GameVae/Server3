@@ -176,10 +176,11 @@ function checkCurrentPos (io,data,stringKey,pos) {
 	// var tempListUnitInPos = [];
 	var listUnitAttack = [];
 	var listIDUnitAttack = [];
+	var listCurrentAttack = [];
 	// var listUnit = [];
 	var checkBoolFriendData = false, checkBoolGuildData = false;
 	var getAttackBool = false;
-	
+
 	var defendingUnit;
 
 	new Promise((resolve,reject)=>{
@@ -195,8 +196,7 @@ function checkCurrentPos (io,data,stringKey,pos) {
 			}
 			// listIDUnitAttack = arrayUnitInPos;
 			if (listIDUnitAttack.length==0) {
-				attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full);
-				reject();
+				attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full);				
 				return null;
 			}
 			resolve();
@@ -236,6 +236,9 @@ function checkCurrentPos (io,data,stringKey,pos) {
 							if (unitResult.Attack_Unit_ID==stringKey){
 								attackBool = true;
 							}
+							if (unitResult.Status==6&&unitResult.Attack_Unit_ID=='null') {
+								attackBool = true;	
+							}
 							// console.log('attackBool')
 							// console.log(attackBool)
 
@@ -248,7 +251,7 @@ function checkCurrentPos (io,data,stringKey,pos) {
 					}
 				}else{
 					// console.log('Moving_Attack.js not found unit')
-					// reject();
+					reject();
 					return null;
 				}
 				// console.log('Moving_Attack.js listIDUnitAttack');
@@ -258,18 +261,29 @@ function checkCurrentPos (io,data,stringKey,pos) {
 		})
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
+			client.hget(stringHAttack,stringKey,function (error,rows) {
+				if (rows!=null) {
+					listCurrentAttack = rows.split("/").filter(String);
+				}
+				resolve()
+			})
+
+		})
+		
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			console.log('Moving_Attack.js listIDUnitAttack');
+			console.log(listIDUnitAttack);
 			if (listIDUnitAttack.length>0) {
-				attackFunc.SetListAttackData(io,Server_ID,stringKey,listIDUnitAttack);
+				attackFunc.SetListAttackData(io,Server_ID,stringKey,listIDUnitAttack,listCurrentAttack);
 				resolve();
 			}else{
+				reject();
 				return null;
 			}
 			
 			
 		})
-		
-		
-
 	})
 
 }
