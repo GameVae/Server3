@@ -228,8 +228,8 @@ function checkCurrentPos (io,data,stringKey,pos) {
 						if(rows[i]!=null){
 							var unitResult = JSON.parse(rows[i]);
 							var attackBool = false;
-							console.log('Moving_Attack.js listIDUnitAttack unitResult');
-							console.log(unitResult)
+							// console.log('Moving_Attack.js listIDUnitAttack unitResult');
+							// console.log(unitResult)
 							if (unitResult.Status==6&&unitResult.Attack_Unit_ID==null) {
 								attackBool = true;	
 							}
@@ -251,7 +251,6 @@ function checkCurrentPos (io,data,stringKey,pos) {
 					}
 				}else{
 					// console.log('Moving_Attack.js not found unit')
-					reject();
 					return null;
 				}
 				// console.log('Moving_Attack.js listIDUnitAttack');
@@ -272,13 +271,13 @@ function checkCurrentPos (io,data,stringKey,pos) {
 		
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
-			console.log('Moving_Attack.js listIDUnitAttack');
-			console.log(listIDUnitAttack);
+			// console.log('Moving_Attack.js listIDUnitAttack');
+			// console.log(listIDUnitAttack);
 			if (listIDUnitAttack.length>0) {
 				attackFunc.SetListAttackData(io,Server_ID,stringKey,listIDUnitAttack,listCurrentAttack);
 				resolve();
 			}else{
-				reject();
+				attackFunc.ClearInterAttack(stringKeyDefend,functions.CaseClearAttack.Full)
 				return null;
 			}
 			
