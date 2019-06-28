@@ -63,18 +63,21 @@ exports.Moving_Attack = function moving_Attack2(io,socket,data) {
 	clearMovingAttack (stringUnit);
 	new Promise((resolve,reject)=>{
 		client.hset(stringHMovingAttack,stringUnit,JSON.stringify(dataMoving),function (error,result) {
-			resolve()
+			resolve();
 		})
-	}).then(()=>new Promise((resolve,reject)=>{
-		client.hget(stringHMovingAttack,stringUnit,function (error,rows) {
-			var result = JSON.parse(rows);
-			// console.log(result)
-			checkMovePos (io,result,stringUnit);
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			client.hget(stringHMovingAttack,stringUnit,function (error,rows) {
+				var result = JSON.parse(rows);
+				// console.log(result)
+				checkMovePos (io,result,stringUnit);
+				resolve();
+			})
 		})
-	})
-	)
-	
-	
+		
+	})	
+
+
 }
 function clearMovingAttack (stringUnit) {
 	stringMoveAttack = "Moving_Attack_"+stringUnit;
@@ -250,7 +253,13 @@ function checkCurrentPos (io,data,stringKey,pos) {
 						}
 					}
 				}else{
+					attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full)
 					// console.log('Moving_Attack.js not found unit')
+					return null;
+				}
+
+				if (listIDUnitAttack.length==0) {
+					attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full)
 					return null;
 				}
 				// console.log('Moving_Attack.js listIDUnitAttack');
@@ -264,23 +273,19 @@ function checkCurrentPos (io,data,stringKey,pos) {
 				if (rows!=null) {
 					listCurrentAttack = rows.split("/").filter(String);
 				}
-				resolve()
+				resolve();
 			})
 
 		})
 		
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
-			// console.log('Moving_Attack.js listIDUnitAttack');
-			// console.log(listIDUnitAttack);
+			console.log('Moving_Attack.js stringKey listIDUnitAttack pos');
+			console.log(stringKey,listIDUnitAttack,pos);
 			if (listIDUnitAttack.length>0) {
 				attackFunc.SetListAttackData(io,Server_ID,stringKey,listIDUnitAttack,listCurrentAttack);
-				resolve();
-			}else{
-				attackFunc.ClearInterAttack(stringKeyDefend,functions.CaseClearAttack.Full)
-				return null;
 			}
-			
+			resolve();
 			
 		})
 	})

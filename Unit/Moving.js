@@ -36,6 +36,7 @@ var DictMoveTimeOut = {};
 var DictMoveAttack = {};
 
 var stringMoveAttack,stringHUnit,stringHPos,stringHAtttack,stringKeyMove,stringUnit;
+var stringMove;
 // var moveUnit_Attack = require('./Moving_Attack.js');
 
 // console.log(dataMove.S_MOVE.Server_ID)
@@ -90,37 +91,39 @@ exports.Start = function start (io) {
 
 function clearMoveTimeout (stringData,data) {
 	clearMove (stringData,data)
-	clearMoveAttack (stringData,data);	
+	// clearMoveAttack (stringData,data);	
 }
 
 function clearMove (stringData,data) {
-	if (DictMoveTimeOut[stringData]!=undefined) {
-		clearTimeout(DictMoveTimeOut[stringData]);
-		delete DictMoveTimeOut[stringData];
+	stringMove = "Moving_"+stringData;
+	if (DictMoveTimeOut[stringMove]!=undefined) {
+		clearTimeout(DictMoveTimeOut[stringMove]);
+		delete DictMoveTimeOut[stringMove];
 	}
 	positionRemove.PostionRemove(data);
 }
-function clearMoveAttack (stringData,data) {
-	var stringMoveAttack = "Moving_Attack_"+stringData;
-	var stringHUnit = "s"+stringData.split("_")[0]+"_unit";
-	var stringHAttack = "s"+stringData.split("_")[0]+"_attack";
 
-	if (DictMoveAttack[stringMoveAttack]!=undefined) {
-		clearTimeout(DictMoveAttack[stringMoveAttack]);
-		delete DictMoveAttack[stringMoveAttack];
-	}
+// function clearMoveAttack (stringData,data) {
+// 	var stringMoveAttack = "Moving_Attack_"+stringData;
+// 	var stringHUnit = "s"+stringData.split("_")[0]+"_unit";
+// 	var stringHAttack = "s"+stringData.split("_")[0]+"_attack";
 
-	if (data.Attack_Unit_ID!=null) {
-		client.hget(stringHAttack,data.Attack_Unit_ID,function (error,rows) {
-			if (rows!=null) {
-				var resultAttack = rows.split("/").filter(String);
-				if (resultAttack.includes(stringData)) {
-					removeValue (stringHAttack,data.Attack_Unit_ID,rows,stringData);
-				}
-			}
-		})
-	}	
-}
+// 	if (DictMoveAttack[stringMoveAttack]!=undefined) {
+// 		clearTimeout(DictMoveAttack[stringMoveAttack]);
+// 		delete DictMoveAttack[stringMoveAttack];
+// 	}
+
+// 	if (data.Attack_Unit_ID!=null) {
+// 		client.hget(stringHAttack,data.Attack_Unit_ID,function (error,rows) {
+// 			if (rows!=null) {
+// 				var resultAttack = rows.split("/").filter(String);
+// 				if (resultAttack.includes(stringData)) {
+// 					removeValue (stringHAttack,data.Attack_Unit_ID,rows,stringData);
+// 				}
+// 			}
+// 		})
+// 	}	
+// }
 
 function removeValue (stringHkey,stringKey,rows,ID_Key) {
 	var stringReplace = rows.replace(ID_Key+"/","");
