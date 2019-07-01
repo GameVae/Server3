@@ -91,9 +91,12 @@ exports.Start = function start (io) {
 
 function clearMoveTimeout (stringData,data) {
 	clearMove (stringData,data)
-	// clearMoveAttack (stringData,data);	
+	clearMoveAttack (stringData,data);	
 }
-
+function clearMoveAttack (stringData,data) {
+	attackFunc.ClearAttackUnit(stringData);
+	
+}
 function clearMove (stringData,data) {
 	stringMove = "Moving_"+stringData;
 	if (DictMoveTimeOut[stringMove]!=undefined) {
