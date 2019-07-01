@@ -9,6 +9,13 @@ client.select(2)
 var Promise = require('promise');
 
 var arrayUnitInPos2 = [ '1_16_44_527', '1_16_44_526', '1_16_43_580' ]
+client.hget('s1_attack','1_16_43_656',function (error,rows) {
+	// console.log(rows)
+	if (rows!=null) {console.log('here');}
+	else{
+		console.log('2')
+	}
+})
 //  test (arrayUnitInPos2)
 // function test (arrayUnitInPos) {
 

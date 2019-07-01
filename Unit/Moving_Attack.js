@@ -199,7 +199,8 @@ function checkCurrentPos (io,data,stringKey,pos) {
 			}
 			// listIDUnitAttack = arrayUnitInPos;
 			if (listIDUnitAttack.length==0) {
-				attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full);				
+				// attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full);		
+				attackFunc.ClearInterAttackUpdate(io,stringKey);		
 				return null;
 			}
 			resolve();
@@ -253,13 +254,15 @@ function checkCurrentPos (io,data,stringKey,pos) {
 						}
 					}
 				}else{
-					attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full)
+					// attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full)
+					attackFunc.ClearInterAttackUpdate(io,stringKey);
 					// console.log('Moving_Attack.js not found unit')
 					return null;
 				}
 
 				if (listIDUnitAttack.length==0) {
-					attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full)
+					// attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full)
+					attackFunc.ClearInterAttackUpdate(io,stringKey);
 					return null;
 				}
 				// console.log('Moving_Attack.js listIDUnitAttack');
@@ -280,8 +283,8 @@ function checkCurrentPos (io,data,stringKey,pos) {
 		
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
-			console.log('Moving_Attack.js stringKey listIDUnitAttack pos');
-			console.log(stringKey,listIDUnitAttack,pos);
+			// console.log('Moving_Attack.js stringKey listIDUnitAttack pos');
+			// console.log(stringKey,listIDUnitAttack,pos);
 			if (listIDUnitAttack.length>0) {
 				attackFunc.SetListAttackData(io,Server_ID,stringKey,listIDUnitAttack,listCurrentAttack);
 			}
