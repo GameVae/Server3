@@ -371,6 +371,7 @@ exports.ClearAttackUnit = function clearAttackUnit2 (ID_User_Attack) {
 
 	var resultUnit={};
 	new Promise((resolve,reject)=>{
+		hgetConsole ('ClearAttackUnit,stringHUnit,ID_User_Attack',stringHUnit,ID_User_Attack);	
 		client.hget(stringHUnit,ID_User_Attack,function (error,rows) {
 			if (rows!=null) {
 				resultUnit = JSON.parse(rows)
@@ -384,20 +385,24 @@ exports.ClearAttackUnit = function clearAttackUnit2 (ID_User_Attack) {
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
 			if (DictTimeInterval[stringInterval]!=undefined) {
+				hgetConsole ('ClearAttackUnit,stringHAttack,ID_User_Defend',stringHAttack,ID_User_Defend);	
 				client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
-					var result = rows.split("/").filter(String);
-					if (result.includes(ID_User_Attack)) {
-						stringReplace = rows.replace(ID_User_Attack+"/","");
-						// console.log('AttackFunc.js stringHAttack,ID_User_Defend,stringReplace');
-						// console.log('stringHAttack,ID_User_Defend,stringReplace');
-						client.hset(stringHAttack,ID_User_Defend,stringReplace)
-						if (stringReplace.length==0) {
+					if (rows!=null) {
 
-							clearInterval(DictTimeInterval[stringInterval]);			
-							delete DictTimeInterval[stringInterval];
-							client.hdel(stringHAttack,ID_User_Defend);
+						var result = rows.split("/").filter(String);
+						if (result.includes(ID_User_Attack)) {
+							stringReplace = rows.replace(ID_User_Attack+"/","");
+							// console.log('AttackFunc.js stringHAttack,ID_User_Defend,stringReplace');
+							// console.log('stringHAttack,ID_User_Defend,stringReplace');
+							client.hset(stringHAttack,ID_User_Defend,stringReplace)
+							if (stringReplace.length==0) {
+
+								clearInterval(DictTimeInterval[stringInterval]);			
+								delete DictTimeInterval[stringInterval];
+								client.hdel(stringHAttack,ID_User_Defend);
+							}
 						}
-					}
+					}				
 					resolve();
 				})		
 			}
@@ -467,19 +472,20 @@ function clearInterAttackUpdate (io,ID_User_Defend) {
 				resolve();				
 			}
 		})
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			resultArrayUnit.forEach(function(unit,index){
-				if (resultUnitInfo[index]!=null) {
-					var unitInfo = JSON.parse(resultUnitInfo[index])
-					console.log('AttackFunc.js ClearInterAttackUpdate unit,unitInfo.Position_Cell')
-					console.log(unit,unitInfo.Position_Cell)
-					checkAttackPosition (io,unit,unitInfo.Position_Cell);					
-				}
-			})
-			resolve();
-		})
 	})
+	// .then(()=>{
+	// 	return new Promise((resolve,reject)=>{
+	// 		resultArrayUnit.forEach(function(unit,index){
+	// 			if (resultUnitInfo[index]!=null) {
+	// 				var unitInfo = JSON.parse(resultUnitInfo[index])
+	// 				console.log('AttackFunc.js ClearInterAttackUpdate unit,unitInfo.Position_Cell')
+	// 				console.log(unit,unitInfo.Position_Cell)
+	// 				// checkAttackPosition (io,unit,unitInfo.Position_Cell);					
+	// 			}
+	// 		})
+	// 		resolve();
+	// 	})
+	// })
 }
 
 exports.ClearInterAttack = clearInterAttack;
@@ -571,6 +577,7 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 			resolve();
 		});
 	}).then(()=> new Promise((resolve,reject)=>{
+		hgetConsole ('getAttackCalc,stringHUnit,dataAttack',stringHUnit,dataAttack);
 		client.hmget(stringHUnit,dataAttack,function (error,rows) {
 			for (var i = 0; i < rows.length; i++) {
 				if (rows[i]!=null&&defendAliveBool==true) {
@@ -684,29 +691,6 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 	)
 	);
 }
-
-// function getAttackAnotherUnit (io,Server_ID,dataAttack) {
-// 	stringHUnit = "s"+Server_ID+"_unit";
-// 	stringHAttack = "s"+Server_ID+"_attack";
-// 	var arrayUnitAttack = [];
-// 	new Promise((resolve,reject)=>{
-// 		client.hget(stringHUnit,dataAttack,function (error,rows) {
-// 			arrayUnitAttack = rows;
-// 			resolve;
-// 		})
-// 	}).then(()=>{
-// 		return new Promise((resolve,reject)=>{
-// 			for (var i = 0; i < dataAttack.length; i++) {
-// 				var unit = JSON.parse(arrayUnitAttack[i])
-// 				console.log('dataAttack[i],unit.Position_Cell')
-// 				console.log(dataAttack[i],unit.Position_Cell)
-// 				checkAttackPosition (io,dataAttack[i],unit.Position_Cell)
-
-// 			}
-// 		})
-// 	})
-
-// }
 
 exports.CheckAttackPosition = checkAttackPosition;
 
