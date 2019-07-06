@@ -79,6 +79,7 @@ exports.Moving_Attack = function moving_Attack2(io,socket,data) {
 
 
 }
+exports.ClearMovingAttack = clearMovingAttack;
 function clearMovingAttack (stringUnit) {
 	stringMoveAttack = "Moving_Attack_"+stringUnit;
 	if (DictMoveAttack[stringMoveAttack]!=null) {
@@ -130,7 +131,7 @@ function checkMovePos (io,data,stringKey) {
 			}
 			break;
 		}
-		if (timeOut<0) {console.log('timeOut<0');console.log(timeOut); return null;}
+		if (timeOut<0) {console.log('Moving Attack timeOut<0');console.log(timeOut); return null;}
 		// console.log('timeOut')
 		// console.log(timeOut);
 		// clearTimeout(DictMoveAttack[stringMoveAttack])
@@ -154,9 +155,7 @@ function checkMovePos (io,data,stringKey) {
 	}
 }
 
-exports.CheckCurrentPos = function checkCurrentPos2 (io,data,stringKey,pos) {
-	checkCurrentPos (io,data,stringKey,pos);
-}
+exports.CheckCurrentPos = checkCurrentPos
 function checkCurrentPos (io,data,stringKey,pos) {
 	// var dataNewPos ={
 	// 	// Position_Cell: data.Position_Cell,
@@ -201,7 +200,7 @@ function checkCurrentPos (io,data,stringKey,pos) {
 			if (listIDUnitAttack.length==0) {
 				// attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full);		
 				attackFunc.ClearInterAttackUpdate(io,stringKey);		
-				return null;
+				// return null;
 			}
 			resolve();
 		})
@@ -263,7 +262,7 @@ function checkCurrentPos (io,data,stringKey,pos) {
 				if (listIDUnitAttack.length==0) {
 					// attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full)
 					attackFunc.ClearInterAttackUpdate(io,stringKey);
-					return null;
+					// return null;
 				}
 				// console.log('Moving_Attack.js listIDUnitAttack');
 				// console.log(listIDUnitAttack);

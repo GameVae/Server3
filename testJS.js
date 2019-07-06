@@ -2,20 +2,73 @@
 // var result = st.split("/").filter(String)
 // console.log(result)
 
-var redis = require("redis"),
-client = redis.createClient();
-client.select(2)
+// var redis = require("redis"),
+// client = redis.createClient();
+// client.select(2)
 
-var Promise = require('promise');
+// var Promise = require('promise');
+// client.hmget("s1_attack",result,function (error,rows) {
+// 	console.log(rows[0])
+// 	if (rows[1]==null) {console.log('ok')}
+// })
+// console.log('\n2')
+// console.log('2')
+var testObj ={}
 
-var arrayUnitInPos2 = [ '1_16_44_527', '1_16_44_526', '1_16_43_580' ]
-client.hget('s1_attack','1_16_43_656',function (error,rows) {
-	// console.log(rows)
-	if (rows!=null) {console.log('here');}
-	else{
-		console.log('2')
-	}
-})
+console.log(testObj.Server_ID)
+//test ()
+// function test () {
+// 	var k=0;
+// 	new Promise((resolve,reject)=>{
+
+// 		test1(k++);//0
+// 		test1(k++);//1
+// 		test1(k++);//2
+// 		test1(k++);//3
+// 		test1(k++);//4
+// 		// test1(k++);//5
+// 		// test1(k++);//6
+// 		// test1(k++);//7
+// 		// test1(k++);//8
+// 		// test1(k++);//9
+
+// 		resolve();
+
+// 	}).then(()=>{
+// 		return new Promise((resolve,reject)=>{
+// 			if (k>5) {				
+// 				return null;
+// 			}else{
+// 				test1(k++);
+// 				test1(k++);
+// 				test1(k++);
+// 				return null;
+// 			}
+// 			resolve();
+// 		})
+// 	}).then(()=>{
+// 		return new Promise((resolve,reject)=>{
+// 			test1(k++);
+// 			test1(k++);
+// 			test1(k++);
+// 			resolve();
+// 		})
+// 	})
+// }
+
+// function test1 (argument) {
+// 	console.log(new Date()+argument)
+// }
+// var arrayUnitInPos2 = [ '1_16_44_527', '1_16_44_526', '1_16_43_580' ]
+// client.hget('s1_attack','1_16_43_656',function (error,rows) {
+// 	// console.log(rows)
+// 	if (rows!=null) {console.log('here');}
+// 	else{
+// 		console.log('2')
+// 	}
+// })
+
+
 //  test (arrayUnitInPos2)
 // function test (arrayUnitInPos) {
 

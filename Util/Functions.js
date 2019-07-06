@@ -2,6 +2,8 @@
 const   fs          = require('fs');
 var path 			= require('path');
 
+
+
 exports.UnitStatus = {
 	Base: 			0,
 	Move: 			1,
@@ -12,12 +14,16 @@ exports.UnitStatus = {
 	Standby: 		6,
 }
 
-exports.RedisData ={
+var redisData = exports.RedisData = {
 	Data0 : 0,
 	Data1 : 1,
 	TestUnit : 2,
 	Server: 2,
 }
+
+var redis 				= require("redis"),
+client 					= redis.createClient();
+client.select(redisData.TestUnit);
 
 exports.CaseClearAttack ={
 	Full 		:1,
@@ -43,8 +49,23 @@ exports.TimeMove ={
 	Straight : StraightTime,
 	Diagonal : DiagonalTime,
 }
+
 exports.Test = function(para){
 	console.log(para)
+}
+exports.AddValue = addValue;
+
+function addValue (stringHKey,stringKey,stringAdd) {
+	client.hget(stringHKey,stringKey,function (error,rows) {
+		if (rows!=null) {
+			var result = rows.split("/").filter(String)
+			if (!result.includes(stringAdd)) {
+				client.hset(stringHKey,stringKey,rows+stringAdd+"/");
+			}
+		}else{
+			client.hset(stringHKey,stringKey,stringAdd+"/");
+		}
+	})
 }
 exports.WriteLogError = function(detailError,intLocationFile){
 	console.log(getTimeNow()+": Error "+detailError);
