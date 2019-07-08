@@ -13,9 +13,14 @@
 // })
 // console.log('\n2')
 // console.log('2')
-var testObj ={}
+// var testObj ={}
 
-console.log(testObj.Server_ID)
+// console.log(testObj.Server_ID)
+var functions = require('./Util/Functions.js')
+var stringThis1="1,23"
+var stringThis2= stringThis1+"3,23"
+
+functions.ShowLog(1,"here",[stringThis1,stringThis2])
 //test ()
 // function test () {
 // 	var k=0;

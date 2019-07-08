@@ -49,12 +49,33 @@ exports.TimeMove ={
 	Straight : StraightTime,
 	Diagonal : DiagonalTime,
 }
+exports.ShowLogBool = showLogBool;
+var showLogBool = {
+	Off: 0,
+	On: 1,
+	Error: 2,
+}
 
 exports.Test = function(para){
 	console.log(para)
 }
-exports.AddValue = addValue;
 
+exports.ShowLog = function showLog (showBool,stringContent,param) {
+	switch (showBool) {
+		case showLogBool.Off:
+		break;
+		case showLogBool.On:
+		console.log("\n"+stringContent,param)
+		break;
+		case showLogBool.Error:
+		console.log("\n"+stringContent,param)
+		fs.appendFile(getStringChangeFile (2), "\r\nError "+ getTimeNow() +": "+"\n"+stringContent+"\nParam: \n"+param, (err) => {
+			if (err) throw err;
+		});
+		break;
+	}
+}
+exports.AddValue = addValue;
 function addValue (stringHKey,stringKey,stringAdd) {
 	client.hget(stringHKey,stringKey,function (error,rows) {
 		if (rows!=null) {

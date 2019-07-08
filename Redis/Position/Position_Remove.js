@@ -1,13 +1,6 @@
 'use strict';
-// var db_s1_base_info			= require('./../../Util/Database/Db_s1_base_info.js');
-// var db_s1_base_defend		= require('./../../Util/Database/Db_s1_base_defend.js');
 
-// var db_s2_base_info			= require('./../../Util/Database/Db_s2_base_info.js');
-// var db_s2_base_defend		= require('./../../Util/Database/Db_s2_base_defend.js');
-
-// var db_training				= require('./../../Util/Database/Db_training.js');
 var db_position				= require('./../../Util/Database/Db_position.js');
-// var db_all_user				= require('./../../Util/Database/Db_all_user.js');
 
 var functions 				= require('./../../Util/Functions.js');
 var Promise 				= require('promise');
@@ -28,6 +21,7 @@ function deleteHashKey (server_ID) {
 }
 
 exports.PostionRemove = function postionRemove (data) {
+	functions.ShowLog(functions.ShowLogBool.Off,'Postion_Remove.js PostionRemove data',[data])
 	if (data.ID_Unit>15&&data.ID_Unit<20) {unitRange1 (data);}
 	if (data.ID_Unit>20&&data.ID_Unit<25) {unitRange2 (data);}
 	if (data.ID_Unit>25&&data.ID_Unit<30) {unitRange1 (data);}

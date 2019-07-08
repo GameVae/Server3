@@ -16,6 +16,7 @@ exports.GetPosition = function getPosition2 (server_ID){
 	getPosition (server_ID);
 }
 exports.AddPosition = function addPosition (data) {
+	functions.ShowLog(functions.ShowLogBool.Off,'Position.js addPosition data',[data])
 	if (data.ID_Unit>15&&data.ID_Unit<20) {unitRange1 (data);}
 	if (data.ID_Unit>20&&data.ID_Unit<25) {unitRange2 (data);}
 	if (data.ID_Unit>25&&data.ID_Unit<30) {unitRange1 (data);}
@@ -57,6 +58,7 @@ function unitRange1 (data) {
 }
 function checkValue (stringHkey,stringKey,ID_Key) {
 	// console.log(stringHkey,stringKey,ID_Key)
+	functions.ShowLog(functions.ShowLogBool.Off,'Position.js checkValue stringHkey,stringKey,ID_Key',[stringHkey,stringKey,ID_Key])
 	client.hexists(stringHkey,stringKey,function (error,resultBool) {
 		if (resultBool==1) {
 			client.hget(stringHkey,stringKey,function (error,rows) {
@@ -219,6 +221,7 @@ function unitRange3 (data) {
 
 function addValue (stringHkey,stringKey,data,ID_Key) {
 	// console.log(stringHkey,stringKey,data,ID_Key)
+	functions.ShowLog(functions.ShowLogBool.Off,'Position.js addValue stringHkey,stringKey,data,ID_Key',[stringHkey,stringKey,data,ID_Key])
 	client.hset(stringHkey,stringKey,data+ID_Key+"/");
 }
 
