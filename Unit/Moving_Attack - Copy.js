@@ -28,29 +28,41 @@ var DictMoveAttack ={};
 // var stringTimeout;
 
 var Promise = require('promise');
-// var data ={
-// 	Server_ID: 1,
-// 	ID: 551,
-// 	ID_Unit: 16,
-// 	ID_User: 43,
-// 	Position_Cell: '288,0,0',
-// 	Next_Cell: '289,0,0',
-// 	End_Cell: '292,0,0',
-// 	TimeMoveNextCell: '2019-06-17T08:31:36.494',
-// 	TimeFinishMove: '2019-06-17T08:31:40.694',
-// 	ListMove: [ [Object], [Object], [Object] ],
-// 	Attack_Unit_ID: 'NULL'
-// }
-exports.Moving_Attack = function moving_Attack(io,socket,data) {
+var data ={
+	Server_ID: 1,
+	ID: 551,
+	ID_Unit: 16,
+	ID_User: 43,
+	Position_Cell: '288,0,0',
+	Next_Cell: '289,0,0',
+	End_Cell: '292,0,0',
+	TimeMoveNextCell: '2019-06-17T08:31:36.494',
+	TimeFinishMove: '2019-06-17T08:31:40.694',
+	ListMove: [ [Object], [Object], [Object] ],
+	Attack_Unit_ID: 'NULL'
+}
+exports.Moving_Attack = function moving_Attack2(io,socket,data) {
 	// console.log('Moving_Attack.js data');
 	// console.log(data);
 	stringUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js Moving_Attack data,stringUnit',[data,stringUnit]);
-
+	var dataMoving = Object.create(data);
+	dataMoving = {
+		Server_ID: data.Server_ID,
+		ID: data.ID,
+		ID_Unit: data.ID_Unit,
+		ID_User: data.ID_User,
+		Position_Cell: data.Position_Cell,
+		Next_Cell: data.Next_Cell,
+		End_Cell: data.End_Cell,
+		TimeMoveNextCell: data.TimeMoveNextCell,
+		TimeFinishMove: data.TimeFinishMove,
+		ListMove: data.ListMove,
+		Attack_Unit_ID: data.Attack_Unit_ID
+	}
 	var stringHMovingAttack = "s"+data.Server_ID+"_movingAttack";
 	clearMovingAttack (stringUnit);
 	new Promise((resolve,reject)=>{
-		client.hset(stringHMovingAttack,stringUnit,JSON.stringify(data),function (error,result) {
+		client.hset(stringHMovingAttack,stringUnit,JSON.stringify(dataMoving),function (error,result) {
 			resolve();
 		})
 	}).then(()=>{

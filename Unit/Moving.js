@@ -71,7 +71,7 @@ exports.Start = function start (io) {
 				})
 			}).then(()=>{
 				return new Promise((resolve,reject)=>{
-					// moving_Attack.Moving_Attack(io,socket,data.S_MOVE);
+					moving_Attack.Moving_Attack(io,socket,data.S_MOVE);
 					resolve();
 				})
 			})					
