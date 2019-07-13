@@ -49,7 +49,12 @@ exports.TimeMove ={
 	Straight : StraightTime,
 	Diagonal : DiagonalTime,
 }
-exports.ShowLogBool = showLogBool;
+
+exports.ShowLogBool = {
+	Off: 0,
+	On: 1,
+	Error: 2,
+}
 var showLogBool = {
 	Off: 0,
 	On: 1,
@@ -65,11 +70,22 @@ exports.ShowLog = function showLog (showBool,stringContent,param) {
 		case showLogBool.Off:
 		break;
 		case showLogBool.On:
-		console.log("\n"+stringContent,param)
+		var nullBool = false;
+		for (var i = 0; i < param.length; i++) {
+			if(param[i]==null||param[i]==undefined){
+				nullBool = true;
+				break;
+			}
+		}
+		if (nullBool == true) {
+			console.log('\x1b[33m%s\x1b[0m',"\n"+new Date()+": "+stringContent,param+"\n")
+		}else{
+			console.log(new Date()+": "+"\n"+stringContent,param+"\n")
+		}		
 		break;
 		case showLogBool.Error:
-		console.log("\n"+stringContent,param)
-		fs.appendFile(getStringChangeFile (2), "\r\nError "+ getTimeNow() +": "+"\n"+stringContent+"\nParam: \n"+param, (err) => {
+		console.log('\x1b[31m%s\x1b[0m',"\n"+new Date()+": "+stringContent,param+"\n")
+		fs.appendFile(getStringErrorFile (2), "\r\nError "+ getTimeNow() +": "+"\n"+stringContent+"\nParam: \n"+param, (err) => {
 			if (err) throw err;
 		});
 		break;

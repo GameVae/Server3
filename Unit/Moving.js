@@ -101,7 +101,8 @@ function clearMove (stringData,data) {
 }
 function clearMoveAttack (io,stringData) {
 	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMoveTimeout stringData',[stringData])
-	// attackFunc.ClearAttackUnit(io,stringData);
+	moving_Attack.ClearMovingAttack(stringData);
+	attackFunc.ClearAttackUnit(io,stringData);
 	
 }
 
@@ -134,6 +135,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 			updateDataMove.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
 			updateDataMove.ListMove.shift();
 
+			// updateDatabase (io,updateDataMove);
 			updateDatabase (updateDataMove);
 			setTimerUpdateDatabase (io,socket,updateDataMove,stringKey);			
 		}else{	
@@ -181,7 +183,25 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 		updateRedisDataPosition (stringKey,updateDataMove,Position_Cell);
 	}, timeOut, stringKey);
 }
-
+function updateDatabase (data) {
+	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+	+"`Position_Cell`='"+data.Position_Cell+"',"
+	+"`Next_Cell`='"+data.Next_Cell+"',"
+	+"`End_Cell`='"+data.End_Cell+"',"
+	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+	+"`ListMove`='"+JSON.stringify(data.ListMove)+"',"
+	+"`Attack_Base_ID`= NULL,"
+	+"`Attack_Unit_ID`= NULL,"
+	+"`Status`='"+functions.UnitStatus.Move+
+	"' WHERE `ID`='"+data.ID+"'";
+	//console.log(stringUpdate);
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateDatabase stringUpdate,data',[stringUpdate,data]);
+	db_position.query(stringUpdate,function (error,result) {
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Moving.js updateDatabase stringUpdate',[stringUpdate]);}
+		logChangeDetail =("Moving.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
+	});
+}
 function updateRedisDataPosition (stringKey,updateDataM,Position_Cell) {
 
 	stringHUnit = "s"+updateDataM.Server_ID+"_unit";
@@ -226,14 +246,14 @@ function R_MOVE (io,Server_ID) {
 }
 
 function sendToClient (io,stringKeyMove,socketID) {
-	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js sendToClient stringKeyMove socketID',[stringKeyMove,socketID])
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js sendToClient stringKeyMove socketID',[stringKeyMove,socketID])
 	client.get(stringKeyMove,function (error,rowData) {
 		io.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
 	})
 }
 
 function S_MOVE (io,socket,data,stringUnit) {
-	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js S_MOVE socket,data,stringUnit',[socket,data,stringUnit])
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE socket,data,stringUnit',[socket,data,stringUnit])
 	
 	currentTime = functions.GetTime();
 	
@@ -247,29 +267,11 @@ function S_MOVE (io,socket,data,stringUnit) {
 		ListMove[i].TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(currentTime + ListMove[i].TimeMoveNextCell).toISOString());		
 	}
 	
-	updateDataBase (io,data);
+	updateDataBaseSMOVE (io,data);
 	setTimerUpdateDatabase (io,socket,data,stringUnit);
 }
-// function updateDatabase (data) {
-// 	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-// 	+"`Position_Cell`='"+data.Position_Cell+"',"
-// 	+"`Next_Cell`='"+data.Next_Cell+"',"
-// 	+"`End_Cell`='"+data.End_Cell+"',"
-// 	+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-// 	+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-// 	+"`ListMove`='"+JSON.stringify(data.ListMove)+"',"
-// 	+"`Attack_Base_ID`= NULL,"
-// 	+"`Attack_Unit_ID`= NULL,"
-// 	+"`Status`='"+functions.UnitStatus.Move+
-// 	"' WHERE `ID`='"+data.ID+"'";
-// 	//console.log(stringUpdate);
-// 	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateDatabase stringUpdate,data',[stringUpdate,data]);
-// 	db_position.query(stringUpdate,function (error,result) {
-// 		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Moving.js updateDatabase stringUpdate',[stringUpdate]);}
-// 		logChangeDetail =("Moving.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
-// 	});
-// }
-function updateDataBase (io,data) {
+
+function updateDataBaseSMOVE (io,data) {
 	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE updateDataBase data',[data])
 
 	var stringUpdate;

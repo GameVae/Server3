@@ -15,12 +15,12 @@
 // console.log('2')
 // var testObj ={}
 
-// console.log(testObj.Server_ID)
-var functions = require('./Util/Functions.js')
-var stringThis1="1,23"
-var stringThis2= stringThis1+"3,23"
+console.log('\x1b[36m%s\x1b[0m', 'info');
+// var functions = require('./Util/Functions.js')
+// var stringThis1="1,23"
+// var stringThis2= stringThis1+"3,23"
 
-functions.ShowLog(1,"here",[stringThis1,stringThis2])
+// functions.ShowLog(1,"here",[stringThis1,stringThis2])
 //test ()
 // function test () {
 // 	var k=0;
