@@ -523,7 +523,6 @@ function attackInterval (io,Server_ID,ID_Defend){
 
 	}
 	
-	
 }
 
 exports.ClearAttackUnit = function clearAttackUnit2 (io,ID_User_Attack) {
@@ -573,7 +572,6 @@ exports.ClearAttackUnit = function clearAttackUnit2 (io,ID_User_Attack) {
 		})
 	})
 	
-
 }
 
 function getAttackCalc (io,server_ID,dataAttack,dataDefend) {

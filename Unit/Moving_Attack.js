@@ -217,7 +217,7 @@ function checkMovePos (io,data,stringKey) {
 }
 
 exports.CheckCurrentPos = function (io,data,stringKey,pos,Server_ID) {
-	function checkCurrentPos (io,data,stringKey,pos,Server_ID);
+	checkCurrentPos (io,data,stringKey,pos,Server_ID);
 }
 function checkCurrentPos (io,data,stringKey,pos,Server_ID) {
 	// var dataNewPos ={
@@ -348,6 +348,7 @@ function checkCurrentPos (io,data,stringKey,pos,Server_ID) {
 		return new Promise((resolve,reject)=>{
 
 			if (listIDUnitAttack.length>0) {
+				functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js checkCurrentPos hget stringHAttack,stringKey',[stringHAttack,stringKey]);
 				attackFunc.SetListAttackData(io,Server_ID,stringKey,listIDUnitAttack,listCurrentAttack);
 			}
 			if(listIDUnitAttack.length==0&&listCurrentAttack.length==0){

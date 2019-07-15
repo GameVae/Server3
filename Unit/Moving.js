@@ -27,9 +27,9 @@ var Promise = require('promise');
 var DictMoveTimeOut = {};
 var DictMoveAttack = {};
 
-var stringMoveAttack,stringHPos,stringHAtttack,stringKeyMove,stringHUnit,stringUnit;
+var stringMoveAttack,stringKeyMove,stringHUnit,stringUnit;
 var stringMove;
-
+var stringHSocket,stringHPos,stringHAttack;
 // var moveUnit_Attack = require('./Moving_Attack.js');
 
 // console.log(dataMove.S_MOVE.Server_ID)
@@ -49,17 +49,18 @@ var stringMove;
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){
+
 			functions.ShowLog(functions.ShowLogBool.On,'Moving.js Start data',[data])
 
 			stringUnit = data.S_MOVE.Server_ID+"_"+data.S_MOVE.ID_Unit+"_"+data.S_MOVE.ID_User+"_"+data.S_MOVE.ID;
 			functions.ShowLog(functions.ShowLogBool.On,'Moving.js Start data',[stringUnit])
 
 			clearMoveTimeout (io,stringUnit,data);	
-
-			R_MOVE (io,data.S_MOVE.Server_ID);
-
 			stringKeyMove = "s"+data.S_MOVE.Server_ID+"_move";
-			functions.ShowLog(functions.ShowLogBool.On,'Moving.js Start stringKeyMove',[stringKeyMove])
+
+			functions.ShowLog(functions.ShowLogBool.On,'Moving.js Start=>R_MOVE data',[data.S_MOVE.Server_ID,stringKeyMove])
+			R_MOVE (io,data.S_MOVE.Server_ID,stringKeyMove);
+
 
 			new Promise((resolve,reject)=>{
 				client.set(stringKeyMove,JSON.stringify(data.S_MOVE));
@@ -69,52 +70,118 @@ exports.Start = function start (io) {
 					S_MOVE (io,socket,data.S_MOVE,stringUnit);
 					resolve();
 				})
-			}).then(()=>{
-				return new Promise((resolve,reject)=>{
-					moving_Attack.Moving_Attack(io,socket,data.S_MOVE);
-					resolve();
-				})
-			})					
-			
+			})
 		});
 	});
 }
 
-exports.ClearMoveTimeout = clearMoveTimeout;
-function clearMoveTimeout (io,stringData,data) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMoveTimeout stringData,data',[stringData,data])
-	clearMove (stringData,data);
-	clearMoveAttack (io,stringData);	
-}
-
-function clearMove (stringData,data) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMove stringData,data',[stringData,data])
-
-	stringMove = "Moving_"+stringData;
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMove stringMove',[stringMove])
-
-	if (DictMoveTimeOut[stringMove]!=undefined) {
-		clearTimeout(DictMoveTimeOut[stringMove]);
-		delete DictMoveTimeOut[stringMove];
-	}
-	positionRemove.PostionRemove(data);
-}
-function clearMoveAttack (io,stringData) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMoveTimeout stringData',[stringData])
-	moving_Attack.ClearMovingAttack(stringData);
-	attackFunc.ClearAttackUnit(io,stringData);
+// #R_MOVE
+function R_MOVE (io,Server_ID,stringKMove) {
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js R_MOVE Server_ID',[Server_ID])
 	
+	stringHSocket = "s"+Server_ID+"_socket";
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js R_MOVE hgetall stringHSocket',[stringHSocket])
+	client.hgetall(stringHSocket,function (error,rows) {
+		if (rows!=undefined) {
+			var result = rows;
+			// delete result[ID_User];
+			functions.ShowLog(functions.ShowLogBool.On,'Moving.js R_MOVE stringHSocket result',[result])
+			if (Object.values(result).length>0) {
+				for (var i = 0; i < Object.values(result).length; i++) {						
+					sendToClient (io,stringKMove,Object.values(result)[i]);
+				}
+			}
+
+		}		
+	});
+}
+
+function sendToClient (io,stringKMove,socketID) {
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js sendToClient stringKMove socketID',[stringKeyMove,socketID])
+	client.get(stringKMove,function (error,rowData) {
+		io.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
+	})
+}
+// #R_MOVE
+
+//#S_MOVE
+function S_MOVE (io,socket,data,stringUnit) {
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE data,stringUnit',[socket,data,stringUnit])
+	
+	currentTime = functions.GetTime();
+	
+	data.TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(currentTime + data.TimeMoveNextCell).toISOString());
+	data.TimeFinishMove = functions.ImportTimeToDatabase(new Date(currentTime + data.TimeFinishMove).toISOString());
+
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE data.TimeMoveNextCell,data.TimeFinishMove',[data.TimeMoveNextCell,data.TimeFinishMove])
+
+	var ListMove = data.ListMove;
+	for (var i = 0; i < ListMove.length; i++) {
+		ListMove[i].TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(currentTime + ListMove[i].TimeMoveNextCell).toISOString());		
+	}	
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE=>updateDataBaseSMOVE data',[data])
+	updateDataBaseSMOVE (data);
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE=>setTimerUpdateDatabase data',[data,stringUnit])
+	setTimerUpdateDatabase (io,socket,data,stringUnit);
 }
 
 
-// function removeValue (stringHkey,stringKey,rows,ID_Key) {
-// 	var stringReplace = rows.replace(ID_Key+"/","");
-// 	if (stringReplace.length==0) {
-// 		client.hdel(stringHkey,stringKey);
-// 	}else{
-// 		client.hset(stringHkey,stringKey,stringReplace);
-// 	}
-// }
+function updateDataBaseSMOVE (data) {
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateDataBaseSMOVE data',[data])
+
+	var stringUpdate;
+	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";	
+	
+	stringHAttack = "s"+data.Server_ID+"_attack";
+	stringUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	
+
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateDataBaseSMOVE stringQuery,stringHAttack,stringUnit',[stringQuery,stringHAttack,stringUnit])
+
+	if (data.Attack_Unit_ID=="NULL") {
+		stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+		+"`Position_Cell`='"+data.Position_Cell+"',"
+		+"`Next_Cell`='"+data.Next_Cell+"',"
+		+"`End_Cell`='"+data.End_Cell+"',"
+		+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+		+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+		+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+		+"`Attack_Unit_ID`= NULL,"
+		+"`Status`='"+functions.UnitStatus.Move+
+		"' WHERE `ID`='"+data.ID+"'";
+	}else{
+		stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
+		+"`Position_Cell`='"+data.Position_Cell+"',"
+		+"`Next_Cell`='"+data.Next_Cell+"',"
+		+"`End_Cell`='"+data.End_Cell+"',"
+		+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
+		+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
+		+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
+		+"`Attack_Unit_ID`='"+ data.Attack_Unit_ID +"',"
+		+"`Status`='"+functions.UnitStatus.Move+
+		"' WHERE `ID`='"+data.ID+"'";
+	}
+
+	db_position.query(stringUpdate,function (error,result) {
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Moving.js updateDataBaseSMOVE stringUpdate',[stringUpdate]);}
+
+		var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
+		db_position.query(stringQuery,function (error,rowsUpdate) {
+			if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'Moving.js updateDataBaseSMOVE stringQuery',[stringQuery]);}
+			updateRedisData (data,rowsUpdate[0]);
+		});
+	});
+}
+
+function updateRedisData (data,rowsData) {
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisData data,rowsData',[data,rowsData])
+
+	stringHUnit ="s"+data.Server_ID+"_unit";
+	stringUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisData stringHUnit,stringUnit',[stringHUnit,stringUnit]);
+
+	client.hset(stringHUnit,stringUnit,JSON.stringify(rowsData));
+}
 
 function setTimerUpdateDatabase (io,socket,data,stringKey) {
 	functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase data,stringKey',[data,stringKey])
@@ -140,6 +207,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 			setTimerUpdateDatabase (io,socket,updateDataMove,stringKey);			
 		}else{	
 			checkPosition (updateDataMove,function (returnBool) {
+				functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase checkPosition data',[returnBool])
 				if (returnBool) {
 					// console.log(returnBool)					
 					if (io!=null) {move_GetNewPos.SendGetNewPos(io,updateDataMove);}
@@ -152,6 +220,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 						// app.set('port', process.env.PORT);
 						console.log('get new pos with no socket');
 						// console.log(index.IO);
+						functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase=>move_GetNewPos.SendGetNewPos data',[updateDataMove])
 						move_GetNewPos.SendGetNewPos(io,updateDataMove);
 						// move_GetNewPos.SendGetNewPos(GetIO.IO,updateData);
 					}	
@@ -161,8 +230,8 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 					+"',`Next_Cell`= NULL,`End_Cell`=NULL,`TimeMoveNextCell`= NULL,`TimeFinishMove`=NULL,`ListMove`=NULL,`Status`='"+functions.UnitStatus.Standby+"' "+
 					"WHERE `ID`='"+data.ID+"'";
 					db_position.query(stringUpdate,function (error,result) {
-						if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Moving.js setTimerUpdateDatabase stringUpdate',[stringUpdate])}
-							logChangeDetail = ("Move.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
+						if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Moving.js setTimerUpdateDatabase stringUpdate',[stringUpdate]);}
+						logChangeDetail = ("Moving.js: setTimerUpdateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
 					});
 					updateDataMove.Position_Cell = data.End_Cell;
 					updateDataMove.Next_Cell = null;
@@ -183,6 +252,50 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 		updateRedisDataPosition (stringKey,updateDataMove,Position_Cell);
 	}, timeOut, stringKey);
 }
+
+function updateRedisDataPosition (stringKey,updateDataM,Position_Cell) {
+
+	stringHUnit = "s"+updateDataM.Server_ID+"_unit";
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisDataPosition hget stringKey,updateDataM,Position_Cell',[stringHUnit,stringKey,updateDataM,Position_Cell])
+
+	client.hget(stringHUnit,stringKey,function (error,rows){
+		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'Moving.js updateRedisDataPosition hget stringHUnit,stringKey',[stringHUnit,stringKey])}
+		if (rows!=null) {
+			var result = JSON.parse(rows);
+			result.Position_Cell = Position_Cell;
+			result.Next_Cell = updateDataM.Next_Cell;
+			result.End_Cell = updateDataM.End_Cell;
+			result.TimeMoveNextCell = updateDataM.TimeMoveNextCell;
+			result.TimeFinishMove = updateDataM.TimeFinishMove;
+			result.ListMove = updateDataM.ListMove;
+			result.Status = updateDataM.Status;
+			result.Attack_Unit_ID = updateDataM.Attack_Unit_ID;
+
+			functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisDataPosition hset result',[result])
+			client.hset(stringHUnit,stringKey,JSON.stringify(result));
+		}
+	})
+	
+}
+
+function checkPosition (data,returnBool) {
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js checkPosition data',[data])
+	var checkBool = false;
+	// var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE "
+	// +"`Status`='"+functions.UnitStatus.Standby
+	// +"' AND `Position_Cell`='"+data.End_Cell
+	// +"' AND `ID`<>'"+data.ID+"'";
+
+	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE "
+	+"`Position_Cell`='"+data.End_Cell+"'";
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js checkPosition stringQuery,data.End_Cell',[stringQuery,data.End_Cell])
+	db_position.query(stringQuery,function (error,rows) {
+		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'Moving.js checkPosition stringQuery',[stringQuery]);}
+		if (rows.length>0) {checkBool = true;}
+		returnBool(checkBool);
+	});
+}
+
 function updateDatabase (data) {
 	var stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
 	+"`Position_Cell`='"+data.Position_Cell+"',"
@@ -202,168 +315,44 @@ function updateDatabase (data) {
 		logChangeDetail =("Moving.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
 	});
 }
-function updateRedisDataPosition (stringKey,updateDataM,Position_Cell) {
-
-	stringHUnit = "s"+updateDataM.Server_ID+"_unit";
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisDataPosition stringKey,updateDataM,Position_Cell',[stringKey,updateDataM,Position_Cell])
-	// console.log('stringKey '+stringKey)
-	// console.log('stringHUnit '+stringHUnit)
-	client.hget(stringHUnit,stringKey,function (error,rows){
-		if (rows!=null) {
-			var result = JSON.parse(rows);
-			result.Position_Cell = Position_Cell;
-			result.Next_Cell = updateDataM.Next_Cell;
-			result.End_Cell = updateDataM.End_Cell;
-			result.TimeMoveNextCell = updateDataM.TimeMoveNextCell;
-			result.TimeFinishMove = updateDataM.TimeFinishMove;
-			result.ListMove = updateDataM.ListMove;
-			result.Status = updateDataM.Status;
-			result.Attack_Unit_ID = updateDataM.Attack_Unit_ID;
-
-			client.hset(stringHUnit,stringKey,JSON.stringify(result));
-		}
-	})
-	
+// #S_MOVE
+exports.ClearMoveTimeout = function (io,stringData,data){
+	clearMoveTimeout (io,stringData,data);
 }
 
-function R_MOVE (io,Server_ID) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js R_MOVE Server_ID',[Server_ID])
-	
-	var stringHSocket = "s"+Server_ID+"_socket";
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js R_MOVE stringHSocket',[stringHSocket])
-
-	client.hgetall(stringHSocket,function (error,rows) {
-		if (rows!=undefined) {
-			var result = rows;
-			// delete result[ID_User];
-			if (Object.values(result).length>0) {
-				for (var i = 0; i < Object.values(result).length; i++) {						
-					sendToClient (io,stringKeyMove,Object.values(result)[i])
-				}
-			}
-		}		
-	});
+function clearMoveTimeout (io,stringData,data) {
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMoveTimeout=>clearMove stringData,data',[stringData,data])
+	clearMove (stringData,data);
+	// clearMoveAttack (io,stringData);
 }
 
-function sendToClient (io,stringKeyMove,socketID) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js sendToClient stringKeyMove socketID',[stringKeyMove,socketID])
-	client.get(stringKeyMove,function (error,rowData) {
-		io.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
-	})
-}
+function clearMove (stringData,data) {
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMove stringData,data',[stringData,data])
 
-function S_MOVE (io,socket,data,stringUnit) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE socket,data,stringUnit',[socket,data,stringUnit])
-	
-	currentTime = functions.GetTime();
-	
-	data.TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(currentTime + data.TimeMoveNextCell).toISOString());
-	data.TimeFinishMove = functions.ImportTimeToDatabase(new Date(currentTime + data.TimeFinishMove).toISOString());
+	stringMove = "Moving_"+stringData;
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMove stringMove',[stringMove])
 
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE data.TimeMoveNextCell,data.TimeFinishMove',[data.TimeMoveNextCell,data.TimeFinishMove])
-
-	var ListMove = data.ListMove;
-	for (var i = 0; i < ListMove.length; i++) {
-		ListMove[i].TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(currentTime + ListMove[i].TimeMoveNextCell).toISOString());		
+	if (DictMoveTimeOut[stringMove]!=undefined) {
+		clearTimeout(DictMoveTimeOut[stringMove]);
+		delete DictMoveTimeOut[stringMove];
 	}
-	
-	updateDataBaseSMOVE (io,data);
-	setTimerUpdateDatabase (io,socket,data,stringUnit);
+	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMove=>positionRemove.PostionRemove data',[data])
+	positionRemove.PostionRemove(data);
 }
 
-function updateDataBaseSMOVE (io,data) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE updateDataBase data',[data])
+// function clearMoveAttack (io,stringData) {
+// 	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMoveTimeout stringData',[stringData])
+// 	moving_Attack.ClearMovingAttack(stringData);
+// 	attackFunc.ClearAttackUnit(io,stringData);
 
-	var stringUpdate;
-	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";	
-	stringUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	var stringHAtttack = "s"+data.Server_ID+"_attack";
+// }
 
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE updateDataBase stringQuery,stringUnit,stringHAtttack',[stringQuery,stringUnit,stringHAtttack])
+// function updateRedisAttack (data,Attack_Unit_ID,rowsUpdate) {
+// 	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisAttack data,Attack_Unit_ID,rowsUpdate',[data,Attack_Unit_ID,rowsUpdate])
 
-	db_position.query(stringQuery,function (error,rows) {		
-		if (!!error){
-			functions.ShowLog(functions.ShowLogBool.Error,'Moving.js updateDataBase stringQuery',[stringQuery]);
-		}
+// 	stringHUnit = "s"+data.Server_ID+"_unit";
+// 	stringUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;	
+// 	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisAttack stringHUnit,stringUnit',[stringHUnit,stringUnit])
 
-		if (rows[0]!=undefined) {
-			if (rows[0].Attack_Unit_ID!=null) {
-				updateRedisAttack (data,rows[0].Attack_Unit_ID,rows[0]);
-				var ID_Defend = data.Server_ID+"_"+rows[0].ID_Unit+"_"+rows[0].ID_User+"_"+rows[0].ID;
-				var ID_Attack = rows[0].Attack_Unit_ID;
-
-				functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE updateDataBase stringHAtttack,ID_Defend,ID_Attack',[stringHAtttack,ID_Defend,ID_Attack]);
-				// attackFunc.RemoveRedisData(stringHAtttack,ID_Defend,ID_Attack);
-
-			}
-			if (data.Attack_Unit_ID=="NULL") {
-				stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-				+"`Position_Cell`='"+data.Position_Cell+"',"
-				+"`Next_Cell`='"+data.Next_Cell+"',"
-				+"`End_Cell`='"+data.End_Cell+"',"
-				+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-				+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-				+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-				+"`Attack_Unit_ID`= NULL,"
-				+"`Status`='"+functions.UnitStatus.Move+
-				"' WHERE `ID`='"+data.ID+"'";
-			}else{
-				stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
-				+"`Position_Cell`='"+data.Position_Cell+"',"
-				+"`Next_Cell`='"+data.Next_Cell+"',"
-				+"`End_Cell`='"+data.End_Cell+"',"
-				+"`TimeMoveNextCell`='"+data.TimeMoveNextCell+"',"
-				+"`TimeFinishMove`='"+data.TimeFinishMove+"',"
-				+"`ListMove`='"+ JSON.stringify(data.ListMove) +"',"
-				+"`Attack_Unit_ID`='"+ data.Attack_Unit_ID +"',"
-				+"`Status`='"+functions.UnitStatus.Move+
-				"' WHERE `ID`='"+data.ID+"'";
-			}
-
-			db_position.query(stringUpdate,function (error,result) {
-				if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Moving.js S_MOVE updateDataBase stringUpdate',[stringUpdate]);}
-				logChangeDetail='Unit_Moving.js: updateDataBase: '+stringUpdate;functions.LogChange(logChangeDetail,2);
-
-				var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";
-				db_position.query(stringQuery,function (error,rowsUpdate) {
-					updateRedisData (io,data,rowsUpdate[0]);
-				});
-			});
-		}
-
-	});
-}
-
-function updateRedisAttack (data,Attack_Unit_ID,rowsUpdate) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisAttack data,Attack_Unit_ID,rowsUpdate',[data,Attack_Unit_ID,rowsUpdate])
-
-	stringHUnit = "s"+data.Server_ID+"_unit";
-	stringUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;	
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisAttack stringHUnit,stringUnit',[stringHUnit,stringUnit])
-
-	client.hset(stringHUnit,stringUnit,JSON.stringify(rowsUpdate))
-}
-
-function updateRedisData (io,data,rowsData) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisData data,rowsData',[data,rowsData])
-
-	stringHUnit ="s"+data.Server_ID+"_unit";
-	stringUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisData stringHUnit,stringUnit',[stringHUnit,stringUnit]);
-
-	client.hset(stringHUnit,stringUnit,JSON.stringify(rowsData));
-}
-
-function checkPosition (data,returnBool) {
-	var checkBool = false;
-	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE "
-	+"`Status`='"+functions.UnitStatus.Standby
-	+"' AND `Position_Cell`='"+data.End_Cell
-	+"' AND `ID`<>'"+data.ID+"'";
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js checkPosition stringQuery',[stringQuery])
-	db_position.query(stringQuery,function (error,rows) {
-		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'Moving.js checkPosition stringQuery',[stringQuery]);}
-		if (rows.length>0) {checkBool = true;}
-		returnBool(checkBool);
-	});
-}
+// 	client.hset(stringHUnit,stringUnit,JSON.stringify(rowsUpdate))
+// }
