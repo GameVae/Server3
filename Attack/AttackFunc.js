@@ -335,6 +335,223 @@ function updateRedisData (stringKey) {
 	})
 }
 
+exports.CheckMovePos = function (io,data,stringKey) {
+	checkMovePos (io,data,stringKey)
+}
+
+function checkMovePos (io,data,stringKey) {
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkMovePos data,stringKey',[data,stringKey]);
+	var posCheck = data.Position_Cell;
+	var timeNext = 0, timeOut = 0;
+	var Position_Cell_X,Position_Cell_Y,Next_Cell_X,Next_Cell_Y;
+	var Server_ID = data.Server_ID;
+	stringMoveAttack = "Moving_Attack_"+stringKey;
+
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkMovePos=>checkCurrentPos data,stringKey',[data,stringKey,posCheck,Server_ID]);
+	checkCurrentPos (io,data,stringKey,posCheck,Server_ID);
+	
+	if (data.TimeMoveNextCell!=null) {
+		Position_Cell_X = data.Position_Cell.toString().split(",")[0];
+		Position_Cell_Y = data.Position_Cell.toString().split(",")[1];
+		Next_Cell_X = data.Next_Cell.toString().split(",")[0];
+		Next_Cell_Y = data.Next_Cell.toString().split(",")[1];
+		var caseMove = functions.CaseMove.Straight;	
+
+		if (Position_Cell_X!=Next_Cell_X&&Position_Cell_Y!=Next_Cell_Y) {caseMove = functions.CaseMove.Diagonal;}
+
+		timeNext = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
+
+		switch (caseMove) {
+			case functions.CaseMove.Straight:
+			if (timeNext == functions.TimeMove.Straight) {
+				// console.log('timeNext == functions.TimeMove.Straight');
+				timeOut = functions.TimeMove.Straight*0.5;
+			}else{
+				// console.log('timeNext != functions.TimeMove.Straight');
+				timeOut =  timeNext - (functions.TimeMove.Straight*0.5);
+			}
+			break;
+
+			case functions.CaseMove.Diagonal:
+			// console.log('functions.CaseMove.Diagonal');
+			if (timeNext == functions.TimeMove.Diagonal) {
+				// console.log('timeNext == functions.TimeMove.Diagonal');
+				timeOut = functions.TimeMove.Diagonal*0.5;
+			}else{
+				// console.log('timeNext != functions.TimeMove.Diagonal');
+				timeOut =  timeNext - (functions.TimeMove.Diagonal*0.5);
+			}
+			break;
+		}
+		if (timeOut<0) {console.log('AttackFunc.js checkMovePos Moving Attack timeOut<0');console.log(timeOut); return null;}
+
+		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkMovePos timeOut,data,stringKey,stringMoveAttack',[timeOut,data,stringKey,stringMoveAttack]);
+		if (data.TimeMoveNextCell!=data.TimeFinishMove) {
+			DictMoveAttack[stringMoveAttack]=setTimeout(function (io,data,stringKey) {
+				var updateData = data;
+
+				if (data.ListMove.length>0) {
+					updateData.Position_Cell = data.Next_Cell;
+					updateData.Next_Cell = data.ListMove[0].Next_Cell;
+					updateData.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
+					updateData.ListMove.shift();
+				}else{
+					updateData.Position_Cell = data.End_Cell;
+					updateData.Next_Cell = null;
+					updateData.TimeMoveNextCell = null;
+					updateData.TimeFinishMove = null;
+				}
+				checkMovePos (io,updateData,stringKey);
+			}, timeOut,io,data,stringKey);
+		}
+	}
+}
+
+exports.CheckCurrentPos = function (io,data,stringKey,pos,Server_ID) {
+	checkCurrentPos (io,data,stringKey,pos,Server_ID);
+}
+function checkCurrentPos (io,data,stringKey,pos,Server_ID) {
+	// var dataNewPos ={
+	// 	// Position_Cell: data.Position_Cell,
+	// 	// Next_Cell: data.Next_Cell,
+	// 	PositionCheck: pos,
+	// }
+	// console.log('dataNewPos')
+	// console.log(dataNewPos)
+	// console.log('stringKey')
+	// console.log(stringKey)
+	// io.emit('R_TESTMOVE',{R_TESTMOVE:dataNewPos});
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos data,stringKey,pos,Server_ID',[data,stringKey,pos,Server_ID]);
+	stringHPos ="s"+Server_ID+"_pos";
+	stringHUnit = "s"+Server_ID+"_unit";
+	stringHAttack = "s"+Server_ID+"_attack";
+	// var Server_ID = data.Server_ID;
+
+	var ID_User = stringKey.split("_")[2];
+	var arrayUnitInPos = [];
+	// var tempListUnitInPos = [];
+	var listUnitAttack = [];
+	var listIDUnitAttack = [];
+	var listCurrentAttack = [];
+	// var listUnit = [];
+	var checkBoolFriendData = false, checkBoolGuildData = false;
+	var getAttackBool = false;
+
+	var defendingUnit;
+
+	new Promise((resolve,reject)=>{
+		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hget stringHPos,pos',[stringHPos,pos]);
+		client.hget(stringHPos,pos,function(error,rows){
+			if (rows!=null) {
+				arrayUnitInPos = rows.split("/").filter(String);				
+				for (var i = 0; i < arrayUnitInPos.length; i++) {
+					if (arrayUnitInPos[i].split("_")[2] != ID_User) {
+						listIDUnitAttack.push(arrayUnitInPos[i]);
+						// arrayUnitInPos.splice(arrayUnitInPos.indexOf(arrayUnitInPos[i], 1))
+					}
+				}
+			}
+			// listIDUnitAttack = arrayUnitInPos;
+			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos listIDUnitAttack',[listIDUnitAttack]);
+			if (listIDUnitAttack.length==0) {
+				// attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full);		
+				clearInterAttackUpdate(io,stringKey);		
+				return null;
+			}
+			resolve();
+		})
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			// console.log('listIDUnitAttack')
+			// console.log(listIDUnitAttack);
+			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos friendData.CheckListFriendData listIDUnitAttack,stringKey',[listIDUnitAttack,stringKey]);
+			friendData.CheckListFriendData(listIDUnitAttack,stringKey.split("_")[2],function (returnListUnit) {
+				// console.log('returnListUnit')
+				// console.log(returnListUnit);
+				listIDUnitAttack = returnListUnit;
+				resolve();
+			})
+		})
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+
+			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos guildData.CheckListGuildData listIDUnitAttack,stringKey',[listIDUnitAttack,stringKey]);
+			guildData.CheckListGuildData(listIDUnitAttack,stringKey.split("_")[2],function (returnListUnit) {
+				listIDUnitAttack = returnListUnit;
+				resolve();
+			})
+		})
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			
+			if (listIDUnitAttack.length==0) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos listIDUnitAttack=0=>attackFunc.ClearInterAttackUpdate',[stringKey]);
+				clearInterAttackUpdate(io,stringKey);
+				return null;
+			}else{
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hmget stringHUnit,listIDUnitAttack',[stringHUnit,listIDUnitAttack]);
+				client.hmget(stringHUnit,listIDUnitAttack,function (error,rows) {
+					if (rows!=null) {
+						for (var i = 0; i < rows.length; i++) {
+							if(rows[i]!=null){
+								var unitResult = JSON.parse(rows[i]);
+								var attackBool = false;
+								
+								if (unitResult.Status==6&&unitResult.Attack_Unit_ID==null) {
+									attackBool = true;	
+								}
+								if (unitResult.Attack_Unit_ID==stringKey){
+									attackBool = true;
+								}
+								if (unitResult.Status==6&&unitResult.Attack_Unit_ID=='null') {
+									attackBool = true;	
+								}
+								if (attackBool == false) {
+									listIDUnitAttack.splice(listIDUnitAttack.indexOf(listIDUnitAttack[i]), 1);
+								}
+							}else{
+								listIDUnitAttack.splice(listIDUnitAttack.indexOf(listIDUnitAttack[i]), 1);
+							}
+						}
+					}else{
+						clearInterAttackUpdate(io,stringKey);
+						return null;
+					}
+					resolve();
+				})
+			}
+		})
+
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hget stringHAttack,stringKey',[stringHAttack,stringKey]);
+			client.hget(stringHAttack,stringKey,function (error,rows) {
+				if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js checkCurrentPos hget stringHAttack,stringKey',[stringHAttack,stringKey]);}
+				if (rows!=null) {
+					listCurrentAttack = rows.split("/").filter(String);
+				}
+				resolve();
+			})
+
+		})
+		
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+
+			if (listIDUnitAttack.length>0) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hget stringHAttack,stringKey',[stringHAttack,stringKey]);
+				setListAttackData(io,Server_ID,stringKey,listIDUnitAttack,listCurrentAttack);
+			}
+			if(listIDUnitAttack.length==0&&listCurrentAttack.length==0){
+				clearInterAttackUpdate(io,stringKey);
+				return null;
+			}
+			resolve();
+			
+		})
+	})
+}
+
 exports.SetAttackData = function (Server_ID,ID_Defend,ID_Attack) {
 	setAttackData (Server_ID,ID_Defend,ID_Attack)
 }

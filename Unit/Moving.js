@@ -50,15 +50,15 @@ exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){
 
-			functions.ShowLog(functions.ShowLogBool.On,'Moving.js Start data',[data])
+			functions.ShowLog(functions.ShowLogBool.Off,'Moving.js Start data',[data])
 
 			stringUnit = data.S_MOVE.Server_ID+"_"+data.S_MOVE.ID_Unit+"_"+data.S_MOVE.ID_User+"_"+data.S_MOVE.ID;
-			functions.ShowLog(functions.ShowLogBool.On,'Moving.js Start data',[stringUnit])
+			functions.ShowLog(functions.ShowLogBool.Off,'Moving.js Start data',[stringUnit])
 
 			clearMoveTimeout (io,stringUnit,data);	
 			stringKeyMove = "s"+data.S_MOVE.Server_ID+"_move";
 
-			functions.ShowLog(functions.ShowLogBool.On,'Moving.js Start=>R_MOVE data',[data.S_MOVE.Server_ID,stringKeyMove])
+			functions.ShowLog(functions.ShowLogBool.Off,'Moving.js Start=>R_MOVE data',[data.S_MOVE.Server_ID,stringKeyMove])
 			R_MOVE (io,data.S_MOVE.Server_ID,stringKeyMove);
 
 
@@ -66,7 +66,7 @@ exports.Start = function start (io) {
 				client.set(stringKeyMove,JSON.stringify(data.S_MOVE));
 				resolve();
 			}).then(()=>{
-				return new Promise((resolve,reject)=>{
+				new Promise((resolve,reject)=>{
 					S_MOVE (io,socket,data.S_MOVE,stringUnit);
 					resolve();
 				})
@@ -77,15 +77,15 @@ exports.Start = function start (io) {
 
 // #R_MOVE
 function R_MOVE (io,Server_ID,stringKMove) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js R_MOVE Server_ID',[Server_ID])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js R_MOVE Server_ID',[Server_ID])
 	
 	stringHSocket = "s"+Server_ID+"_socket";
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js R_MOVE hgetall stringHSocket',[stringHSocket])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js R_MOVE hgetall stringHSocket',[stringHSocket])
 	client.hgetall(stringHSocket,function (error,rows) {
 		if (rows!=undefined) {
 			var result = rows;
 			// delete result[ID_User];
-			functions.ShowLog(functions.ShowLogBool.On,'Moving.js R_MOVE stringHSocket result',[result])
+			functions.ShowLog(functions.ShowLogBool.Off,'Moving.js R_MOVE stringHSocket result',[result])
 			if (Object.values(result).length>0) {
 				for (var i = 0; i < Object.values(result).length; i++) {						
 					sendToClient (io,stringKMove,Object.values(result)[i]);
@@ -97,7 +97,7 @@ function R_MOVE (io,Server_ID,stringKMove) {
 }
 
 function sendToClient (io,stringKMove,socketID) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js sendToClient stringKMove socketID',[stringKeyMove,socketID])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js sendToClient stringKMove socketID',[stringKeyMove,socketID])
 	client.get(stringKMove,function (error,rowData) {
 		io.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
 	})
@@ -106,28 +106,28 @@ function sendToClient (io,stringKMove,socketID) {
 
 //#S_MOVE
 function S_MOVE (io,socket,data,stringUnit) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE data,stringUnit',[socket,data,stringUnit])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js S_MOVE data,stringUnit',[socket,data,stringUnit])
 	
 	currentTime = functions.GetTime();
 	
 	data.TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(currentTime + data.TimeMoveNextCell).toISOString());
 	data.TimeFinishMove = functions.ImportTimeToDatabase(new Date(currentTime + data.TimeFinishMove).toISOString());
 
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE data.TimeMoveNextCell,data.TimeFinishMove',[data.TimeMoveNextCell,data.TimeFinishMove])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js S_MOVE data.TimeMoveNextCell,data.TimeFinishMove',[data.TimeMoveNextCell,data.TimeFinishMove])
 
 	var ListMove = data.ListMove;
 	for (var i = 0; i < ListMove.length; i++) {
 		ListMove[i].TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(currentTime + ListMove[i].TimeMoveNextCell).toISOString());		
 	}	
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE=>updateDataBaseSMOVE data',[data])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js S_MOVE=>updateDataBaseSMOVE data',[data])
 	updateDataBaseSMOVE (data);
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js S_MOVE=>setTimerUpdateDatabase data',[data,stringUnit])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js S_MOVE=>setTimerUpdateDatabase data',[data,stringUnit])
 	setTimerUpdateDatabase (io,socket,data,stringUnit);
 }
 
 
 function updateDataBaseSMOVE (data) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateDataBaseSMOVE data',[data])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js updateDataBaseSMOVE data',[data])
 
 	var stringUpdate;
 	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE `ID`='"+data.ID+"'";	
@@ -136,7 +136,7 @@ function updateDataBaseSMOVE (data) {
 	stringUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	
 
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateDataBaseSMOVE stringQuery,stringHAttack,stringUnit',[stringQuery,stringHAttack,stringUnit])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js updateDataBaseSMOVE stringQuery,stringHAttack,stringUnit',[stringQuery,stringHAttack,stringUnit])
 
 	if (data.Attack_Unit_ID=="NULL") {
 		stringUpdate = "UPDATE `s"+data.Server_ID+"_unit` SET "
@@ -174,20 +174,20 @@ function updateDataBaseSMOVE (data) {
 }
 
 function updateRedisData (data,rowsData) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisData data,rowsData',[data,rowsData])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js updateRedisData data,rowsData',[data,rowsData])
 
 	stringHUnit ="s"+data.Server_ID+"_unit";
 	stringUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisData stringHUnit,stringUnit',[stringHUnit,stringUnit]);
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js updateRedisData stringHUnit,stringUnit',[stringHUnit,stringUnit]);
 
 	client.hset(stringHUnit,stringUnit,JSON.stringify(rowsData));
 }
 
 function setTimerUpdateDatabase (io,socket,data,stringKey) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase data,stringKey',[data,stringKey])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js setTimerUpdateDatabase data,stringKey',[data,stringKey])
 	
 	var	timeOut  = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase timeOut',[timeOut])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js setTimerUpdateDatabase timeOut',[timeOut])
 
 	var stringMove = "Moving_"+stringKey;
 
@@ -207,7 +207,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 			setTimerUpdateDatabase (io,socket,updateDataMove,stringKey);			
 		}else{	
 			checkPosition (updateDataMove,function (returnBool) {
-				functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase checkPosition data',[returnBool])
+				functions.ShowLog(functions.ShowLogBool.Off,'Moving.js setTimerUpdateDatabase checkPosition data',[returnBool])
 				if (returnBool) {
 					// console.log(returnBool)					
 					if (io!=null) {move_GetNewPos.SendGetNewPos(io,updateDataMove);}
@@ -220,7 +220,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 						// app.set('port', process.env.PORT);
 						console.log('get new pos with no socket');
 						// console.log(index.IO);
-						functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase=>move_GetNewPos.SendGetNewPos data',[updateDataMove])
+						functions.ShowLog(functions.ShowLogBool.Off,'Moving.js setTimerUpdateDatabase=>move_GetNewPos.SendGetNewPos data',[updateDataMove])
 						move_GetNewPos.SendGetNewPos(io,updateDataMove);
 						// move_GetNewPos.SendGetNewPos(GetIO.IO,updateData);
 					}	
@@ -256,7 +256,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 function updateRedisDataPosition (stringKey,updateDataM,Position_Cell) {
 
 	stringHUnit = "s"+updateDataM.Server_ID+"_unit";
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisDataPosition hget stringKey,updateDataM,Position_Cell',[stringHUnit,stringKey,updateDataM,Position_Cell])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js updateRedisDataPosition hget stringKey,updateDataM,Position_Cell',[stringHUnit,stringKey,updateDataM,Position_Cell])
 
 	client.hget(stringHUnit,stringKey,function (error,rows){
 		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'Moving.js updateRedisDataPosition hget stringHUnit,stringKey',[stringHUnit,stringKey])}
@@ -271,7 +271,7 @@ function updateRedisDataPosition (stringKey,updateDataM,Position_Cell) {
 			result.Status = updateDataM.Status;
 			result.Attack_Unit_ID = updateDataM.Attack_Unit_ID;
 
-			functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisDataPosition hset result',[result])
+			functions.ShowLog(functions.ShowLogBool.Off,'Moving.js updateRedisDataPosition hset result',[result])
 			client.hset(stringHUnit,stringKey,JSON.stringify(result));
 		}
 	})
@@ -279,7 +279,7 @@ function updateRedisDataPosition (stringKey,updateDataM,Position_Cell) {
 }
 
 function checkPosition (data,returnBool) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js checkPosition data',[data])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js checkPosition data',[data])
 	var checkBool = false;
 	// var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE "
 	// +"`Status`='"+functions.UnitStatus.Standby
@@ -288,7 +288,7 @@ function checkPosition (data,returnBool) {
 
 	var stringQuery = "SELECT * FROM `s"+data.Server_ID+"_unit` WHERE "
 	+"`Position_Cell`='"+data.End_Cell+"'";
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js checkPosition stringQuery,data.End_Cell',[stringQuery,data.End_Cell])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js checkPosition stringQuery,data.End_Cell',[stringQuery,data.End_Cell])
 	db_position.query(stringQuery,function (error,rows) {
 		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'Moving.js checkPosition stringQuery',[stringQuery]);}
 		if (rows.length>0) {checkBool = true;}
@@ -309,7 +309,7 @@ function updateDatabase (data) {
 	+"`Status`='"+functions.UnitStatus.Move+
 	"' WHERE `ID`='"+data.ID+"'";
 	//console.log(stringUpdate);
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateDatabase stringUpdate,data',[stringUpdate,data]);
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js updateDatabase stringUpdate,data',[stringUpdate,data]);
 	db_position.query(stringUpdate,function (error,result) {
 		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Moving.js updateDatabase stringUpdate',[stringUpdate]);}
 		logChangeDetail =("Moving.js: updateDatabase "+stringUpdate); functions.LogChange(logChangeDetail,2);
@@ -321,38 +321,21 @@ exports.ClearMoveTimeout = function (io,stringData,data){
 }
 
 function clearMoveTimeout (io,stringData,data) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMoveTimeout=>clearMove stringData,data',[stringData,data])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js clearMoveTimeout=>clearMove stringData,data',[stringData,data])
 	clearMove (stringData,data);
 	// clearMoveAttack (io,stringData);
 }
 
 function clearMove (stringData,data) {
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMove stringData,data',[stringData,data])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js clearMove stringData,data',[stringData,data])
 
 	stringMove = "Moving_"+stringData;
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMove stringMove',[stringMove])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js clearMove stringMove',[stringMove])
 
 	if (DictMoveTimeOut[stringMove]!=undefined) {
 		clearTimeout(DictMoveTimeOut[stringMove]);
 		delete DictMoveTimeOut[stringMove];
 	}
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMove=>positionRemove.PostionRemove data',[data])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js clearMove=>positionRemove.PostionRemove data',[data])
 	positionRemove.PostionRemove(data);
 }
-
-// function clearMoveAttack (io,stringData) {
-// 	functions.ShowLog(functions.ShowLogBool.On,'Moving.js clearMoveTimeout stringData',[stringData])
-// 	moving_Attack.ClearMovingAttack(stringData);
-// 	attackFunc.ClearAttackUnit(io,stringData);
-
-// }
-
-// function updateRedisAttack (data,Attack_Unit_ID,rowsUpdate) {
-// 	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisAttack data,Attack_Unit_ID,rowsUpdate',[data,Attack_Unit_ID,rowsUpdate])
-
-// 	stringHUnit = "s"+data.Server_ID+"_unit";
-// 	stringUnit = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;	
-// 	functions.ShowLog(functions.ShowLogBool.On,'Moving.js updateRedisAttack stringHUnit,stringUnit',[stringHUnit,stringUnit])
-
-// 	client.hset(stringHUnit,stringUnit,JSON.stringify(rowsUpdate))
-// }
