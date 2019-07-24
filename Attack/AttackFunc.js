@@ -79,13 +79,14 @@ function checkCurrentPos (io,data,stringKey,pos,Server_ID) {
 			// functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos listIDUnitAttack',[listIDUnitAttack]);
 			if (listIDUnitAttack.length==0) {
 				// attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full);		
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos=>clearDefend stringKey',[stringKey]);
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos=>clearDefend1 stringKey',[stringKey]);
 				clearDefend(io,stringKey);		
 				clearBool = true;
 			}
 			resolve();
 		})
 	}).then(()=>{
+		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearBool1',[clearBool]);
 		if (clearBool==false) {
 			return new Promise((resolve,reject)=>{
 				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos=>friendData.CheckListFriendData listIDUnitAttack,stringKey',[listIDUnitAttack,stringKey]);
@@ -93,7 +94,6 @@ function checkCurrentPos (io,data,stringKey,pos,Server_ID) {
 					listIDUnitAttack = returnListUnit;
 					resolve();
 				})
-
 			})
 		}
 	}).then(()=>{
@@ -143,7 +143,7 @@ function checkCurrentPos (io,data,stringKey,pos,Server_ID) {
 								}
 							}
 						}else{
-							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos=>clearDefend stringKey',[stringKey]);
+							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos=>clearDefend2 stringKey',[stringKey]);
 							clearDefend(io,stringKey);
 							clearBool=true;
 						}
@@ -325,6 +325,12 @@ function clearDefend (io,stringDefend) {
 						for (var i = 0; i < rows.length; i++) {
 							if(rows[i]!=null){
 								var result = JSON.parse(rows)
+								if (result.Status==functions.UnitStatus.Attack_Unit) {
+									result.Status = functions.UnitStatus.Standby
+								}
+								if (result.Status==functions.UnitStatus.Base) {
+									result.Status = functions.UnitStatus.Base
+								}
 								result.Attack_Unit_ID = null;
 								functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearDefend hset1 result',[result]);
 								client.hset(stringHUnit,listStringUnitAttacking[i],JSON.stringify(result));
@@ -384,132 +390,132 @@ function clearDefend (io,stringDefend) {
 
 }
 // #ClearDefend
-exports.StopIntervalAttack =function (ID_User_Defend) {
-	stopIntervalAttack (ID_User_Defend);
-}
-function stopIntervalAttack (ID_User_Defend) {
-	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack ID_User_Defend',[ID_User_Defend]);
-	var server_ID = ID_User_Defend.split("_")[0];
-	var ID_Unit = ID_User_Defend.split("_")[3];
-	stringHAttack ="s"+server_ID+"_attack";
-	stringHUnit ="s"+server_ID+"_unit";
-	stringInterval = "Attacking_"+ID_User_Defend;
+// exports.StopIntervalAttack =function (ID_User_Defend) {
+// 	stopIntervalAttack (ID_User_Defend);
+// }
+// function stopIntervalAttack (ID_User_Defend) {
+// 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack ID_User_Defend',[ID_User_Defend]);
+// 	var server_ID = ID_User_Defend.split("_")[0];
+// 	var ID_Unit = ID_User_Defend.split("_")[3];
+// 	stringHAttack ="s"+server_ID+"_attack";
+// 	stringHUnit ="s"+server_ID+"_unit";
+// 	stringInterval = "Attacking_"+ID_User_Defend;
 
-	if (DictTimeAttack[stringInterval]!=undefined) {
-		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack DictTimeAttack[stringInterval]',[DictTimeAttack[stringInterval]]);
-		clearTimeout(DictTimeAttack[stringInterval]);			
-		delete DictTimeAttack[stringInterval];			
-	}
-	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack stringHAttack,ID_User_Defend',[stringHAttack,ID_User_Defend]);
-	client.hdel(stringHAttack,ID_User_Defend);
+// 	if (DictTimeAttack[stringInterval]!=undefined) {
+// 		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack DictTimeAttack[stringInterval]',[DictTimeAttack[stringInterval]]);
+// 		clearTimeout(DictTimeAttack[stringInterval]);			
+// 		delete DictTimeAttack[stringInterval];			
+// 	}
+// 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack stringHAttack,ID_User_Defend',[stringHAttack,ID_User_Defend]);
+// 	client.hdel(stringHAttack,ID_User_Defend);
 
-	new Promise((resolve,reject)=>{
-		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack hget stringHUnit,stringKey',[stringHUnit,stringKey]);
-		client.hget(stringHUnit,stringKey,function (error,rows) {
-			if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js stopIntervalAttack hget stringHUnit,stringKey',[stringHUnit,stringKey]);}
-			var unitResult = JSON.parse(rows);
-			unit.AttackedBool = 0;
-			client.hset(stringHUnit,stringKey,JSON.stringify(unitResult))
-			resolve();
-		})
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			var stringUpdate = "UPDATE `s"+server_ID+"_unit` SET `AttackedBool`='0' WHERE `ID`='"+ID_Unit+"';"
-			db_position.query(stringUpdate,function(error,result){
-				if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js stopIntervalAttack stringUpdate',[stringUpdate]);}
-				resolve();
-			})
+// 	new Promise((resolve,reject)=>{
+// 		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack hget stringHUnit,stringKey',[stringHUnit,stringKey]);
+// 		client.hget(stringHUnit,stringKey,function (error,rows) {
+// 			if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js stopIntervalAttack hget stringHUnit,stringKey',[stringHUnit,stringKey]);}
+// 			var unitResult = JSON.parse(rows);
+// 			unit.AttackedBool = 0;
+// 			client.hset(stringHUnit,stringKey,JSON.stringify(unitResult))
+// 			resolve();
+// 		})
+// 	}).then(()=>{
+// 		return new Promise((resolve,reject)=>{
+// 			var stringUpdate = "UPDATE `s"+server_ID+"_unit` SET `AttackedBool`='0' WHERE `ID`='"+ID_Unit+"';"
+// 			db_position.query(stringUpdate,function(error,result){
+// 				if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js stopIntervalAttack stringUpdate',[stringUpdate]);}
+// 				resolve();
+// 			})
 
-		})
-	})
-}
-
-
-exports.ClearInterAttackUpdate = function clearInterAttackUpdate2 (io,ID_User_Defend){
-	clearInterAttackUpdate (io,ID_User_Defend);
-}
-
-function clearInterAttackUpdate (io,ID_User_Defend) {
-	stringInterval = "Attacking_"+ID_User_Defend;
-	var server_ID = ID_User_Defend.split("_")[0]
-	stringHAttack ="s"+server_ID+"_attack";
-	stringHUnit = "s"+server_ID+"_unit";
-	var resultArrayUnit = [];
-	var arrayAttacking = [];
-
-	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate ID_User_Defend,stringInterval,server_ID,stringHAttack,stringHUnit',[ID_User_Defend,stringInterval,server_ID,stringHAttack,stringHUnit]);
-
-	new Promise((resolve,reject)=>{
-		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate hget stringHAttack,ID_User_Defend',[stringHAttack,ID_User_Defend]);
-		client.hget(stringHAttack,ID_User_Defend, function (error,rows){
-			if (rows!=null) {
-				resultArrayUnit = rows.split("/").filter(String);
-			}
-			resolve();
-		})
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			if (resultArrayUnit.length>0) {
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate hmget sstringHAttack,resultArrayUnit',[stringHAttack,resultArrayUnit]);
-				client.hmget(stringHAttack,resultArrayUnit,function (error,rowsAttack) {
-					if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearInterAttackUpdate hmget stringHAttack,resultArrayUnit',[stringHAttack,resultArrayUnit]);}
-					arrayAttacking = rowsAttack;
-					resolve();
-				})
-			}else{
-				resolve();
-			}
-		})
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			if (resultArrayUnit.length>0) {
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate hmget stringHUnit,resultArrayUnit',[stringHUnit,resultArrayUnit]);
-				client.hmget(stringHUnit,resultArrayUnit,function (error,resultUnitAttack){
-					if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearInterAttackUpdate hmget stringHUnit,resultArrayUnit',[stringHUnit,resultArrayUnit]);}
-					if (resultUnitAttack!=null) {
-
-						for (var i = 0; i < resultUnitAttack.length; i++) {		
-							if (resultUnitAttack[i]!=null) {
-								var stringUnitResult =  JSON.parse(resultUnitAttack[i]);
-								var unitID = resultArrayUnit[i];
-								stringUnitResult.Attack_Unit_ID = null;
-								if (arrayAttacking[i]==null) {
-									stringUnitResult.AttackedBool = 0;
-								}
-
-								stringUnitResult.Status = functions.UnitStatus.Standby;	
-								updateRedis (stringHUnit,unitID,stringUnitResult);
-								var stringUpdate = "UPDATE `s"+server_ID+"_unit` SET `Attack_Unit_ID` = NULL, `Status`='"+functions.UnitStatus.Standby+"',`AttackedBool`='"+stringUnitResult.AttackedBool+"' WHERE `Attack_Unit_ID`='"+ID_User_Defend+"'";
-								db_position.query(stringUpdate,function (error,result) {
-									if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearInterAttackUpdate stringUpdate',[stringUpdate]);}	
-								});							
-							}
-							if (i == (resultUnitAttack.length-1)) {
-								resolve();
-							}					
-						}					
-					}				
-				})
-			}
-			resolve();
+// 		})
+// 	})
+// }
 
 
-		})
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate del stringInterval,stringHAttack,ID_User_Defend',[stringInterval,stringHAttack,ID_User_Defend]);
-			if (DictTimeAttack[stringInterval]!=undefined) {
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate clearInterval1 stringInterval,DictTimeAttack[stringInterval]',[stringInterval,DictTimeAttack[stringInterval]]);
-				clearInterval(DictTimeAttack[stringInterval]);			
-				delete DictTimeAttack[stringInterval];
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate clearInterval2 stringInterval,DictTimeAttack[stringInterval]',[stringInterval,DictTimeAttack[stringInterval]]);									
-			}
-			client.hdel(stringHAttack,ID_User_Defend);
-			resolve();
-		})
-	})
+// exports.ClearInterAttackUpdate = function clearInterAttackUpdate2 (io,ID_User_Defend){
+// 	clearInterAttackUpdate (io,ID_User_Defend);
+// }
 
-}
+// function clearInterAttackUpdate (io,ID_User_Defend) {
+// 	stringInterval = "Attacking_"+ID_User_Defend;
+// 	var server_ID = ID_User_Defend.split("_")[0]
+// 	stringHAttack ="s"+server_ID+"_attack";
+// 	stringHUnit = "s"+server_ID+"_unit";
+// 	var resultArrayUnit = [];
+// 	var arrayAttacking = [];
+
+// 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate ID_User_Defend,stringInterval,server_ID,stringHAttack,stringHUnit',[ID_User_Defend,stringInterval,server_ID,stringHAttack,stringHUnit]);
+
+// 	new Promise((resolve,reject)=>{
+// 		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate hget stringHAttack,ID_User_Defend',[stringHAttack,ID_User_Defend]);
+// 		client.hget(stringHAttack,ID_User_Defend, function (error,rows){
+// 			if (rows!=null) {
+// 				resultArrayUnit = rows.split("/").filter(String);
+// 			}
+// 			resolve();
+// 		})
+// 	}).then(()=>{
+// 		return new Promise((resolve,reject)=>{
+// 			if (resultArrayUnit.length>0) {
+// 				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate hmget sstringHAttack,resultArrayUnit',[stringHAttack,resultArrayUnit]);
+// 				client.hmget(stringHAttack,resultArrayUnit,function (error,rowsAttack) {
+// 					if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearInterAttackUpdate hmget stringHAttack,resultArrayUnit',[stringHAttack,resultArrayUnit]);}
+// 					arrayAttacking = rowsAttack;
+// 					resolve();
+// 				})
+// 			}else{
+// 				resolve();
+// 			}
+// 		})
+// 	}).then(()=>{
+// 		return new Promise((resolve,reject)=>{
+// 			if (resultArrayUnit.length>0) {
+// 				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate hmget stringHUnit,resultArrayUnit',[stringHUnit,resultArrayUnit]);
+// 				client.hmget(stringHUnit,resultArrayUnit,function (error,resultUnitAttack){
+// 					if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearInterAttackUpdate hmget stringHUnit,resultArrayUnit',[stringHUnit,resultArrayUnit]);}
+// 					if (resultUnitAttack!=null) {
+
+// 						for (var i = 0; i < resultUnitAttack.length; i++) {		
+// 							if (resultUnitAttack[i]!=null) {
+// 								var stringUnitResult =  JSON.parse(resultUnitAttack[i]);
+// 								var unitID = resultArrayUnit[i];
+// 								stringUnitResult.Attack_Unit_ID = null;
+// 								if (arrayAttacking[i]==null) {
+// 									stringUnitResult.AttackedBool = 0;
+// 								}
+
+// 								stringUnitResult.Status = functions.UnitStatus.Standby;	
+// 								updateRedis (stringHUnit,unitID,stringUnitResult);
+// 								var stringUpdate = "UPDATE `s"+server_ID+"_unit` SET `Attack_Unit_ID` = NULL, `Status`='"+functions.UnitStatus.Standby+"',`AttackedBool`='"+stringUnitResult.AttackedBool+"' WHERE `Attack_Unit_ID`='"+ID_User_Defend+"'";
+// 								db_position.query(stringUpdate,function (error,result) {
+// 									if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearInterAttackUpdate stringUpdate',[stringUpdate]);}	
+// 								});							
+// 							}
+// 							if (i == (resultUnitAttack.length-1)) {
+// 								resolve();
+// 							}					
+// 						}					
+// 					}				
+// 				})
+// 			}
+// 			resolve();
+
+
+// 		})
+// 	}).then(()=>{
+// 		return new Promise((resolve,reject)=>{
+// 			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate del stringInterval,stringHAttack,ID_User_Defend',[stringInterval,stringHAttack,ID_User_Defend]);
+// 			if (DictTimeAttack[stringInterval]!=undefined) {
+// 				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate clearInterval1 stringInterval,DictTimeAttack[stringInterval]',[stringInterval,DictTimeAttack[stringInterval]]);
+// 				clearInterval(DictTimeAttack[stringInterval]);			
+// 				delete DictTimeAttack[stringInterval];
+// 				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate clearInterval2 stringInterval,DictTimeAttack[stringInterval]',[stringInterval,DictTimeAttack[stringInterval]]);									
+// 			}
+// 			client.hdel(stringHAttack,ID_User_Defend);
+// 			resolve();
+// 		})
+// 	})
+
+// }
 
 function updateRedis(stringHkey,stringUnit,data) {
 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js updateRedis stringHkey,stringUnit,data]',[stringHkey,stringUnit,data]);
@@ -638,7 +644,7 @@ function compareArray (arrayOldPos,arrayNewPos) {
 	var uniqueArray = finalArray.filter(function(item, pos) {
 		return finalArray.indexOf(item) == pos;
 	})
-	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js compareArray uniqueArray',[uniqueArray]);
+	if (uniqueArray.length>0) {functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js compareArray uniqueArray',[uniqueArray]);}	
 	return uniqueArray;
 }
 

@@ -74,8 +74,6 @@ var attacking 				= require('./Attack/Attacking.js');
 
 // var attackingUnit			= require('./Unit/Attacking.js');
 
-
-
 var moving_Update 			= require('./Unit/Moving_Update.js');
 moving_Update.UpdateDataBase(1);
 

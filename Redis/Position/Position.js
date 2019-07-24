@@ -30,7 +30,7 @@ function getPosition (server_ID) {
 	});
 }
 exports.AddPosition = function (data) {
-	functions.ShowLog(functions.ShowLogBool.On,'Position.js addPosition data.Server_ID,data.ID_Unit,data.Position_Cell',[data.Server_ID,data.ID_Unit,data.Position_Cell])
+	functions.ShowLog(functions.ShowLogBool.Off,'Position.js addPosition data.Server_ID,data.ID_Unit,data.Position_Cell',[data.Server_ID,data.ID_Unit,data.Position_Cell])
 
 	if (data.ID_Unit>15&&data.ID_Unit<20) {unitRange1 (data);}
 	if (data.ID_Unit>20&&data.ID_Unit<25) {unitRange2 (data);}
@@ -101,7 +101,7 @@ function checkValue (stringHkey,stringKey,ID_Key) {
 
 function addValue (stringHkey,stringKey,data,ID_Key) {
 	// console.log(stringHkey,stringKey,data,ID_Key)
-	if (data!="") {functions.ShowLog(functions.ShowLogBool.On,'Position.js addValue stringHkey,stringKey,data,ID_Key',[stringHkey,stringKey,data,ID_Key])}
+	if (data!="") {functions.ShowLog(functions.ShowLogBool.Off,'Position.js addValue stringHkey,stringKey,data null,ID_Key',[stringHkey,stringKey,data,ID_Key])}
 
 		client.hset(stringHkey,stringKey,data+ID_Key+"/");
 }

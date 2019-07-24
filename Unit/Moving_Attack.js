@@ -166,7 +166,7 @@ function checkMovePos (io,data,stringKey) {
 function clearMovingAttack (stringUnit) {
 
 	stringMoveAttack = "Moving_Attack_"+stringUnit;
-	functions.ShowLog(functions.ShowLogBool.Off,'Moving_Attack.js clearMovingAttack stringUnit,stringMoveAttack,DictMoveAttack[stringMoveAttack]',[stringUnit,stringMoveAttack,DictMoveAttack[stringMoveAttack]]);
+	functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js clearMovingAttack stringUnit,stringMoveAttack,DictMoveAttack[stringMoveAttack]',[stringUnit,stringMoveAttack,DictMoveAttack[stringMoveAttack]]);
 	if (DictMoveAttack[stringMoveAttack]!=null) {
 		clearTimeout(DictMoveAttack[stringMoveAttack]);			
 		delete DictMoveAttack[stringMoveAttack];

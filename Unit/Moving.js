@@ -243,7 +243,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 					// updateDataMove.Server_ID = parseInt(stringKey.split("_")[0])
 					// attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell);
 				
-					functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase updateDataMove.Server_ID',[updateDataMove.Server_ID]);
+					functions.ShowLog(functions.ShowLogBool.Off,'Moving.js setTimerUpdateDatabase updateDataMove.Server_ID',[updateDataMove.Server_ID]);
 					positionAdd.AddPosition(updateDataMove);
 				}
 
@@ -366,10 +366,10 @@ function moveCalc (io,socket,data) {
 	var stringHkey = "s"+data.Server_ID+"_unit";
 	var stringKey = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	// clearMoveTimeout(stringKey);
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js moveCalc=>clearMoveTimeout stringKey,data',[stringKey,data])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js moveCalc=>clearMoveTimeout stringKey,data',[stringKey,data])
 	clearMoveTimeout (io,stringKey,data)
 	positionRemove.PostionRemove(data);
-	functions.ShowLog(functions.ShowLogBool.On,'Moving.js moveCalc=>setTimerUpdateDatabase data,stringKey',[data,stringKey])
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js moveCalc=>setTimerUpdateDatabase data,stringKey',[data,stringKey])
 	setTimerUpdateDatabase (io,socket,data,stringKey);
 
 }
