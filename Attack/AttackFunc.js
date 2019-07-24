@@ -9,21 +9,381 @@ var position_Check			= require('./../Redis/Position/Position_Check.js');
 var positionCheckPos		= require('./../Redis/Position/Position_CheckPos.js');
 var db_position 			= require('./../Util/Database/Db_position.js');
 
+var guildData				= require('./../Redis/Guild/GuildData.js');
+var friendData				= require('./../Redis/Friend/FriendData.js');
+
 var attackGetPos 			= require('./AttackGetPos.js');
 
 var functions 				= require('./../Util/Functions.js');
 
 var Promise 				= require('promise');
+
 var redis 					= require("redis"),
 client 						= redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
 var counter = 1.2;
 
-var stringHAttack,stringHUnit,stringHPos;
-var DictTimeInterval={};
+var stringHAttack,stringHUnit,stringHPos,stringMoveAttack;
+
+var DictTimeAttack={};
+var DictMoveAttack={};
 var stringInterval;
 
+
+exports.CheckCurrentPos = function (io,data,stringKey,pos,Server_ID) {
+	checkCurrentPos (io,data,stringKey,pos,Server_ID);
+}
+function checkCurrentPos (io,data,stringKey,pos,Server_ID) {
+	// var dataNewPos ={
+	// 	// Position_Cell: data.Position_Cell,
+	// 	// Next_Cell: data.Next_Cell,
+	// 	PositionCheck: pos,
+	// }
+	// console.log('dataNewPos')
+	// console.log(dataNewPos)
+	// console.log('stringKey')
+	// console.log(stringKey)
+	// io.emit('R_TESTMOVE',{R_TESTMOVE:dataNewPos});
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos data,stringKey,pos,Server_ID',[data,stringKey,pos,Server_ID]);
+	stringHPos ="s"+Server_ID+"_pos";
+	stringHUnit = "s"+Server_ID+"_unit";
+	stringHAttack = "s"+Server_ID+"_attack";
+	// var Server_ID = data.Server_ID;
+
+	var ID_User = stringKey.split("_")[2];
+	var arrayUnitInPos = [];
+	// var tempListUnitInPos = [];
+	var listUnitAttack = [];
+	var listIDUnitAttack = [];
+	var listCurrentAttack = [];
+	// var listUnit = [];
+	var checkBoolFriendData = false, checkBoolGuildData = false;
+	var getAttackBool = false;
+	var clearBool = false;
+	var defendingUnit;
+
+	new Promise((resolve,reject)=>{
+		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hget stringHPos,pos',[stringHPos,pos]);
+		client.hget(stringHPos,pos,function(error,rows){
+			if (rows!=null) {
+				arrayUnitInPos = rows.split("/").filter(String);				
+				for (var i = 0; i < arrayUnitInPos.length; i++) {
+					if (arrayUnitInPos[i].split("_")[2] != ID_User) {
+						listIDUnitAttack.push(arrayUnitInPos[i]);
+						// arrayUnitInPos.splice(arrayUnitInPos.indexOf(arrayUnitInPos[i], 1))
+					}
+				}
+			}
+			// listIDUnitAttack = arrayUnitInPos;
+			// functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos listIDUnitAttack',[listIDUnitAttack]);
+			if (listIDUnitAttack.length==0) {
+				// attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full);		
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos=>clearDefend stringKey',[stringKey]);
+				clearDefend(io,stringKey);		
+				clearBool = true;
+			}
+			resolve();
+		})
+	}).then(()=>{
+		if (clearBool==false) {
+			return new Promise((resolve,reject)=>{
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos=>friendData.CheckListFriendData listIDUnitAttack,stringKey',[listIDUnitAttack,stringKey]);
+				friendData.CheckListFriendData(listIDUnitAttack,stringKey.split("_")[2],function (returnListUnit) {
+					listIDUnitAttack = returnListUnit;
+					resolve();
+				})
+
+			})
+		}
+	}).then(()=>{
+		if (clearBool==false) {
+			return new Promise((resolve,reject)=>{
+
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos guildData.CheckListGuildData listIDUnitAttack,stringKey',[listIDUnitAttack,stringKey]);
+				guildData.CheckListGuildData(listIDUnitAttack,stringKey.split("_")[2],function (returnListUnit) {
+					listIDUnitAttack = returnListUnit;
+					resolve();
+				})
+			})
+		}
+	}).then(()=>{
+		if (clearBool==false) {
+			return new Promise((resolve,reject)=>{
+				if (listIDUnitAttack.length==0) {
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos listIDUnitAttack=0=>clearDefend',[stringKey]);
+					clearDefend(io,stringKey);
+					clearBool==true
+				}else{
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hmget stringHUnit,listIDUnitAttack',[stringHUnit,listIDUnitAttack]);
+					client.hmget(stringHUnit,listIDUnitAttack,function (error,rows) {
+						if (rows!=null) {
+							for (var i = 0; i < rows.length; i++) {
+								if(rows[i]!=null){
+									var unitResult = JSON.parse(rows[i]);
+									var attackBool = false;
+
+									if (unitResult.Status==functions.UnitStatus.Standby&&unitResult.Attack_Unit_ID==null) {
+										attackBool = true;	
+									}
+									if (unitResult.Attack_Unit_ID==stringKey){
+										attackBool = true;
+									}
+									if (unitResult.Status==functions.UnitStatus.Standby&&unitResult.Attack_Unit_ID=='null') {
+										attackBool = true;	
+									}
+									if (unitResult.Status==functions.UnitStatus.Attack_Unit&&unitResult.Attack_Unit_ID==stringKey) {
+										attackBool = true;	
+									}
+									if (attackBool == false) {
+										listIDUnitAttack.splice(listIDUnitAttack.indexOf(listIDUnitAttack[i]), 1);
+									}
+								}else{
+									listIDUnitAttack.splice(listIDUnitAttack.indexOf(listIDUnitAttack[i]), 1);
+								}
+							}
+						}else{
+							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos=>clearDefend stringKey',[stringKey]);
+							clearDefend(io,stringKey);
+							clearBool=true;
+						}
+						resolve();
+					})
+				}
+			})
+		}
+	}).then(()=>{
+		if (listIDUnitAttack.length>0) {
+			return new Promise((resolve,reject)=>{
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hget stringHAttack,stringKey',[stringHAttack,stringKey]);
+				client.hget(stringHAttack,stringKey,function (error,rows) {
+					if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js checkCurrentPos hget stringHAttack,stringKey',[stringHAttack,stringKey]);}
+					if (rows!=null) {
+						listCurrentAttack = rows.split("/").filter(String);
+					}
+					resolve();
+				})
+
+			})
+		}
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+
+			if (listIDUnitAttack.length>0) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos=>setListAttackData Server_ID,stringKey,listIDUnitAttack,listCurrentAttack',[Server_ID,stringKey,listIDUnitAttack,listCurrentAttack]);
+				setListAttackData(io,Server_ID,stringKey,listIDUnitAttack,listCurrentAttack);
+			}
+			if(listIDUnitAttack.length==0&&listCurrentAttack.length==0){
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos=>clearDefend listIDUnitAttack.length==0&&listCurrentAttack.length==0 stringKey',[stringKey]);
+				clearDefend(io,stringKey);				
+			}
+			resolve();
+
+		})
+	})
+}
+
+exports.ClearAttackUnit = function (io,stringUnit) {
+	clearAttackUnit (io,stringUnit)
+}
+function clearAttackUnit (io,stringUnit) {
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearAttackUnit stringUnit',[stringUnit]);
+	
+	var Server_ID = stringUnit.split("_")[0];
+	stringHAttack = "s"+Server_ID+"_attack";
+	stringHUnit = "s"+Server_ID+"_unit";
+	
+	var defendUnit = null;
+	new Promise((resolve,reject)=>{
+		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearAttackUnit hget stringHUnit,stringUnit',[stringHUnit,stringUnit]);
+		client.hget(stringHUnit,stringUnit,function (error,rows) {
+			if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'Moving_Attack.js clearAttackUnit stringHUnit stringUnit',[stringHUnit,stringUnit]);}
+			if (rows!=null) {
+				var result = JSON.parse(rows);
+				defendUnit = result.Attack_Unit_ID;
+			}
+			resolve();
+		})
+	}).then(()=>{
+		
+		return new Promise((resolve,reject)=>{
+			if (defendUnit!=null) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearAttackUnit stringHAttack,defendUnit',[stringHAttack,defendUnit]);
+				client.hget(stringHAttack,defendUnit,function (error,rows) {
+					if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearAttackUnit stringUnit',[stringUnit]);}
+					if (rows!=null) {
+						var arrayAttackUnit = rows.split("/").filter(String);
+						if (arrayAttackUnit.includes(stringUnit)) {
+							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearAttackUnit=>removeValue',[stringHAttack,defendUnit,rows,stringUnit]);
+							removeValue (stringHAttack,defendUnit,rows,stringUnit);
+							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearAttackUnit=>clearDefend',[defendUnit]);
+							clearDefend(io,defendUnit)
+						}
+					}
+					resolve();
+				})
+			}else{
+				resolve();
+			}
+		})
+		
+	})	
+}
+// exports.ClearAttackUnit = function clearAttackUnit2 (io,ID_User_Attack) {
+// 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit ID_User_Attack',[ID_User_Attack]);
+
+// 	var Server_ID = ID_User_Attack.split("_")[0]
+// 	stringHUnit ="s"+Server_ID+"_unit";
+// 	stringHAttack ="s"+Server_ID+"_attack";
+// 	var ID_User_Defend;
+// 	var stringReplace;
+
+// 	var resultUnit={};
+// 	new Promise((resolve,reject)=>{
+// 		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit hget stringHUnit,ID_User_Attack',[stringHUnit,ID_User_Attack]);
+// 		client.hget(stringHUnit,ID_User_Attack,function (error,rows) {
+// 			if (rows!=null) {
+// 				resultUnit = JSON.parse(rows)				
+// 				ID_User_Defend = resultUnit.Attack_Unit_ID;
+// 				stringInterval = "Attacking_"+ID_User_Defend;
+// 			}
+// 			resolve();
+// 		})
+// 	}).then(()=>{
+// 		return new Promise((resolve,reject)=>{
+
+// 			if (DictTimeAttack[stringInterval]!=undefined) {
+// 				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit hget stringHUnit,ID_User_Attack',[stringHUnit,ID_User_Attack]);
+// 				client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
+// 					if (rows!=null) {
+
+// 						var result = rows.split("/").filter(String);
+// 						if (result.includes(ID_User_Attack)) {
+// 							stringReplace = rows.replace(ID_User_Attack+"/","");
+// 							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit hset stringReplace',[stringReplace]);
+// 							client.hset(stringHAttack,ID_User_Defend,stringReplace)
+// 							if (stringReplace.length==0) {
+// 								clearInterval(DictTimeAttack[stringInterval]);			
+// 								delete DictTimeAttack[stringInterval];
+// 								functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit hdel stringHAttack,ID_User_Defend',[stringHAttack,ID_User_Defend]);
+// 								client.hdel(stringHAttack,ID_User_Defend);
+// 							}
+// 						}
+// 					}				
+// 					resolve();
+// 				})		
+// 			}
+// 		})
+// 	})
+
+// }
+
+// #ClearDefend
+exports.ClearDefend = function (io,stringDefend) {
+	clearDefend (io,stringDefend)
+}
+function clearDefend (io,stringDefend) {
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearDefend stringDefend',[stringDefend])
+	var server_ID = stringDefend.split("_")[0]
+	stringHAttack ="s"+server_ID+"_attack";
+	stringHUnit = "s"+server_ID+"_unit";
+	stringInterval = "Attacking_"+stringDefend;
+	stringMoveAttack = "Moving_Attack_"+stringDefend;
+
+	var listStringUnitAttacking = [];
+	var listDataUnitAttacking = [];
+
+	new Promise((resolve,reject)=>{
+		client.hget(stringHAttack,stringDefend,function (error,rows) {
+			if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearDefend stringDefend',[stringDefend]);}
+			if (rows!=null) {
+				listStringUnitAttacking = rows.split("/").filter(String);
+			}
+			// if (DictMoveAttack[stringMoveAttack]!=null) {
+			// 	clearTimeout(DictMoveAttack[stringMoveAttack]);
+			// 	delete DictMoveAttack[stringMoveAttack];
+			// }
+			if (DictTimeAttack[stringInterval]!=null) {
+				clearTimeout(DictTimeAttack[stringInterval]);
+				delete DictTimeAttack[stringInterval];
+			}
+
+			client.hdel(stringHAttack,stringDefend,function (error,result) {
+				if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearDefend hdel stringDefend',[stringDefend]);}
+			})			
+			resolve();
+		})
+	}).then(()=>{
+		new Promise((resolve,reject)=>{
+			functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js clearDefend listStringUnitAttacking',[listStringUnitAttacking]);
+			if (listStringUnitAttacking.length>0) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearDefend hmget stringHUnit,listStringUnitAttacking',[stringHUnit,listStringUnitAttacking])
+				client.hmget(stringHUnit,listStringUnitAttacking,function (error,rows) {
+					if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearDefend hmget stringHUnit,listStringUnitAttacking',[stringHUnit,listStringUnitAttacking]);}
+					
+					if (rows!=null) {
+						for (var i = 0; i < rows.length; i++) {
+							if(rows[i]!=null){
+								var result = JSON.parse(rows)
+								result.Attack_Unit_ID = null;
+								functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearDefend hset1 result',[result]);
+								client.hset(stringHUnit,listStringUnitAttacking[i],JSON.stringify(result));
+								var ID = listStringUnitAttacking[i].split("_")[3];
+								var stringUpdate = "UPDATE `s"+server_ID+"_unit` SET `Status`='"+functions.UnitStatus.Standby+"', `Attack_Unit_ID`= NULL WHERE `ID`='"+ID+"'";
+								db_position.query(stringUpdate,function(error,result){
+									if(!!error){functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearDefend stringUpdate1',[stringUpdate]);}
+								})
+								listDataUnitAttacking.push(result);
+							}else{
+								listDataUnitAttacking.push(null);
+							}
+						}
+						resolve();
+					}else{
+						return null;
+					}
+
+				});	
+			}else{
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearDefend listStringUnitAttacking.length=0 stringHUnit,stringDefend',[stringHUnit,stringDefend]);
+				
+				client.hget(stringHUnit,stringDefend,function (error,rows) {
+					var result = JSON.parse(rows);
+					result.AttackedBool = 0;
+					
+					client.hset(stringHUnit,stringDefend,JSON.stringify(result));
+
+					var stringUpdate = "UPDATE `s"+server_ID+"_unit` SET`AttackedBool`= 0 WHERE `ID`='"+stringDefend.split("_")[3]+"'"
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearDefend hset2 result,stringUpdate',[result,stringUpdate]);
+					db_position.query(stringUpdate,function(error,result){
+						if(!!error){functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js clearDefend stringUpdate2',[stringUpdate]);}
+						// return null;
+						resolve();
+					})
+				})
+				
+			}
+
+		})
+	}).then(()=>{
+		new Promise((resolve,reject)=>{
+			if (listStringUnitAttacking.length>0) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearDefend listStringUnitAttacking',[listStringUnitAttacking]);
+				listStringUnitAttacking.forEach(function(unit, index) {
+					if (listDataUnitAttacking[index]!=null) {
+						functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearDefend=>checkAttackPosition unit,listDataUnitAttacking.Position_Cell',[unit,listDataUnitAttacking.Position_Cell]);
+						checkAttackPosition (io,unit,listDataUnitAttacking.Position_Cell);
+						// checkCurrentPos(io,listDataUnitAttacking[index],unit,listDataUnitAttacking.Position_Cell,server_ID)
+					}
+				});
+			}
+			
+			resolve();
+		})
+	})
+
+}
+// #ClearDefend
 exports.StopIntervalAttack =function (ID_User_Defend) {
 	stopIntervalAttack (ID_User_Defend);
 }
@@ -35,10 +395,10 @@ function stopIntervalAttack (ID_User_Defend) {
 	stringHUnit ="s"+server_ID+"_unit";
 	stringInterval = "Attacking_"+ID_User_Defend;
 
-	if (DictTimeInterval[stringInterval]!=undefined) {
-		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack DictTimeInterval[stringInterval]',[DictTimeInterval[stringInterval]]);
-		clearInterval(DictTimeInterval[stringInterval]);			
-		delete DictTimeInterval[stringInterval];			
+	if (DictTimeAttack[stringInterval]!=undefined) {
+		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack DictTimeAttack[stringInterval]',[DictTimeAttack[stringInterval]]);
+		clearTimeout(DictTimeAttack[stringInterval]);			
+		delete DictTimeAttack[stringInterval];			
 	}
 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js stopIntervalAttack stringHAttack,ID_User_Defend',[stringHAttack,ID_User_Defend]);
 	client.hdel(stringHAttack,ID_User_Defend);
@@ -83,7 +443,7 @@ function clearInterAttackUpdate (io,ID_User_Defend) {
 		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate hget stringHAttack,ID_User_Defend',[stringHAttack,ID_User_Defend]);
 		client.hget(stringHAttack,ID_User_Defend, function (error,rows){
 			if (rows!=null) {
-				resultArrayUnit = rows.split("/").filter(String);				
+				resultArrayUnit = rows.split("/").filter(String);
 			}
 			resolve();
 		})
@@ -138,11 +498,11 @@ function clearInterAttackUpdate (io,ID_User_Defend) {
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
 			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate del stringInterval,stringHAttack,ID_User_Defend',[stringInterval,stringHAttack,ID_User_Defend]);
-			if (DictTimeInterval[stringInterval]!=undefined) {
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate clearInterval1 stringInterval,DictTimeInterval[stringInterval]',[stringInterval,DictTimeInterval[stringInterval]]);
-				clearInterval(DictTimeInterval[stringInterval]);			
-				delete DictTimeInterval[stringInterval];
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate clearInterval2 stringInterval,DictTimeInterval[stringInterval]',[stringInterval,DictTimeInterval[stringInterval]]);									
+			if (DictTimeAttack[stringInterval]!=undefined) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate clearInterval1 stringInterval,DictTimeAttack[stringInterval]',[stringInterval,DictTimeAttack[stringInterval]]);
+				clearInterval(DictTimeAttack[stringInterval]);			
+				delete DictTimeAttack[stringInterval];
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearInterAttackUpdate clearInterval2 stringInterval,DictTimeAttack[stringInterval]',[stringInterval,DictTimeAttack[stringInterval]]);									
 			}
 			client.hdel(stringHAttack,ID_User_Defend);
 			resolve();
@@ -155,8 +515,8 @@ function updateRedis(stringHkey,stringUnit,data) {
 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js updateRedis stringHkey,stringUnit,data]',[stringHkey,stringUnit,data]);
 	client.hset(stringHkey,stringUnit,JSON.stringify(data));
 }
-
-exports.SetListAttackData = function setListAttackData2(io,Server_ID,stringKeyDefend,listStringKeyAttack,listCurrentAttack){
+// #SetListAttackData
+exports.SetListAttackData = function (io,Server_ID,stringKeyDefend,listStringKeyAttack,listCurrentAttack){
 	setListAttackData (io,Server_ID,stringKeyDefend,listStringKeyAttack,listCurrentAttack)
 }
 function setListAttackData (io,Server_ID,stringKeyDefend,listStringKeyAttack,listCurrentAttack) {
@@ -164,8 +524,10 @@ function setListAttackData (io,Server_ID,stringKeyDefend,listStringKeyAttack,lis
 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData Server_ID,stringKeyDefend,listStringKeyAttack,listCurrentAttack]',[Server_ID,stringKeyDefend,listStringKeyAttack,listCurrentAttack]);
 	stringHUnit = "s"+Server_ID+"_unit";
 	stringHAttack = "s"+Server_ID+"_attack";
+
 	var defendAliveBool = false;
 	var attackAliveBool = false;
+	var clearBool = false;
 	var currentAttack = listCurrentAttack;
 	var listClearUnit = [];
 
@@ -177,29 +539,31 @@ function setListAttackData (io,Server_ID,stringKeyDefend,listStringKeyAttack,lis
 				defendAliveBool = true;
 				var result = JSON.parse(rows);
 				result.AttackedBool = 1;
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData hset stringHUnit,stringKeyDefend,result]',[stringHUnit,stringKeyDefend]); 
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData hset result]',[result]); 
 				client.hset(stringHUnit,stringKeyDefend,JSON.stringify(result));
 			}else{
-				// functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData clearInterAttackUpdate stringKeyDefend]',[stringKeyDefend]); 
-				clearInterAttackUpdate(io,stringKeyDefend);
-				return null;
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData=>clearDefend1 stringKeyDefend]',[stringKeyDefend]); 
+				clearDefend(io,stringKeyDefend);	
+				clearBool = true; 			
 			}
 			resolve();
 		})
 	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData currentAttack,listStringKeyAttack]',[currentAttack,listStringKeyAttack]); 
-			if (currentAttack.length>0&&listStringKeyAttack.length>0) {
-				listClearUnit = compareArray (currentAttack,listStringKeyAttack);				
-				if (listClearUnit.length>0) {
-					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData listClearUnit',[listClearUnit]); 
-					updateClearUnit (Server_ID,listClearUnit,stringKeyDefend);
+		if (clearBool==false) {
+			return new Promise((resolve,reject)=>{
+
+				if ((currentAttack.length>0&&listStringKeyAttack.length>0)) {
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData=>compareArray currentAttack,listStringKeyAttack',[currentAttack,listStringKeyAttack]); 
+					listClearUnit = compareArray (currentAttack,listStringKeyAttack);				
+					if (listClearUnit.length>0) {
+						functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData=>updateClearUnit Server_ID,listClearUnit,stringKeyDefend',[Server_ID,listClearUnit,stringKeyDefend]); 
+						updateClearUnit (Server_ID,listClearUnit,stringKeyDefend);
+					}
 				}
-			}
 
-			resolve();
-		})
-
+				resolve();
+			})
+		}
 	}).then(()=>{
 
 		return new Promise((resolve,reject)=>{
@@ -209,49 +573,53 @@ function setListAttackData (io,Server_ID,stringKeyDefend,listStringKeyAttack,lis
 					stringListAttack = stringListAttack + listStringKeyAttack[i]+"/";
 				}
 				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData hset stringHAttack,stringKeyDefend,stringListAttack',[stringHAttack,stringKeyDefend,stringListAttack]); 
-
-				client.hset(stringHAttack,stringKeyDefend,stringListAttack,function (error) {
-					resolve();
-				});
+				client.hset(stringHAttack,stringKeyDefend,stringListAttack);
+				resolve();
 			}else{
-				// functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData clearInterAttackUpdate hset stringKeyDefend',[stringKeyDefend]); 
-				clearInterAttackUpdate(io,stringKeyDefend);
-				console.log('AttackFunc.js setListAttackData listStringKeyAttack empty');
-				return null;
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData=>clearDefend2 listStringKeyAttack.length==0 stringKeyDefend',[stringKeyDefend]); 
+				clearDefend(io,stringKeyDefend);
+				clearBool = true;
 			}
 		})
 
 	}).then(()=>{
-
-		return new Promise((resolve,reject)=>{
+		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData=>attackInterval Server_ID,stringKeyDefend',[Server_ID,stringKeyDefend]); 
+		if (clearBool==false) {
 			attackInterval(io,Server_ID,stringKeyDefend);
-			resolve();
-		})	
-
+		}
+		// return new Promise((resolve,reject)=>{
+		// 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData=>attackInterval Server_ID,stringKeyDefend',[Server_ID,stringKeyDefend]); 
+		// 	attackInterval(io,Server_ID,stringKeyDefend);
+		// 	resolve();
+		// })
 	}).then(()=>{
-		listStringKeyAttack.forEach(function (unit){
-			new Promise((resolve,reject)=>{
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData UpdateData hget stringHUnit,unit',[stringHUnit,unit]); 
-				client.hget(stringHUnit,unit,function (error,rows) {
-					if (rows!=null) {
-						var result = JSON.parse(rows);
-						result.Attack_Unit_ID = stringKeyDefend;
-						result.Status = functions.UnitStatus.Attack_Unit;
-						client.hset(stringHUnit,unit,JSON.stringify(result),function (error) {
+		if (clearBool==false) {
+			listStringKeyAttack.forEach(function (unit){
+				new Promise((resolve,reject)=>{
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData listStringKeyAttack hget stringHUnit,unit',[stringHUnit,unit]); 
+					client.hget(stringHUnit,unit,function (error,rows) {
+						if (rows!=null) {
+							var result = JSON.parse(rows);
+							result.Attack_Unit_ID = stringKeyDefend;
+							result.Status = functions.UnitStatus.Attack_Unit;
+							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData listStringKeyAttack hset result',[result]); 
+							client.hset(stringHUnit,unit,JSON.stringify(result))
+							resolve();
+						}
+					})
+				}).then(()=>{
+					return new Promise((resolve,reject)=>{
+						var stringUpdate = "UPDATE `s"+Server_ID+"_unit` SET `Attack_Unit_ID` ='"+stringKeyDefend+"', `Status`='"+functions.UnitStatus.Attack_Unit+"' WHERE `ID`='"+unit.split("_")[3]+"'";
+						functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js setListAttackData stringUpdate',[stringUpdate]); 
+						db_position.query(stringUpdate,function (error,result) {
+							if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js setListAttackData UpdateData stringUpdate',[stringUpdate]);}
 							resolve();
 						})
-					}
-				})
-			}).then(()=>{
-				return new Promise((resolve,reject)=>{
-					var stringUpdate = "UPDATE `s"+Server_ID+"_unit` SET `Attack_Unit_ID` ='"+stringKeyDefend+"', `Status`='"+functions.UnitStatus.Attack_Unit+"' WHERE `ID`='"+unit.split("_")[3]+"'";
-					db_position.query(stringUpdate,function (error,result) {
-						if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js setListAttackData UpdateData stringUpdate',[stringUpdate]);}
-						resolve();
 					})
 				})
 			})
-		})
+		}
+		
 
 
 	})
@@ -335,222 +703,8 @@ function updateRedisData (stringKey) {
 	})
 }
 
-exports.CheckMovePos = function (io,data,stringKey) {
-	checkMovePos (io,data,stringKey)
-}
 
-function checkMovePos (io,data,stringKey) {
-	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkMovePos data,stringKey',[data,stringKey]);
-	var posCheck = data.Position_Cell;
-	var timeNext = 0, timeOut = 0;
-	var Position_Cell_X,Position_Cell_Y,Next_Cell_X,Next_Cell_Y;
-	var Server_ID = data.Server_ID;
-	stringMoveAttack = "Moving_Attack_"+stringKey;
 
-	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkMovePos=>checkCurrentPos data,stringKey',[data,stringKey,posCheck,Server_ID]);
-	checkCurrentPos (io,data,stringKey,posCheck,Server_ID);
-	
-	if (data.TimeMoveNextCell!=null) {
-		Position_Cell_X = data.Position_Cell.toString().split(",")[0];
-		Position_Cell_Y = data.Position_Cell.toString().split(",")[1];
-		Next_Cell_X = data.Next_Cell.toString().split(",")[0];
-		Next_Cell_Y = data.Next_Cell.toString().split(",")[1];
-		var caseMove = functions.CaseMove.Straight;	
-
-		if (Position_Cell_X!=Next_Cell_X&&Position_Cell_Y!=Next_Cell_Y) {caseMove = functions.CaseMove.Diagonal;}
-
-		timeNext = functions.ExportTimeDatabase(data.TimeMoveNextCell) - functions.GetTime();
-
-		switch (caseMove) {
-			case functions.CaseMove.Straight:
-			if (timeNext == functions.TimeMove.Straight) {
-				// console.log('timeNext == functions.TimeMove.Straight');
-				timeOut = functions.TimeMove.Straight*0.5;
-			}else{
-				// console.log('timeNext != functions.TimeMove.Straight');
-				timeOut =  timeNext - (functions.TimeMove.Straight*0.5);
-			}
-			break;
-
-			case functions.CaseMove.Diagonal:
-			// console.log('functions.CaseMove.Diagonal');
-			if (timeNext == functions.TimeMove.Diagonal) {
-				// console.log('timeNext == functions.TimeMove.Diagonal');
-				timeOut = functions.TimeMove.Diagonal*0.5;
-			}else{
-				// console.log('timeNext != functions.TimeMove.Diagonal');
-				timeOut =  timeNext - (functions.TimeMove.Diagonal*0.5);
-			}
-			break;
-		}
-		if (timeOut<0) {console.log('AttackFunc.js checkMovePos Moving Attack timeOut<0');console.log(timeOut); return null;}
-
-		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkMovePos timeOut,data,stringKey,stringMoveAttack',[timeOut,data,stringKey,stringMoveAttack]);
-		if (data.TimeMoveNextCell!=data.TimeFinishMove) {
-			DictMoveAttack[stringMoveAttack]=setTimeout(function (io,data,stringKey) {
-				var updateData = data;
-
-				if (data.ListMove.length>0) {
-					updateData.Position_Cell = data.Next_Cell;
-					updateData.Next_Cell = data.ListMove[0].Next_Cell;
-					updateData.TimeMoveNextCell = data.ListMove[0].TimeMoveNextCell;
-					updateData.ListMove.shift();
-				}else{
-					updateData.Position_Cell = data.End_Cell;
-					updateData.Next_Cell = null;
-					updateData.TimeMoveNextCell = null;
-					updateData.TimeFinishMove = null;
-				}
-				checkMovePos (io,updateData,stringKey);
-			}, timeOut,io,data,stringKey);
-		}
-	}
-}
-
-exports.CheckCurrentPos = function (io,data,stringKey,pos,Server_ID) {
-	checkCurrentPos (io,data,stringKey,pos,Server_ID);
-}
-function checkCurrentPos (io,data,stringKey,pos,Server_ID) {
-	// var dataNewPos ={
-	// 	// Position_Cell: data.Position_Cell,
-	// 	// Next_Cell: data.Next_Cell,
-	// 	PositionCheck: pos,
-	// }
-	// console.log('dataNewPos')
-	// console.log(dataNewPos)
-	// console.log('stringKey')
-	// console.log(stringKey)
-	// io.emit('R_TESTMOVE',{R_TESTMOVE:dataNewPos});
-	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos data,stringKey,pos,Server_ID',[data,stringKey,pos,Server_ID]);
-	stringHPos ="s"+Server_ID+"_pos";
-	stringHUnit = "s"+Server_ID+"_unit";
-	stringHAttack = "s"+Server_ID+"_attack";
-	// var Server_ID = data.Server_ID;
-
-	var ID_User = stringKey.split("_")[2];
-	var arrayUnitInPos = [];
-	// var tempListUnitInPos = [];
-	var listUnitAttack = [];
-	var listIDUnitAttack = [];
-	var listCurrentAttack = [];
-	// var listUnit = [];
-	var checkBoolFriendData = false, checkBoolGuildData = false;
-	var getAttackBool = false;
-
-	var defendingUnit;
-
-	new Promise((resolve,reject)=>{
-		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hget stringHPos,pos',[stringHPos,pos]);
-		client.hget(stringHPos,pos,function(error,rows){
-			if (rows!=null) {
-				arrayUnitInPos = rows.split("/").filter(String);				
-				for (var i = 0; i < arrayUnitInPos.length; i++) {
-					if (arrayUnitInPos[i].split("_")[2] != ID_User) {
-						listIDUnitAttack.push(arrayUnitInPos[i]);
-						// arrayUnitInPos.splice(arrayUnitInPos.indexOf(arrayUnitInPos[i], 1))
-					}
-				}
-			}
-			// listIDUnitAttack = arrayUnitInPos;
-			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos listIDUnitAttack',[listIDUnitAttack]);
-			if (listIDUnitAttack.length==0) {
-				// attackFunc.ClearInterAttack(stringKey,functions.CaseClearAttack.Full);		
-				clearInterAttackUpdate(io,stringKey);		
-				return null;
-			}
-			resolve();
-		})
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			// console.log('listIDUnitAttack')
-			// console.log(listIDUnitAttack);
-			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos friendData.CheckListFriendData listIDUnitAttack,stringKey',[listIDUnitAttack,stringKey]);
-			friendData.CheckListFriendData(listIDUnitAttack,stringKey.split("_")[2],function (returnListUnit) {
-				// console.log('returnListUnit')
-				// console.log(returnListUnit);
-				listIDUnitAttack = returnListUnit;
-				resolve();
-			})
-		})
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-
-			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos guildData.CheckListGuildData listIDUnitAttack,stringKey',[listIDUnitAttack,stringKey]);
-			guildData.CheckListGuildData(listIDUnitAttack,stringKey.split("_")[2],function (returnListUnit) {
-				listIDUnitAttack = returnListUnit;
-				resolve();
-			})
-		})
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			
-			if (listIDUnitAttack.length==0) {
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos listIDUnitAttack=0=>attackFunc.ClearInterAttackUpdate',[stringKey]);
-				clearInterAttackUpdate(io,stringKey);
-				return null;
-			}else{
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hmget stringHUnit,listIDUnitAttack',[stringHUnit,listIDUnitAttack]);
-				client.hmget(stringHUnit,listIDUnitAttack,function (error,rows) {
-					if (rows!=null) {
-						for (var i = 0; i < rows.length; i++) {
-							if(rows[i]!=null){
-								var unitResult = JSON.parse(rows[i]);
-								var attackBool = false;
-								
-								if (unitResult.Status==6&&unitResult.Attack_Unit_ID==null) {
-									attackBool = true;	
-								}
-								if (unitResult.Attack_Unit_ID==stringKey){
-									attackBool = true;
-								}
-								if (unitResult.Status==6&&unitResult.Attack_Unit_ID=='null') {
-									attackBool = true;	
-								}
-								if (attackBool == false) {
-									listIDUnitAttack.splice(listIDUnitAttack.indexOf(listIDUnitAttack[i]), 1);
-								}
-							}else{
-								listIDUnitAttack.splice(listIDUnitAttack.indexOf(listIDUnitAttack[i]), 1);
-							}
-						}
-					}else{
-						clearInterAttackUpdate(io,stringKey);
-						return null;
-					}
-					resolve();
-				})
-			}
-		})
-
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hget stringHAttack,stringKey',[stringHAttack,stringKey]);
-			client.hget(stringHAttack,stringKey,function (error,rows) {
-				if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js checkCurrentPos hget stringHAttack,stringKey',[stringHAttack,stringKey]);}
-				if (rows!=null) {
-					listCurrentAttack = rows.split("/").filter(String);
-				}
-				resolve();
-			})
-
-		})
-		
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-
-			if (listIDUnitAttack.length>0) {
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkCurrentPos hget stringHAttack,stringKey',[stringHAttack,stringKey]);
-				setListAttackData(io,Server_ID,stringKey,listIDUnitAttack,listCurrentAttack);
-			}
-			if(listIDUnitAttack.length==0&&listCurrentAttack.length==0){
-				clearInterAttackUpdate(io,stringKey);
-				return null;
-			}
-			resolve();
-			
-		})
-	})
-}
 
 exports.SetAttackData = function (Server_ID,ID_Defend,ID_Attack) {
 	setAttackData (Server_ID,ID_Defend,ID_Attack)
@@ -687,112 +841,129 @@ exports.AttackInterval =function (io,Server_ID,ID_Defend){
 	attackInterval (io,Server_ID,ID_Defend)
 }
 
-
 function attackInterval (io,Server_ID,ID_Defend){
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
 	stringInterval = "Attacking_"+ID_Defend;
-
-	if (DictTimeInterval[stringInterval]!=null) {
-		
-	}else{
-		DictTimeInterval[stringInterval] = setInterval(function (stringHUnit,stringHAttack,io,Server_ID,ID_Defend) {
-			var defendAliveBool = true;
-			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval stringHUnit,stringHAttack,Server_ID,ID_Defend',[stringHUnit,stringHAttack,Server_ID,ID_Defend]);
-			new Promise((resolve,reject)=>{
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval hget1 stringHUnit,ID_Defend',[stringHUnit,ID_Defend]);
-				client.hget(stringHUnit,ID_Defend,function (error,rows) {
-					if (rows==null) {
-						defendAliveBool = false;
-						functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval clearInterAttackUpdate1 ID_Defend',[ID_Defend]);
-						clearInterAttackUpdate(io,ID_Defend);			
-					}
-					if (rows==undefined) {
-						defendAliveBool = false;
-						functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval clearInterAttackUpdate2 ID_Defend',[ID_Defend]);
-						clearInterAttackUpdate(io,ID_Defend);
-					}
+	var clearBool = false;
+	//lay data attack truoc => danh truoc roi moi chay lai timeout
+	var defendAliveBool = true;
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval stringHUnit,stringHAttack,Server_ID,ID_Defend',[stringHUnit,stringHAttack,Server_ID,ID_Defend]);
+	new Promise((resolve,reject)=>{
+		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval hget1 stringHUnit,ID_Defend',[stringHUnit,ID_Defend]);
+		client.hget(stringHUnit,ID_Defend,function (error,rows) {
+			if (rows==null||rows==undefined) {
+				defendAliveBool = false;
+				functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval=>clearDefend1 ID_Defend',[ID_Defend]);
+				clearDefend(io,ID_Defend);			
+			}
+			// if (rows==undefined) {
+			// 	defendAliveBool = false;
+			// 	functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval=>clearDefend2 ID_Defend',[ID_Defend]);
+			// 	clearDefend(io,ID_Defend);
+			// }
+			if (defendAliveBool == false) {clearDefend(io,ID_Defend);}
+			resolve();
+		});
+	}).then(()=>{
+		new Promise((resolve,reject)=>{
+			if (defendAliveBool==true) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval hget2 stringHAttack,ID_Defend',[stringHAttack,ID_Defend]);
+				client.hget(stringHAttack,ID_Defend,function (error,rows) {	
+					if (rows!=null) {
+						var dataAttack = rows.split("/").filter(String);						
+						if (dataAttack.length>0) {
+							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval=>getAttackCalc Server_ID,dataAttack,ID_Defend',[Server_ID,dataAttack,ID_Defend]);
+							getAttackCalc (io,Server_ID,dataAttack,ID_Defend);
+						}else {
+							functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval=>clearDefend3 ID_Defend',[ID_Defend]);
+							clearDefend(io,ID_Defend);
+							clearBool = true;
+						}
+					}else {
+						functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval=>clearDefend4 ID_Defend',[ID_Defend]);
+						clearDefend(io,ID_Defend);
+						clearBool = true;
+						
+					}	
 					resolve();
 				});
-			}).then(()=>{
-
-				return new Promise((resolve,reject)=>{
-					if (defendAliveBool==true) {
-						functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval hget2 stringHAttack,ID_Defend',[stringHAttack,ID_Defend]);
-						client.hget(stringHAttack,ID_Defend,function (error,rows) {	
-							if (rows!=null) {
-								var dataAttack = rows.split("/").filter(String);						
-								if (dataAttack.length>0) {
-									functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval getAttackCalc Server_ID,dataAttack,ID_Defend',[Server_ID,dataAttack,ID_Defend]);
-									getAttackCalc (io,Server_ID,dataAttack,ID_Defend);
-								}
-							}else {
-								functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval clearInterAttackUpdate3 ID_Defend',[ID_Defend]);
-								clearInterAttackUpdate(io,ID_Defend);
-							}	
-						});
-					}
-					resolve();
-				})
-			})
-
-		}, 1000, stringHUnit,stringHAttack,io,Server_ID,ID_Defend);
-
-	}
-	
-}
-
-exports.ClearAttackUnit = function clearAttackUnit2 (io,ID_User_Attack) {
-	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit ID_User_Attack',[ID_User_Attack]);
-	
-	var Server_ID = ID_User_Attack.split("_")[0]
-	stringHUnit ="s"+Server_ID+"_unit";
-	stringHAttack ="s"+Server_ID+"_attack";
-	var ID_User_Defend;
-	var stringReplace;
-	
-	var resultUnit={};
-	new Promise((resolve,reject)=>{
-		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit hget stringHUnit,ID_User_Attack',[stringHUnit,ID_User_Attack]);
-
-		client.hget(stringHUnit,ID_User_Attack,function (error,rows) {
-			if (rows!=null) {
-				resultUnit = JSON.parse(rows)				
-				ID_User_Defend = resultUnit.Attack_Unit_ID;
-				stringInterval = "Attacking_"+ID_User_Defend;
 			}
-			resolve();
+			
 		})
 	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-
-			if (DictTimeInterval[stringInterval]!=undefined) {
-				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit hget stringHUnit,ID_User_Attack',[stringHUnit,ID_User_Attack]);
-				client.hget(stringHAttack,ID_User_Defend, function (error,rows) {
-					if (rows!=null) {
-
-						var result = rows.split("/").filter(String);
-						if (result.includes(ID_User_Attack)) {
-							stringReplace = rows.replace(ID_User_Attack+"/","");
-							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit hset stringReplace',[stringReplace]);
-							client.hset(stringHAttack,ID_User_Defend,stringReplace)
-							if (stringReplace.length==0) {
-								clearInterval(DictTimeInterval[stringInterval]);			
-								delete DictTimeInterval[stringInterval];
-								client.hdel(stringHAttack,ID_User_Defend);
-							}
-						}
-					}				
-					resolve();
-				})		
-			}
-		})
+		if (defendAliveBool==true && clearBool==false) {
+			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval=>DictTimeAttack[stringInterval] Server_ID,ID_Defend',[Server_ID,ID_Defend]);
+			DictTimeAttack[stringInterval] = setTimeout(function (io,Server_ID,ID_Defend) {
+				attackInterval (io,Server_ID,ID_Defend)
+			}, 1000,io,Server_ID,ID_Defend);
+		}
+		
 	})
 	
 }
 
+// function attackInterval (io,Server_ID,ID_Defend){
+// 	stringHAttack = "s"+Server_ID+"_attack";
+// 	stringHUnit = "s"+Server_ID+"_unit";
+// 	stringInterval = "Attacking_"+ID_Defend;
+// 	//lay data attack truoc => danh truoc roi moi chay lai timeout
+
+
+
+// 	if (DictTimeAttack[stringInterval]!=null) {
+
+// 	}else{
+// 		DictTimeAttack[stringInterval] = setTimeout(function (stringHUnit,stringHAttack,io,Server_ID,ID_Defend) {
+// 			var defendAliveBool = true;
+// 			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval stringHUnit,stringHAttack,Server_ID,ID_Defend',[stringHUnit,stringHAttack,Server_ID,ID_Defend]);
+// 			new Promise((resolve,reject)=>{
+// 				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval hget1 stringHUnit,ID_Defend',[stringHUnit,ID_Defend]);
+// 				client.hget(stringHUnit,ID_Defend,function (error,rows) {
+// 					if (rows==null) {
+// 						defendAliveBool = false;
+// 						functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval clearInterAttackUpdate1 ID_Defend',[ID_Defend]);
+// 						clearDefend(io,ID_Defend);			
+// 					}
+// 					if (rows==undefined) {
+// 						defendAliveBool = false;
+// 						functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval clearInterAttackUpdate2 ID_Defend',[ID_Defend]);
+// 						clearDefend(io,ID_Defend);
+// 					}
+// 					resolve();
+// 				});
+// 			}).then(()=>{
+
+// 				return new Promise((resolve,reject)=>{
+// 					if (defendAliveBool==true) {
+// 						functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval hget2 stringHAttack,ID_Defend',[stringHAttack,ID_Defend]);
+// 						client.hget(stringHAttack,ID_Defend,function (error,rows) {	
+// 							if (rows!=null) {
+// 								var dataAttack = rows.split("/").filter(String);						
+// 								if (dataAttack.length>0) {
+// 									functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval getAttackCalc Server_ID,dataAttack,ID_Defend',[Server_ID,dataAttack,ID_Defend]);
+// 									getAttackCalc (io,Server_ID,dataAttack,ID_Defend);
+// 									attackInterval (io,Server_ID,ID_Defend);
+// 								}
+// 							}else {
+// 								functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval clearInterAttackUpdate3 ID_Defend',[ID_Defend]);
+// 								clearDefend(io,ID_Defend);
+// 							}	
+// 						});
+// 					}
+// 					resolve();
+// 				})
+// 			})
+
+// 		}, 1000, stringHUnit,stringHAttack,io,Server_ID,ID_Defend);
+
+// 	}
+
+// }
+
+
+
 function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
-	
 	stringHUnit = "s"+server_ID+"_unit";
 	stringHAttack = "s"+server_ID+"_attack";
 
@@ -803,170 +974,221 @@ function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 	var tempObj={};
 	var defendAliveBool=false;
 	var rowsUnit={};
+	var clearBool =  false;
 
 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc server_ID,dataAttack,dataDefend',[server_ID,dataAttack,dataDefend]);
 	
 	new Promise((resolve,reject)=>{
+		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc hget stringHUnit,ID_User_Attack',[stringHUnit,dataAttack]);
 
-		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc hget stringHUnit,ID_User_Attack',[stringHUnit,ID_User_Attack]);
 		client.hget(stringHUnit,dataDefend,function (error,rows) {
 			if (rows!=null) {
 				def = JSON.parse(rows);
 				if ((def.Attack_Unit_ID==null&&def.Status==functions.UnitStatus.Standby)||(def.Attack_Unit_ID=='null'&&def.Status==functions.UnitStatus.Standby)) {
-					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc moving_Attack.CheckCurrentPos',[def,dataDefend,def.Position_Cell,server_ID]);
-					moving_Attack.CheckCurrentPos(io,def,dataDefend,def.Position_Cell,server_ID);
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>checkAttackPosition dataDefend,def.Position_Cell',[dataDefend,def.Position_Cell]);
+					checkAttackPosition (io,dataDefend,def.Position_Cell)
+					// checkCurrentPos(io,def,dataDefend,def.Position_Cell,server_ID);
 				}
 				defendAliveBool = true;
 			}else{
-				functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getAttackCalc clearInterAttackUpdate dataDefend',[dataDefend]);
-				clearInterAttackUpdate(io,dataDefend)
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>clearDefend1 dataDefend',[dataDefend]);
+				clearBool = true;
+				clearDefend(io,dataDefend);
 			}	
 			resolve();
 		});
 
 	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit hmget stringHUnit,dataAttack',[stringHUnit,dataAttack]);
-			client.hmget(stringHUnit,dataAttack,function (error,rows){
-				rowsUnit = rows;
-				if (rows!=null) {					
-					for (var i = 0; i < rows.length; i++) {
-						if (rows[i]!=null&&defendAliveBool==true) {
-							var result = JSON.parse(rows[i]);
-							CounterMul[i] = checkCounter(result,def);
-							Attack = Attack + (result.Attack * (result.Quality/def.Quality)*CounterMul[i]);
-							checkSocketAttack (io,server_ID,dataAttack[i],result,dataDefend);
-						}else {
-							Attack = Attack + 0;
-							if (dataDefend==null) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js ClearAttackUnit removeRedisData dataDefend null',[dataDefend]);}
-							else{
-								functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit removeRedisData dataDefend,dataAttack[i]',[dataDefend,dataAttack[i]]);
-								removeRedisData (stringHAttack,dataDefend,dataAttack[i]);}							
-								dataAttack.splice(dataAttack.indexOf(dataAttack[i]), 1);
-							}
-						}
 
-						Hea_Lost = parseFloat(Attack - def.Defend).toFixed(2);
+		if (clearBool==false) {
+			new Promise((resolve,reject)=>{
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc hmget stringHUnit,dataAttack',[stringHUnit,dataAttack]);			
+				client.hmget(stringHUnit,dataAttack,function (error,rows){
+					rowsUnit = rows;
 
-						if (Hea_Lost < 1) {Hea_Lost = 1;}
-						if (Hea_Lost < def.Hea_cur){
-							if (parseFloat(def.Hea_cur - Hea_Lost).toFixed(2)<1) {
-								def.Hea_cur = def.Hea_cur - 1;
-							}else{
-								def.Hea_cur = parseFloat(def.Hea_cur - Hea_Lost).toFixed(2);
-							}	
-						}else if (Hea_Lost >= def.Hea_cur) {
-							if (parseFloat(def.Health - parseInt((Hea_Lost - def.Hea_cur)%def.Health)).toFixed(2)<1) {
-								def.Hea_cur = def.Hea_cur - 1;
-							}else{
-								def.Hea_cur = parseFloat(def.Health - parseInt((Hea_Lost - def.Hea_cur)%def.Health)).toFixed(2);
+					if (rows!=null) {
+						for (var i = 0; i < rows.length; i++) {
+							if (rows[i]!=null&&defendAliveBool==true) {
+								var result = JSON.parse(rows[i]);
+								functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>checkCounter result,def',[result,def]);
+								CounterMul[i] = checkCounter(result,def);
+								Attack = Attack + (result.Attack * (result.Quality/def.Quality)*CounterMul[i]);
+								functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>checkSocketAttack server_ID,dataAttack[i],result,dataDefend',[server_ID,dataAttack[i],result,dataDefend]);
+								checkSocketAttack (io,server_ID,dataAttack[i],result,dataDefend);
+							}else {
+								Attack = Attack + 0;
+								if (dataDefend==null) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js getAttackCalc removeRedisData dataDefend null',[dataDefend]);return null;}
+								else{
+									functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>removeRedisData dataDefend,dataAttack[i]',[dataDefend,dataAttack[i]]);
+									removeRedisData (stringHAttack,dataDefend,dataAttack[i]);							
+									dataAttack.splice(dataAttack.indexOf(dataAttack[i]), 1);
+								}
 							}
 
-							QualityLost = parseInt((Hea_Lost - def.Hea_cur)/def.Health);
-							def.Quality = def.Quality - (parseInt((Hea_Lost - def.Hea_cur)/def.Health) +1);
+							Hea_Lost = parseFloat(Attack - def.Defend).toFixed(2);
+
+							if (Hea_Lost < 1) {Hea_Lost = 1;}
+
+							if (Hea_Lost < def.Hea_cur){
+								if (parseFloat(def.Hea_cur - Hea_Lost).toFixed(2)<1) {
+									def.Hea_cur = def.Hea_cur - 1;
+								}else{
+									def.Hea_cur = parseFloat(def.Hea_cur - Hea_Lost).toFixed(2);
+								}	
+							}else if (Hea_Lost >= def.Hea_cur) {
+								if (parseFloat(def.Health - parseInt((Hea_Lost - def.Hea_cur)%def.Health)).toFixed(2)<1) {
+									def.Hea_cur = def.Hea_cur - 1;
+								}else{
+									def.Hea_cur = parseFloat(def.Health - parseInt((Hea_Lost - def.Hea_cur)%def.Health)).toFixed(2);
+								}
+
+								QualityLost = parseInt((Hea_Lost - def.Hea_cur)/def.Health);
+								def.Quality = def.Quality - (parseInt((Hea_Lost - def.Hea_cur)/def.Health) +1);
+							}
+
 						}
+
 						if (def.Quality <= 0) {
+							
 							def.Quality = 0;
-							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit def.Quality=0',[def]);
-
+							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc def.Quality=0',[def]);
 							for (var i = 0; i < rows.length; i++) {
-								if (rows[i]!=null) {						
+								if (rows[i]!=null) {
+									
 									var resultAttack = JSON.parse(rows[i]);
 									resultAttack.Status = 6;
 									resultAttack.Attack_Unit_ID = null;
-									var stringAttack = server_ID+"_"+resultAttack.ID_Unit+"_"+resultAttack.ID_User+"_"+resultAttack.ID;
 									
-									functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit CheckCurrentPos def.Quality=0,resultAttack,stringAttack,resultAttack.Position_Cell,server_ID ',[def,resultAttack,stringAttack,resultAttack.Position_Cell,server_ID]);
-									// if (resultAttack.Server_ID==undefined) {resultAttack.Server_ID = server_ID;}
-									
-									moving_Attack.CheckCurrentPos(io,resultAttack,stringAttack,resultAttack.Position_Cell,server_ID);
+									var stringAttack = server_ID+"_"+resultAttack.ID_Unit+"_"+resultAttack.ID_User+"_"+resultAttack.ID;									
 									client.hset(stringHUnit,stringAttack,JSON.stringify(resultAttack));
-									checkAttackedUnit (io,server_ID,stringAttack)
+									functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>checkAttackPosition stringAttack,resultAttack.Position_Cell',[stringAttack,resultAttack.Position_Cell]);
+									// checkCurrentPos(io,resultAttack,stringAttack,resultAttack.Position_Cell,server_ID);
+									checkAttackPosition (io,stringAttack,resultAttack.Position_Cell);
 								}
 							}
-							client.hdel(stringHAttack,dataDefend);
-							client.hdel(stringHUnit,dataDefend);
-							updateAttackData (io,dataAttack);
-							updateRemoveDefendData (server_ID,dataDefend);
-							
-						}
 
+						}
+						functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>updateAttackData dataAttack',[dataAttack]);
+						updateAttackData (io,dataAttack);
+
+						functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>updateRemoveDefendData dataAttack',[server_ID,dataDefend]);
+						updateRemoveDefendData (server_ID,dataDefend);
+						def.Hea_cur = Number(def.Hea_cur);
+						resolve();
 					}
 
-					def.Hea_cur = Number(def.Hea_cur);
-					resolve();
-				});
+				})
 
-		});
-
-	}).then(()=>{
-		
-		return new Promise((resolve,reject)=>{
-			updateDataBaseQuality(server_ID,def);
-			
-			checkSocketClient (io,dataDefend,def);
-			if (def.Quality > 0) {
-				client.hset(stringHUnit,dataDefend,JSON.stringify(def));
-			}else{			
-				//remove pos khi chet
-				positionRemove.PostionRemove(dataDefend);
-				moving.ClearMoveTimeout(io,dataDefend,def)
-				moving_Attack.ClearMovingAttack(dataDefend);
-				// functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit clearInterAttackUpdate dataDefend',[def,resultAttack,stringAttack,resultAttack.Position_Cell,server_ID]);
-				clearInterAttackUpdate(io,dataDefend);
-			}
-			resolve();
-		})
-
-	}).then(()=>{
-		
-		return new Promise((resolve,reject)=>{
-			if (QualityLost>0) {
-				updateMight_Kill (QualityLost,dataAttack,dataDefend);
-			}
-			
-			resolve();
-		})
-
-	})
-
-}
-
-function checkAttackedUnit (io,Server_ID,dataCheck) {
-
-	// console.log("checkAttackedUnit: "+dataCheck)
-	// var posArray = [];
-	// var dataAttack = dataCheck;
-
-	// var dataDefendArray = [];
-	// var dataDefend;
-
-	// var attackBool = false;
-	// var attackDataBool = false;
-
-	stringHUnit = "s"+Server_ID+"_unit";
-	stringHAttack = "s"+Server_ID+"_attack";
-	var attackedBool=false;
-	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkAttackedUnit stringHUnit,stringHAttack,dataCheck,',[stringHUnit,stringHAttack,dataCheck]);
-
-	client.hget(stringHUnit,dataCheck,function (error,rows) {
-		if (rows!=null) {
-			var result = JSON.parse(rows);
-			
-			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkAttackedUnit stringHUnit,dataCheck,',[stringHUnit,dataCheck]);
-			checkAttackPosition(io,dataCheck,result.Position_Cell);
-			
-		}else{
-			functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js checkAttackedUnit dataCheck null',[dataCheck]);
-			return null;
+			})		
 		}
+		
+
+	}).then(()=>{
+		if (clearBool==false) {
+			new Promise((resolve,reject)=>{
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>updateDataBaseQuality server_ID,def',[server_ID,def]);
+				updateDataBaseQuality(server_ID,def);
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>checkSocketClient dataDefend,def',[dataDefend,def]);
+				checkSocketClient (io,dataDefend,def);
+
+				if (def.Quality>0) {
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>hset def.Quality>0 def',[def]);
+					client.hset(stringHUnit,dataDefend,JSON.stringify(def));
+				}else{
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>positionRemove.PostionRemove dataDefend',[dataDefend]);
+					positionRemove.PostionRemove(dataDefend);
+
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>moving.ClearMoveTimeout dataDefend,def',[dataDefend,def]);
+					moving.ClearMoveTimeout(io,dataDefend,def);
+
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>clearMovingAttack dataDefend',[dataDefend]);
+					clearMovingAttack(dataDefend);
+
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>clearDefend2 dataDefend',[dataDefend]);
+					clearDefend(io,dataDefend);
+
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>hdel stringHAttack,dataDefend',[stringHAttack,dataDefend]);
+					client.hdel(stringHAttack,dataDefend);
+
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>hdel stringHUnit,dataDefend',[stringHUnit,dataDefend]);
+					client.hdel(stringHUnit,dataDefend);
+
+					clearBool=true;
+
+
+				}
+				resolve();
+
+			})
+		}
+	}).then(()=>{
+		
+		if (QualityLost>0) {
+			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>updateMight_Kill QualityLost,dataAttack,dataDefend',[QualityLost,dataAttack,dataDefend]);
+			updateMight_Kill (QualityLost,dataAttack,dataDefend);
+		}
+
 	})
+
 }
 
+// #begin: updateMight_Kill
+function updateMight_Kill (QualityLost,dataAttack,dataDefend) {
+	functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js updateMight_Kill=>getInfo.UpdateMight_Kill QualityLost,dataAttack,dataDefend',[QualityLost,dataAttack,dataDefend]);
+	getInfo.UpdateMight_Kill(QualityLost,dataAttack,dataDefend);
+}
+// #end: updateMight_Kill
 
+exports.ClearMovingAttack = function (dataDefend) {
+	clearMovingAttack (dataDefend)
+}
+
+function clearMovingAttack (dataDefend) {
+	stringMoveAttack = "Moving_Attack_"+stringUnit;
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js clearMovingAttack stringUnit,stringMoveAttack,DictMoveAttack[stringMoveAttack]',[stringUnit,stringMoveAttack,DictMoveAttack[stringMoveAttack]]);
+	if (DictMoveAttack[stringMoveAttack]!=null) {
+		clearTimeout(DictMoveAttack[stringMoveAttack]);			
+		delete DictMoveAttack[stringMoveAttack];
+	}
+}
+// exports.CheckAttackedUnit = function (io,Server_ID,dataCheck) {
+// 	checkAttackedUnit (io,Server_ID,dataCheck);
+// }
+// function checkAttackedUnit (io,Server_ID,dataCheck) {
+// 	// console.log("checkAttackedUnit: "+dataCheck)
+// 	// var posArray = [];
+// 	// var dataAttack = dataCheck;
+
+// 	// var dataDefendArray = [];
+// 	// var dataDefend;
+
+// 	// var attackBool = false;
+// 	// var attackDataBool = false;
+
+// 	stringHUnit = "s"+Server_ID+"_unit";
+// 	stringHAttack = "s"+Server_ID+"_attack";
+// 	var attackedBool=false;
+// 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkAttackedUnit stringHUnit,stringHAttack,dataCheck,',[stringHUnit,stringHAttack,dataCheck]);
+
+// 	client.hget(stringHUnit,dataCheck,function (error,rows) {
+// 		if (rows!=null) {
+// 			var result = JSON.parse(rows);
+
+// 			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkAttackedUnit stringHUnit,dataCheck,',[stringHUnit,dataCheck]);
+// 			checkAttackPosition(io,dataCheck,result.Position_Cell);
+
+// 		}else{
+// 			functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js checkAttackedUnit dataCheck null',[dataCheck]);
+// 			return null;
+// 		}
+// 	})
+// }
+
+// #CheckAttackPosition lấy unit để tấn công
 exports.CheckAttackPosition = function (io,stringUnit,pos) {
 	checkAttackPosition (io,stringUnit,pos) 
 }
+
 function checkAttackPosition (io,stringUnit,pos) {
 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkAttackPosition stringUnit,pos',[stringUnit,pos]);
 
@@ -986,11 +1208,14 @@ function checkAttackPosition (io,stringUnit,pos) {
 
 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkAttackPosition returnPosArray',[returnPosArray]);
 
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkAttackPosition hget stringHAttack,stringUnit',[stringHAttack,stringUnit]);
 	client.hget(stringHAttack,stringUnit,function (error,rows) {
 		if (rows!=null) {
 			listUnitAttacking = rows.split("/").filter(String);
+			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkAttackPosition=>getAttackedUnit stringUnit,pos,listUnitAttacking,returnPosArray',[stringUnit,pos,listUnitAttacking,returnPosArray]);
 			getAttackedUnit(io,stringUnit,pos,listUnitAttacking,returnPosArray)
 		}else {
+			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkAttackPosition=>getUnitAttackInPos stringUnit,pos,returnPosArray',[stringUnit,pos,returnPosArray]);
 			getUnitAttackInPos(io,stringUnit,pos,returnPosArray)
 		}
 
@@ -1023,17 +1248,16 @@ function getAttackedUnit(io,stringUnit,pos,listUnitAttacking,returnPosArray) {
 							defendingUnit = listUnitAttacking[i];
 							break;
 						}
-					}
-					
+					}					
 				}				
 			}
 			resolve();
 		})
 
-	}).then(()=>{
-		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackedUnit hmget stringHUnit,listUnitAttacking',[stringHUnit,listUnitAttacking]);
-		return new Promise((resolve,reject)=>{
+	}).then(()=>{		
+		new Promise((resolve,reject)=>{
 			if (getAttackBool==true) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackedUnit=>setAttackData Server_ID,defendingUnit,stringUnit',[Server_ID,defendingUnit,stringUnit]);
 				setAttackData(Server_ID,defendingUnit,stringUnit);
 			}else {
 				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackedUnit hmget stringHUnit,listUnitAttacking',[stringHUnit,listUnitAttacking]);
@@ -1046,6 +1270,7 @@ function getAttackedUnit(io,stringUnit,pos,listUnitAttacking,returnPosArray) {
 		
 		return new Promise((resolve,reject)=>{
 			if (getAttackBool==true) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackedUnit=>attackInterval Server_ID,defendingUnit',[Server_ID,defendingUnit]);
 				attackInterval(io,Server_ID,defendingUnit);	
 			}
 			resolve();
@@ -1079,9 +1304,10 @@ function getUnitAttackInPos (io,stringUnit,pos,returnPosArray) {
 					}
 				}
 			}else{
-				functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos not found any unit',[]);
-				clearInterAttackUpdate(io,stringUnit)
-				return null;
+				functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos=>clearDefend not found any unit',[]);
+				clearDefend(io,stringUnit)
+
+				// return null;
 			}
 			resolve();
 		})
@@ -1104,12 +1330,9 @@ function getUnitAttackInPos (io,stringUnit,pos,returnPosArray) {
 						}
 					}
 				}
-
-				if (getAttackBool == false) {
-					
-					return null;}
-					resolve();
-				})
+				if (getAttackBool == false) {return null;}
+				resolve();
+			})
 
 		})
 
@@ -1117,6 +1340,7 @@ function getUnitAttackInPos (io,stringUnit,pos,returnPosArray) {
 		
 		return new Promise((resolve,reject)=>{
 			if (getAttackBool==true) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getUnitAttackInPos=>setAttackData',[Server_ID,defendingUnit,stringUnit]);
 				setAttackData(Server_ID,defendingUnit,stringUnit);					
 			}
 			resolve();
@@ -1125,6 +1349,7 @@ function getUnitAttackInPos (io,stringUnit,pos,returnPosArray) {
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
 			if (getAttackBool==true) {
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getUnitAttackInPos=>attackInterval',[Server_ID,defendingUnit]);
 				attackInterval(io,Server_ID,defendingUnit);
 				resolve();
 			}
@@ -1132,15 +1357,18 @@ function getUnitAttackInPos (io,stringUnit,pos,returnPosArray) {
 	})
 
 }
+// #CheckAttackPosition
 
 function updateRemoveDefendData (server_ID,stringDefend) {
 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js updateRemoveDefendData server_ID,stringDefend',[server_ID,stringDefend]);
 	stringHUnit ="s"+server_ID+"_unit";
 	stringHAttack ="s"+server_ID+"_attack";
+
 	var stringQuery ="SELECT `Attack_Unit_ID` FROM `s"+server_ID+"_unit` WHERE `ID` ='"+stringDefend.split("_")[3]+"'"
 	db_position.query(stringQuery,function (error,rows) {
 		if (!!error) {console.log('AttackFunc.js updateRemoveDefendData '+ stringQuery);}
 		if (rows[0].Attack_Unit_ID!=null) {
+			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js updateRemoveDefendData=>removeRedisData stringHAttack,rows[0].Attack_Unit_ID,stringDefend',[stringHAttack,rows[0].Attack_Unit_ID,stringDefend]);
 			removeRedisData (stringHAttack,rows[0].Attack_Unit_ID,stringDefend);
 		}
 	})
@@ -1212,6 +1440,7 @@ function checkSocketAttack (io,Server_ID,dataAttack,att,dataDefend) {
 	client.hvals(stringHSocket,function (error,rowsSocket) {
 		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js checkSocketAttack stringHSocket',[stringHSocket]);}
 		for (var i = 0; i < rowsSocket.length; i++) {
+			functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js checkSocketAttack=>sendToClientAttack rowsSocket[i],att,dataDefend',[rowsSocket[i],att,dataDefend]);
 			sendToClientAttack (io,rowsSocket[i],att,dataDefend);
 		}
 	});
@@ -1245,26 +1474,22 @@ function sendToClient (io,socketID,def) {
 	io.to(socketID).emit('R_ATTACK',{R_ATTACK:dataSend});
 }
 //#end: Attack Interval
-// #begin: updateMight_Kill
-function updateMight_Kill (QualityLost,dataAttack,dataDefend) {
-	functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js updateMight_Kill QualityLost,dataAttack,dataDefend',[QualityLost,dataAttack,dataDefend]);
-	getInfo.UpdateMight_Kill(QualityLost,dataAttack,dataDefend);
-}
-// #end: updateMight_Kill
 
 //#begin: updateAttackData
 function updateAttackData (io,data) {
-	functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js updateAttackData data',[data]);
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js updateAttackData data',[data]);
 	for (var i = 0; i < data.length; i++) {
 		checkDataAttack (io,data[i])
 	}
 }
 function checkDataAttack (io,dataCheck) {
 	var stringHUnit;
+	var stringUpdate,stringQuery;
 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkDataAttack dataCheck',[dataCheck]);
 	
 	for (var i = 0; i < dataCheck.length; i++) {
-		var stringUpdate,stringQuery;
+
+		
 		stringHUnit = "s"+dataCheck[i].toString().split("_")[3]+"_unit"
 		stringQuery = "SELECT * FROM `s"+dataCheck.toString().split("_")[0]+"_unit` WHERE "+
 		"`ID`='"+dataCheck[i].toString().split("_")[3]+"'";
@@ -1272,8 +1497,7 @@ function checkDataAttack (io,dataCheck) {
 		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkDataAttack dataCheck',[dataCheck]);
 		db_position.query(stringQuery,function(error,rows){
 			if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js checkDataAttack stringQuery',[stringQuery]);}
-
-			if (rows!=null) {
+			if (rows[0]!=null) {
 				if (rows[0].Status!=functions.UnitStatus.Base){
 					stringUpdate = "UPDATE `s"+dataCheck.toString().split("_")[0]+"_unit` SET "
 					+"`Status`='"+functions.UnitStatus.Standby
@@ -1315,11 +1539,7 @@ function checkDataAttack (io,dataCheck) {
 	}
 }
 
-exports.CheckAttackedUnit = function (io,Server_ID,dataCheck) {
-	checkAttackedUnit (io,Server_ID,dataCheck);
-}
 
-// checkAttackedUnit (null,1,'1_16_43_113')
 
 function updateDataBaseAttack (Server_ID,dataAttack,dataDefend) {
 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js updateDataBaseAttack Server_ID,dataAttack,dataDefend',[Server_ID,dataAttack,dataDefend]);

@@ -21,7 +21,7 @@ function deleteHashKey (server_ID) {
 }
 
 exports.PostionRemove = function postionRemove (data) {
-	functions.ShowLog(functions.ShowLogBool.Off,'Postion_Remove.js PostionRemove data',[data])
+	functions.ShowLog(functions.ShowLogBool.On,'Postion_Remove.js PostionRemove data.Server_ID,data.ID_Unit,data.ID_User,data.ID;',[data.Server_ID,data.ID_Unit,data.ID_User,data.ID])
 	if (data.ID_Unit>15&&data.ID_Unit<20) {unitRange1 (data);}
 	if (data.ID_Unit>20&&data.ID_Unit<25) {unitRange2 (data);}
 	if (data.ID_Unit>25&&data.ID_Unit<30) {unitRange1 (data);}

@@ -12,18 +12,40 @@ client.select(functions.RedisData.TestUnit);
 // exports.Test = function Test (server_ID){
 // 	console.log(server_ID);
 // }
-exports.GetPosition = function getPosition2 (server_ID){
+exports.GetPosition = function (server_ID){
 	getPosition (server_ID);
 }
-exports.AddPosition = function addPosition (data) {
-	functions.ShowLog(functions.ShowLogBool.Off,'Position.js addPosition data',[data])
+function getPosition (server_ID) {
+	var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"' OR `Status`='"+functions.UnitStatus.Attack_Unit+"'";
+	// console.log(stringQuery)
+	db_position.query(stringQuery,function (error,rows) {
+		
+		for (var i = 0; i < rows.length; i++) {
+			rows[i].Server_ID = server_ID
+			getRangeUnit (rows[i])
+
+			// getRangeUnit (rows[i],server_ID);
+
+		}
+	});
+}
+exports.AddPosition = function (data) {
+	functions.ShowLog(functions.ShowLogBool.On,'Position.js addPosition data.Server_ID,data.ID_Unit,data.Position_Cell',[data.Server_ID,data.ID_Unit,data.Position_Cell])
+
 	if (data.ID_Unit>15&&data.ID_Unit<20) {unitRange1 (data);}
 	if (data.ID_Unit>20&&data.ID_Unit<25) {unitRange2 (data);}
 	if (data.ID_Unit>25&&data.ID_Unit<30) {unitRange1 (data);}
 	if (data.ID_Unit>30&&data.ID_Unit<35) {unitRange3 (data);}
 	// getRangeUnit (data,data.Server_ID)
 }
+function getRangeUnit (data) {
+	if (data.ID_Unit>15&&data.ID_Unit<20) {unitRange1 (data);}
+	if (data.ID_Unit>20&&data.ID_Unit<25) {unitRange2 (data);}
+	if (data.ID_Unit>25&&data.ID_Unit<30) {unitRange1 (data);}
+	if (data.ID_Unit>30&&data.ID_Unit<35) {unitRange3 (data);}
+}
 function unitRange1 (data) {
+	// console.log('\x1b[33m%s\x1b[0m',data)
 	var posCenter = data.Position_Cell;;
 	var posX = parseInt(posCenter.split(",")[0]);
 	var posY = parseInt(posCenter.split(",")[1]);
@@ -31,7 +53,7 @@ function unitRange1 (data) {
 	var stringHkey = "s"+data.Server_ID+"_pos";
 	var stringKey = [];
 	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	//console.log(ID_Key)
+	// console.log('\x1b[33m%s\x1b[0m',ID_Key)
 	stringKey[0] = data.Position_Cell;
 	
 	if (posY%2==0) {
@@ -75,6 +97,13 @@ function checkValue (stringHkey,stringKey,ID_Key) {
 			addValue (stringHkey,stringKey,"",ID_Key);
 		}
 	});
+}
+
+function addValue (stringHkey,stringKey,data,ID_Key) {
+	// console.log(stringHkey,stringKey,data,ID_Key)
+	if (data!="") {functions.ShowLog(functions.ShowLogBool.On,'Position.js addValue stringHkey,stringKey,data,ID_Key',[stringHkey,stringKey,data,ID_Key])}
+
+		client.hset(stringHkey,stringKey,data+ID_Key+"/");
 }
 
 function unitRange2 (data) {
@@ -219,23 +248,8 @@ function unitRange3 (data) {
 	}
 }
 
-function addValue (stringHkey,stringKey,data,ID_Key) {
-	// console.log(stringHkey,stringKey,data,ID_Key)
-	functions.ShowLog(functions.ShowLogBool.Off,'Position.js addValue stringHkey,stringKey,data,ID_Key',[stringHkey,stringKey,data,ID_Key])
-	client.hset(stringHkey,stringKey,data+ID_Key+"/");
-}
 
 
-// function getPosition (server_ID) {
-// 	var stringQuery = "SELECT * FROM `s"+server_ID+"_unit` WHERE `Status`='"+functions.UnitStatus.Standby+"' OR `Status`='"+functions.UnitStatus.Attack_Unit+"'";
-// 	// console.log(stringQuery)
-// 	db_position.query(stringQuery,function (error,rows) {
-// 		// console.log(rows.length)
-// 		/*lấy vị trí => lấy theo ID_Unit tính range*/
-// 		for (var i = 0; i < rows.length; i++) {
-// 			getRangeUnit (rows[i],server_ID);
-// 		}
-// 	});
 
 // 	// var dataRows=[];
 // 	// var stringKeyUnit=[];
@@ -251,21 +265,22 @@ function addValue (stringHkey,stringKey,data,ID_Key) {
 // 	// 		getRangeUnit (dataRows[i],server_ID);
 // 	// 	}
 // 	// }))
-	
+
 // }
 
 
-// exports.DeletePosKey = function deleteHashKey2 (server_ID,resolve) {
-// 	deleteHashKey (server_ID,resolve);
-// }
-// function deleteHashKey (server_ID,resolve) {
-// 	var stringHkey = "s"+server_ID+"_pos";
-// 	client.del(stringHkey,function (error,result) {
-// 		if (!!error) {console.log(error);}
-// 		resolve()
-// 	});
+exports.DeletePosKey = function deleteHashKey2 (server_ID,resolve) {
+	deleteHashKey (server_ID,resolve);
+}
+function deleteHashKey (server_ID,resolve) {
+	var stringHkey = "s"+server_ID+"_pos";
+	client.del(stringHkey,function (error,result) {
+		if (!!error) {console.log(error);}
+		resolve()
+	});
 
-// }
+}
+
 // function getRangeUnit (row,server_ID) {
 // 	if (row.ID_Unit>15&&row.ID_Unit<20) {unitRange1 (row,server_ID);}
 // 	if (row.ID_Unit>20&&row.ID_Unit<25) {unitRange2 (row,server_ID);}
@@ -282,9 +297,9 @@ function addValue (stringHkey,stringKey,data,ID_Key) {
 // 	var stringHkey = "s"+server_ID+"_pos";
 // 	var stringKey=[];
 // 	var ID_Key = server_ID+"_"+row.ID_Unit+"_"+row.ID_User+"_"+row.ID;
-	
+
 // 	stringKey[0] = row.Position_Cell;
-	
+
 // 	if (posY%2==0) {
 // 		//even
 // 		// new Vector3Int(-1, 0, 0),
@@ -314,7 +329,7 @@ function addValue (stringHkey,stringKey,data,ID_Key) {
 // 		stringKey[4] = (posX) +","+(posY+1)+",0";
 // 		stringKey[5] = (posX) +","+(posY-1)+",0";
 // 		stringKey[6] = (posX+1) +","+(posY)+",0";
-		
+
 // 	}
 // 	// console.log(stringKey)
 // 	for (var i = 0; i < stringKey.length; i++) {
@@ -327,23 +342,23 @@ function addValue (stringHkey,stringKey,data,ID_Key) {
 
 
 
-// function addValue (stringHkey,stringKey,data,ID_Key) {
-// 	// console.log(stringHkey,stringKey,data,ID_Key)
-// 	client.hset(stringHkey,stringKey,data+ID_Key+"/");
-// }
+// // function addValue (stringHkey,stringKey,data,ID_Key) {
+// // 	// console.log(stringHkey,stringKey,data,ID_Key)
+// // 	client.hset(stringHkey,stringKey,data+ID_Key+"/");
+// // }
 
-// function removeValue (stringHkey,stringKey,ID_Key) {
-// 	client.hget(stringHkey,stringKey,function (error,rows) {
-// 		var result = rows.split("/");
-// 		if (result.includes(ID_Key)) {
-// 			var stringReplace = rows.replace(ID_Key+"/","");
-// 			client.hset(stringHkey,stringKey,stringReplace);
-// 			if (stringReplace.length==0) {
-// 				client.hdel(stringHkey,stringKey);
-// 			}
-// 		}
-// 	});
-// }
+// // function removeValue (stringHkey,stringKey,ID_Key) {
+// // 	client.hget(stringHkey,stringKey,function (error,rows) {
+// // 		var result = rows.split("/");
+// // 		if (result.includes(ID_Key)) {
+// // 			var stringReplace = rows.replace(ID_Key+"/","");
+// // 			client.hset(stringHkey,stringKey,stringReplace);
+// // 			if (stringReplace.length==0) {
+// // 				client.hdel(stringHkey,stringKey);
+// // 			}
+// // 		}
+// // 	});
+// // }
 
 // function unitRange2 (row,server_ID) {
 // 	var posCenter = row.Position_Cell;
@@ -353,7 +368,7 @@ function addValue (stringHkey,stringKey,data,ID_Key) {
 // 	var stringHkey = "s"+server_ID+"_pos";
 // 	var stringKey=[];
 // 	var ID_Key = server_ID+"_"+row.ID_Unit+"_"+row.ID_User+"_"+row.BaseNumber;
-	
+
 // 	stringKey[0] = row.Position_Cell;
 
 // 	if (posY%2==0) {
@@ -364,7 +379,7 @@ function addValue (stringHkey,stringKey,data,ID_Key) {
 // 		stringKey[4] = (posX+1)+","+(posY-1)+",0";
 // 		stringKey[5] = (posX+1)+","+(posY+1)+",0";
 // 		stringKey[6] = (posX+1)+","+(posY)+",0";
-		
+
 // 		stringKey[7] = (posX-2)+","+(posY)+",0";
 // 		stringKey[8] = (posX-1)+","+(posY-1)+",0";
 // 		stringKey[9] = (posX-1)+","+(posY+1)+",0";
@@ -414,7 +429,7 @@ function addValue (stringHkey,stringKey,data,ID_Key) {
 // 	var stringHkey = "s"+server_ID+"_pos";
 // 	var stringKey=[];
 // 	var ID_Key = server_ID+"_"+row.ID_Unit+"_"+row.ID_User+"_"+row.BaseNumber;
-	
+
 // 	if (posY%2==0) {
 // 		//odd		
 // 		stringKey[0] = (posX-2)+","+(posY)+",0";

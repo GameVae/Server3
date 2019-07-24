@@ -14,13 +14,18 @@ exports.UnitStatus = {
 	Standby: 		6,
 }
 
-var redisData = exports.RedisData = {
+exports.RedisData = {
 	Data0 : 0,
 	Data1 : 1,
 	TestUnit : 2,
 	Server: 2,
 }
-
+var redisData = {
+	Data0 : 0,
+	Data1 : 1,
+	TestUnit : 2,
+	Server: 2,
+}
 var redis 				= require("redis"),
 client 					= redis.createClient();
 client.select(redisData.TestUnit);
@@ -72,7 +77,7 @@ exports.ShowLog = function showLog (showBool,stringContent,param) {
 		case showLogBool.On:
 		var nullBool = false;
 		for (var i = 0; i < param.length; i++) {
-			if(param[i]==null||param[i]==undefined){
+			if(param[i]==null||param[i]==undefined||param[i].length==0){
 				nullBool = true;
 				break;
 			}

@@ -32,6 +32,7 @@ function getUnitDataPos (server_ID) {
 	// for (var i = 0; i < 36; i++) {
 	// 	positionData.GetPosition(server_ID);
 	// }
+	
 	new Promise((resolve,reject)=>{
 		positionData.DeletePosKey(server_ID,resolve);
 		

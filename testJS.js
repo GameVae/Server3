@@ -2,11 +2,190 @@
 // var result = st.split("/").filter(String)
 // console.log(result)
 
-// var redis = require("redis"),
-// client = redis.createClient();
-// client.select(2)
+var redis = require("redis"),
+client = redis.createClient();
+client.select(2)
 
-// var Promise = require('promise');
+// client.hmget('s1_unit','1_16_43_824',function (error,rows) {
+// 	console.log(rows)
+// })
+var functions = require('./Util/Functions.js')
+var Promise = require('promise');
+var dataAttacka = ['1_16_44_678','1_16_43_824']
+var dataDefendb = '1_16_42_552'
+
+console.log(functions.RedisData.TestUnit)
+// getAttackCalc (1,dataAttacka,dataDefendb)
+function getAttackCalc (server_ID,dataAttack,dataDefend) {
+	stringHUnit = "s"+server_ID+"_unit";
+	stringHAttack = "s"+server_ID+"_attack";
+
+	var def = {};
+	var Attack = 0, Hea_Lost = 0;
+	var CounterMul = [];
+	var QualityLost = 0;
+	var tempObj={};
+	var defendAliveBool=false;
+	var rowsUnit={};
+	var clearBool =  false;
+
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc server_ID,dataAttack,dataDefend',[server_ID,dataAttack,dataDefend]);
+
+	new Promise((resolve,reject)=>{
+		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc hget stringHUnit,dataDefend',[stringHUnit,dataDefend]);
+
+		client.hget(stringHUnit,dataDefend,function (error,rows) {
+			console.log(rows)
+			if (rows!=null) {
+				def = JSON.parse(rows);
+
+				if ((def.Attack_Unit_ID==null&&def.Status==functions.UnitStatus.Standby)||(def.Attack_Unit_ID=='null'&&def.Status==functions.UnitStatus.Standby)) {
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>checkAttackPosition dataDefend,def.Position_Cell',[dataDefend,def.Position_Cell]);
+					checkAttackPosition (io,dataDefend,def.Position_Cell)
+					// checkCurrentPos(io,def,dataDefend,def.Position_Cell,server_ID);
+				}
+				defendAliveBool = true;
+			}else{
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>clearDefend1 dataDefend',[dataDefend]);
+				clearBool = true;
+				clearDefend(io,dataDefend);
+			}	
+			resolve();
+		})
+
+	}).then(()=>{
+
+		if (clearBool==false) {
+			new Promise((resolve,reject)=>{
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc hmget stringHUnit,dataAttack',[stringHUnit,dataAttack]);			
+				client.hmget(stringHUnit,dataAttack,function (error,rows){
+					rowsUnit = rows;
+
+					if (rows!=null) {
+						for (var i = 0; i < rows.length; i++) {
+							if (rows[i]!=null&&defendAliveBool==true) {
+								var result = JSON.parse(rows[i]);
+								functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>checkCounter result,def',[result,def]);
+								CounterMul[i] = checkCounter(result,def);
+								Attack = Attack + (result.Attack * (result.Quality/def.Quality)*CounterMul[i]);
+								functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>checkSocketAttack server_ID,dataAttack[i],result,dataDefend',[server_ID,dataAttack[i],result,dataDefend]);
+								checkSocketAttack (io,server_ID,dataAttack[i],result,dataDefend);
+							}else {
+								Attack = Attack + 0;
+								if (dataDefend==null) {functions.ShowLog(functions.ShowLogBool.Error,'AttackFunc.js getAttackCalc removeRedisData dataDefend null',[dataDefend]);return null;}
+								else{
+									functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>removeRedisData dataDefend,dataAttack[i]',[dataDefend,dataAttack[i]]);
+									removeRedisData (stringHAttack,dataDefend,dataAttack[i]);							
+									dataAttack.splice(dataAttack.indexOf(dataAttack[i]), 1);
+								}
+							}
+
+							Hea_Lost = parseFloat(Attack - def.Defend).toFixed(2);
+
+							if (Hea_Lost < 1) {Hea_Lost = 1;}
+
+							if (Hea_Lost < def.Hea_cur){
+								if (parseFloat(def.Hea_cur - Hea_Lost).toFixed(2)<1) {
+									def.Hea_cur = def.Hea_cur - 1;
+								}else{
+									def.Hea_cur = parseFloat(def.Hea_cur - Hea_Lost).toFixed(2);
+								}	
+							}else if (Hea_Lost >= def.Hea_cur) {
+								if (parseFloat(def.Health - parseInt((Hea_Lost - def.Hea_cur)%def.Health)).toFixed(2)<1) {
+									def.Hea_cur = def.Hea_cur - 1;
+								}else{
+									def.Hea_cur = parseFloat(def.Health - parseInt((Hea_Lost - def.Hea_cur)%def.Health)).toFixed(2);
+								}
+
+								QualityLost = parseInt((Hea_Lost - def.Hea_cur)/def.Health);
+								def.Quality = def.Quality - (parseInt((Hea_Lost - def.Hea_cur)/def.Health) +1);
+							}
+
+						}
+
+						if (def.Quality <= 0) {
+							
+							def.Quality = 0;
+							functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc def.Quality=0',[def]);
+							for (var i = 0; i < rows.length; i++) {
+								if (rows[i]!=null) {
+									
+									var resultAttack = JSON.parse(rows[i]);
+									resultAttack.Status = 6;
+									resultAttack.Attack_Unit_ID = null;
+									
+									var stringAttack = server_ID+"_"+resultAttack.ID_Unit+"_"+resultAttack.ID_User+"_"+resultAttack.ID;									
+									client.hset(stringHUnit,stringAttack,JSON.stringify(resultAttack));
+									functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>checkAttackPosition stringAttack,resultAttack.Position_Cell',[stringAttack,resultAttack.Position_Cell]);
+									// checkCurrentPos(io,resultAttack,stringAttack,resultAttack.Position_Cell,server_ID);
+									checkAttackPosition (io,stringAttack,resultAttack.Position_Cell);
+								}
+							}
+
+						}
+						functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>updateAttackData dataAttack',[dataAttack]);
+						updateAttackData (io,dataAttack);
+
+						functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>updateRemoveDefendData dataAttack',[server_ID,dataDefend]);
+						updateRemoveDefendData (server_ID,dataDefend);
+						def.Hea_cur = Number(def.Hea_cur);
+						resolve();
+					}
+
+				})
+
+			})		
+		}
+		
+
+	}).then(()=>{
+		if (clearBool==false) {
+			new Promise((resolve,reject)=>{
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>updateDataBaseQuality server_ID,def',[server_ID,def]);
+				updateDataBaseQuality(server_ID,def);
+				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>checkSocketClient dataDefend,def',[dataDefend,def]);
+				checkSocketClient (io,dataDefend,def);
+
+				if (def.Quality>0) {
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>hset def.Quality>0 def',[def]);
+					client.hset(stringHUnit,dataDefend,JSON.stringify(def));
+				}else{
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>positionRemove.PostionRemove dataDefend',[dataDefend]);
+					positionRemove.PostionRemove(dataDefend);
+
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>moving.ClearMoveTimeout dataDefend,def',[dataDefend,def]);
+					moving.ClearMoveTimeout(io,dataDefend,def);
+
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>clearMovingAttack dataDefend',[dataDefend]);
+					clearMovingAttack(dataDefend);
+
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>clearDefend2 dataDefend',[dataDefend]);
+					clearDefend(io,dataDefend);
+
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>hdel stringHAttack,dataDefend',[stringHAttack,dataDefend]);
+					client.hdel(stringHAttack,dataDefend);
+
+					functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>hdel stringHUnit,dataDefend',[stringHUnit,dataDefend]);
+					client.hdel(stringHUnit,dataDefend);
+
+					clearBool=true;
+
+
+				}
+				resolve();
+
+			})
+		}
+	}).then(()=>{
+		
+		if (QualityLost>0) {
+			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js getAttackCalc=>updateMight_Kill QualityLost,dataAttack,dataDefend',[QualityLost,dataAttack,dataDefend]);
+			updateMight_Kill (QualityLost,dataAttack,dataDefend);
+		}
+
+	})
+
+}
 // client.hmget("s1_attack",result,function (error,rows) {
 // 	console.log(rows[0])
 // 	if (rows[1]==null) {console.log('ok')}
@@ -14,8 +193,9 @@
 // console.log('\n2')
 // console.log('2')
 // var testObj ={}
-
-console.log('\x1b[36m%s\x1b[0m', 'info');
+// var test = []
+// console.log(test)
+// console.log('\x1b[36m%s\x1b[0m', 'info');
 // var functions = require('./Util/Functions.js')
 // var stringThis1="1,23"
 // var stringThis2= stringThis1+"3,23"

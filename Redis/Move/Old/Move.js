@@ -4,7 +4,8 @@
 var move_GetNewPos 			= require('./Move_GetNewPosition.js');
 
 var db_position				= require('./../../Util/Database/Db_position.js');
-var attackFunc 				= require('./../Attack/Attack.js');
+
+var attackFunc 				= require('./../Attack/AttackFunc.js');
 var guildData				= require('./../Guild/GuildData.js');
 var friendData				= require('./../Friend/FriendData.js');
 var positionAdd 			= require('./../Position/Position.js');
@@ -147,8 +148,10 @@ function checkAttackData (io,data) {
 			var result = JSON.parse(rows);
 			// console.log("result.Attack_Unit_ID:"+result.Attack_Unit_ID)
 			if(result.Attack_Unit_ID!="null"){
+			attackFunc.CheckAttackPosition(io,stringKey,data.Position_Cell)
 			// console.log(data,stringKey)
-			checkPositionAttackUnit (io,data,stringKey);
+
+			// checkPositionAttackUnit (io,data,stringKey);
 		}
 	}
 
@@ -203,7 +206,7 @@ function checkPositionAttackUnit (io,data,stringKey) {
 	}).then(()=>new Promise((resolve,reject)=>{
 		if (boolAttack==true) {
 			attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend);
-			attacking.CheckUnitDefend(io,stringKeyAttack,stringKeyDefend,data.Position_Cell);
+			// attacking.CheckUnitDefend(io,stringKeyAttack,stringKeyDefend,data.Position_Cell);
 		}	
 		resolve();
 	})))

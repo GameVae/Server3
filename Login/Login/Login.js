@@ -34,11 +34,15 @@ function S_LOGIN (socket,data) {
 
 	db_all_user.query(queryUserNamePass, function (error,rows) {
 		if (!!error){DetailError = ('Login.js: Error queryUserNamePass '+queryUserNamePass);functions.WriteLogError(DetailError,1);}
-		if (rows[0].BlockedForever==1) {
-			socket.emit('R_BLOCKED',{BlockedForever:1,Time:0});
+		if (rows[0]==undefined) {
+			socket.emit('R_LOGIN',{LoginBool:0});
+			return null;
 		}else{
-			if (rows[0].BlockedTime!=null) {
-				if (functions.ExportTimeDatabase(rows[0].BlockedTime)>=functions.GetTime()) {
+			if (rows[0].BlockedForever==1) {
+				socket.emit('R_BLOCKED',{BlockedForever:1,Time:0});
+			}else{
+				if (rows[0].BlockedTime!=null) {
+					if (functions.ExportTimeDatabase(rows[0].BlockedTime)>=functions.GetTime()) {
 					// check time => lấy time chenh lech => chay settimeout  doi voi time lon hon hien tai, con nho hon thi reset ve null, va doi bien blockForever 	
 					var databaseTime = functions.ExportTimeDatabase(rows[0].BlockedTime) - functions.GetTime()
 					socket.emit('R_BLOCKED',{BlockedForever:0,Time: databaseTime});
@@ -54,9 +58,10 @@ function S_LOGIN (socket,data) {
 				}
 			}
 		}
-		//db_all_user.end();
-		LogChange='Login.js: queryUserNamePass: '+data.UserName;functions.LogChange(LogChange,1);	
-	});
+		
+		LogChange ='Login.js: queryUserNamePass: '+data.UserName;functions.LogChange(LogChange,1);
+	}
+});
 }
 
 function R_USER_INFO (socket,ID_User,Server_ID) {

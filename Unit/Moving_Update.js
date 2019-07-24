@@ -1,10 +1,11 @@
 'use strict';
 
 // var db_all_user		= require('./../Util/Database/Db_all_user.js');
+var move 				= require('./Moving.js');
 var db_position			= require('./../Util/Database/Db_position.js');
 var db_server_task 		= require('./../Util/Database/Db_server_task.js');
 // var moveRedis 		= require('./../Redis/Move/Move.js');
-var move 				= require('./../Redis/Move/Move.js');
+
 
 var functions 		= require('./../Util/Functions.js');
 var DetailError,logChangeDetail;
