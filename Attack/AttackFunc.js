@@ -732,6 +732,14 @@ exports.AttackInterval =function (io,Server_ID,ID_Defend){
 }
 
 function attackInterval (io,Server_ID,ID_Defend){
+	stringInterval = "Attacking_"+ID_Defend;
+
+	if (DictTimeAttack[stringInterval]==null||DictTimeAttack[stringInterval]==undefined) {
+		doAttackInterval (io,Server_ID,ID_Defend)
+	}
+
+}
+function doAttackInterval (io,Server_ID,ID_Defend){
 	stringHAttack = "s"+Server_ID+"_attack";
 	stringHUnit = "s"+Server_ID+"_unit";
 	stringInterval = "Attacking_"+ID_Defend;
@@ -785,73 +793,13 @@ function attackInterval (io,Server_ID,ID_Defend){
 		if (defendAliveBool==true && clearBool==false) {
 			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval=>DictTimeAttack[stringInterval] Server_ID,ID_Defend',[Server_ID,ID_Defend]);
 			DictTimeAttack[stringInterval] = setTimeout(function (io,Server_ID,ID_Defend) {
-				attackInterval (io,Server_ID,ID_Defend)
+				doAttackInterval (io,Server_ID,ID_Defend)
 			}, 1000,io,Server_ID,ID_Defend);
 		}
 		
 	})
 	
 }
-
-// function attackInterval (io,Server_ID,ID_Defend){
-// 	stringHAttack = "s"+Server_ID+"_attack";
-// 	stringHUnit = "s"+Server_ID+"_unit";
-// 	stringInterval = "Attacking_"+ID_Defend;
-// 	//lay data attack truoc => danh truoc roi moi chay lai timeout
-
-
-
-// 	if (DictTimeAttack[stringInterval]!=null) {
-
-// 	}else{
-// 		DictTimeAttack[stringInterval] = setTimeout(function (stringHUnit,stringHAttack,io,Server_ID,ID_Defend) {
-// 			var defendAliveBool = true;
-// 			functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval stringHUnit,stringHAttack,Server_ID,ID_Defend',[stringHUnit,stringHAttack,Server_ID,ID_Defend]);
-// 			new Promise((resolve,reject)=>{
-// 				functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval hget1 stringHUnit,ID_Defend',[stringHUnit,ID_Defend]);
-// 				client.hget(stringHUnit,ID_Defend,function (error,rows) {
-// 					if (rows==null) {
-// 						defendAliveBool = false;
-// 						functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval clearInterAttackUpdate1 ID_Defend',[ID_Defend]);
-// 						clearDefend(io,ID_Defend);			
-// 					}
-// 					if (rows==undefined) {
-// 						defendAliveBool = false;
-// 						functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval clearInterAttackUpdate2 ID_Defend',[ID_Defend]);
-// 						clearDefend(io,ID_Defend);
-// 					}
-// 					resolve();
-// 				});
-// 			}).then(()=>{
-
-// 				return new Promise((resolve,reject)=>{
-// 					if (defendAliveBool==true) {
-// 						functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval hget2 stringHAttack,ID_Defend',[stringHAttack,ID_Defend]);
-// 						client.hget(stringHAttack,ID_Defend,function (error,rows) {	
-// 							if (rows!=null) {
-// 								var dataAttack = rows.split("/").filter(String);						
-// 								if (dataAttack.length>0) {
-// 									functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js attackInterval getAttackCalc Server_ID,dataAttack,ID_Defend',[Server_ID,dataAttack,ID_Defend]);
-// 									getAttackCalc (io,Server_ID,dataAttack,ID_Defend);
-// 									attackInterval (io,Server_ID,ID_Defend);
-// 								}
-// 							}else {
-// 								functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js attackInterval clearInterAttackUpdate3 ID_Defend',[ID_Defend]);
-// 								clearDefend(io,ID_Defend);
-// 							}	
-// 						});
-// 					}
-// 					resolve();
-// 				})
-// 			})
-
-// 		}, 1000, stringHUnit,stringHAttack,io,Server_ID,ID_Defend);
-
-// 	}
-
-// }
-
-
 
 function getAttackCalc (io,server_ID,dataAttack,dataDefend) {
 	stringHUnit = "s"+server_ID+"_unit";

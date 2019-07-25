@@ -71,3 +71,8 @@
  logChangeDetail: 2019-07-25T04:41:04.667Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
  logChangeDetail: 2019-07-25T04:41:04.670Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='289,5,0' WHERE `ID_Type`='42_0_1';
  logChangeDetail: 2019-07-25T04:41:16.406Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-07-25T07:01:08.503Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-07-25T07:01:08.496Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='295,10,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-07-25T07:01:08.499Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='289,5,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-07-25T07:01:08.501Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-07-25T07:01:12.946Z: Login.js: queryUserNamePass: ndinhtoan44
