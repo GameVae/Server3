@@ -47,8 +47,8 @@ exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_MOVE', function (data){
 			var dataMoveAttack  = data.S_MOVE;
-			// console.log('dataMoveAttack')
-			// console.log(dataMoveAttack)
+			console.log('dataMoveAttack')
+			console.log(dataMoveAttack)
 			functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js Start data',[dataMoveAttack]);
 			stringUnit = dataMoveAttack.Server_ID+"_"+dataMoveAttack.ID_Unit+"_"+dataMoveAttack.ID_User+"_"+dataMoveAttack.ID;
 			functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js Start data',[stringUnit])
@@ -61,13 +61,13 @@ exports.Start = function start (io) {
 				attackFunc.ClearAttackUnit (io,stringUnit);
 				resolve();
 			}).then(()=>{
-				new Promise((resolve,reject)=>{
+				return new Promise((resolve,reject)=>{
 					functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js Start=>clearMovingAttack stringUnit',[stringUnit]);
 					clearMovingAttack (stringUnit);
 					resolve();
 				})
 			}).then(()=>{
-				new Promise((resolve,reject)=>{
+				return new Promise((resolve,reject)=>{
 					functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js start hset stringHMovingAttack,stringUnit',[stringHMovingAttack,stringUnit]);
 					client.hset(stringHMovingAttack,stringUnit,JSON.stringify(dataMoveAttack))
 					resolve()
@@ -101,7 +101,7 @@ function checkMovePos (io,data,stringKey) {
 	var Server_ID = data.Server_ID;
 	stringMoveAttack = "Moving_Attack_"+stringKey;
 
-	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkMovePos=>checkCurrentPos data,stringKey',[data,stringKey,posCheck,Server_ID]);
+	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkMovePos=>checkCurrentPos data,stringKey,posCheck,Server_ID',[data,stringKey,posCheck,Server_ID]);
 	attackFunc.CheckCurrentPos (io,data,stringKey,posCheck,Server_ID);
 	
 	if (data.TimeMoveNextCell!=null) {
@@ -137,9 +137,12 @@ function checkMovePos (io,data,stringKey) {
 			}
 			break;
 		}
-		if (timeOut<0) {console.log('AttackFunc.js checkMovePos Moving Attack timeOut<0');console.log(timeOut);}
+		if (timeOut<0) {console.log('AttackFunc.js checkMovePos Moving Attack timeOut<0');console.log(timeOut);
+		clearTimeout(DictMoveAttack[stringMoveAttack]);
+		return null;}
 
 		functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js checkMovePos timeOut,data,stringKey,stringMoveAttack',[timeOut,data,stringKey,stringMoveAttack]);
+		
 		if (data.TimeMoveNextCell!=data.TimeFinishMove) {
 			DictMoveAttack[stringMoveAttack]=setTimeout(function (io,data,stringKey) {
 				var updateData = data;
@@ -152,21 +155,35 @@ function checkMovePos (io,data,stringKey) {
 				}else{
 					updateData.Position_Cell = data.End_Cell;
 					updateData.Next_Cell = null;
-					updateData.TimeMoveNextCell = null;
-					updateData.TimeFinishMove = null;
+					updateData.TimeMoveNextCell = data.TimeFinishMove;
+					// updateData.TimeFinishMove = null;
+					// console.log('updateData.TimeMoveNextCell')
+					// console.log(updateData.TimeMoveNextCell)
 				}
 				checkMovePos (io,updateData,stringKey);
 			}, timeOut,io,data,stringKey);
+		}else{
+
+			DictMoveAttack[stringMoveAttack]=setTimeout(function (io,data,stringKey) {
+				var updateData = data;
+				updateData.Position_Cell = data.End_Cell;
+				updateData.Next_Cell = null;
+				updateData.TimeMoveNextCell = null;
+				updateData.TimeFinishMove = null;
+				checkMovePos (io,updateData,stringKey);
+			}, timeOut,io,data,stringKey)
 		}
 	}
 }
 
-
+exports.ClearMovingAttack = function (stringUnit) {
+	clearMovingAttack (stringUnit)
+}
 
 function clearMovingAttack (stringUnit) {
 
 	stringMoveAttack = "Moving_Attack_"+stringUnit;
-	functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js clearMovingAttack stringUnit,stringMoveAttack,DictMoveAttack[stringMoveAttack]',[stringUnit,stringMoveAttack,DictMoveAttack[stringMoveAttack]]);
+	functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js clearMovingAttack stringUnit,stringMoveAttack',[stringUnit,stringMoveAttack]);
 	if (DictMoveAttack[stringMoveAttack]!=null) {
 		clearTimeout(DictMoveAttack[stringMoveAttack]);			
 		delete DictMoveAttack[stringMoveAttack];
@@ -176,7 +193,7 @@ function clearMovingAttack (stringUnit) {
 
 function removeValue (stringHkey,stringKey,rows,ID_Key) {
 	var stringReplace = rows.replace(ID_Key+"/","");
-	
+
 	functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js removeValue stringHkey,stringKey,rows,ID_Key,stringReplace',[stringHkey,stringKey,rows,ID_Key,stringReplace]);
 	client.hset(stringHkey,stringKey,stringReplace);
 	if (stringReplace.length==0) {

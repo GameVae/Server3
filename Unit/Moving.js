@@ -66,7 +66,7 @@ exports.Start = function start (io) {
 				client.set(stringKeyMove,JSON.stringify(data.S_MOVE));
 				resolve();
 			}).then(()=>{
-				new Promise((resolve,reject)=>{
+				return new Promise((resolve,reject)=>{
 					S_MOVE (io,socket,data.S_MOVE,stringUnit);
 					resolve();
 				})
@@ -242,7 +242,7 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 					updateDataMove.Status = 6;
 					// updateDataMove.Server_ID = parseInt(stringKey.split("_")[0])
 					// attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell);
-				
+
 					functions.ShowLog(functions.ShowLogBool.Off,'Moving.js setTimerUpdateDatabase updateDataMove.Server_ID',[updateDataMove.Server_ID]);
 					positionAdd.AddPosition(updateDataMove);
 				}
@@ -329,9 +329,12 @@ function clearMoveTimeout (io,stringData,data) {
 }
 
 function clearMove (stringData,data) {
+	
+	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js clearMove=>positionRemove.PostionRemove stringData,data',[stringData,data])
+	if (data.Server_ID==null||data.Server_ID==undefined) {
+		data.Server_ID = stringData.split("_")[0]
+	}
 	positionRemove.PostionRemove(data);
-	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js clearMove stringData,data',[stringData,data])
-
 	stringMove = "Moving_"+stringData;
 	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js clearMove stringMove',[stringMove])
 
@@ -339,8 +342,6 @@ function clearMove (stringData,data) {
 		clearTimeout(DictMoveTimeOut[stringMove]);
 		delete DictMoveTimeOut[stringMove];
 	}
-	functions.ShowLog(functions.ShowLogBool.Off,'Moving.js clearMove=>positionRemove.PostionRemove data',[data])
-	
 }
 
 exports.MoveCalc = function (io,socket,data) {
