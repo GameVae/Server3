@@ -54,7 +54,7 @@ function unitRange1 (data) {
 		stringKey[3] = (posX-1) +","+(posY+1)+",0";
 		stringKey[4] = (posX) +","+(posY+1)+",0";
 		stringKey[5] = (posX) +","+(posY-1)+",0";
-		stringKey[6] = (posX-1) +","+(posY)+",0";
+		stringKey[6] = (posX+1) +","+(posY)+",0";
 	}
 
 	for (var i = 0; i < stringKey.length; i++) {
@@ -122,7 +122,7 @@ function unitRange2 (data) {
 		stringKey[3] = (posX-1) +","+(posY+1)+",0";
 		stringKey[4] = (posX) +","+(posY+1)+",0";
 		stringKey[5] = (posX) +","+(posY-1)+",0";
-		stringKey[6] = (posX-1) +","+(posY)+",0";
+		stringKey[6] = (posX+1) +","+(posY)+",0";
 
 		stringKey[7] = (posX-2)+","+(posY)+",0";
 		stringKey[8] = (posX-2)+","+(posY-1)+",0";

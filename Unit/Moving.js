@@ -241,9 +241,10 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 					updateDataMove.TimeFinishMove = null;
 					updateDataMove.Status = 6;
 					// updateDataMove.Server_ID = parseInt(stringKey.split("_")[0])
+					functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase=>attackFunc.CheckAttackPosition stringKey,updateDataMove.Position_Cell',[stringKey,updateDataMove.Position_Cell]);
 					// attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell);
 
-					functions.ShowLog(functions.ShowLogBool.Off,'Moving.js setTimerUpdateDatabase updateDataMove.Server_ID',[updateDataMove.Server_ID]);
+					
 					positionAdd.AddPosition(updateDataMove);
 				}
 
