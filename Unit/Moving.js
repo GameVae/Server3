@@ -244,9 +244,17 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 
 					// updateDataMove.Server_ID = parseInt(stringKey.split("_")[0])
 					functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase=>attackFunc.CheckAttackPosition stringKey,updateDataMove.Position_Cell',[stringKey,updateDataMove.Position_Cell]);
-					// attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell);
+					var attackBool = true;
+										
+					if (updateDataMove.Attack_Unit_ID==null) {attackBool = false;}
+					if (updateDataMove.Attack_Unit_ID=='null') {attackBool = false;}
+					if (updateDataMove.Attack_Unit_ID=='NULL') {attackBool = false;}
 
-					
+					if (attackBool == true) {
+						attackFunc.SetAttackData(io,data.Server_ID,updateDataMove.Attack_Unit_ID,stringKey)
+					}else{
+						attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell);
+					}
 					positionAdd.AddPosition(updateDataMove);
 				}
 

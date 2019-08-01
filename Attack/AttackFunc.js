@@ -245,6 +245,14 @@ function clearAttackUnit (io,stringUnit) {
 	})	
 }
 
+function removeValue (stringHkey,stringKey,rows,ID_Key) {
+	var stringReplace = rows.replace(ID_Key+"/","");
+	client.hset(stringHkey,stringKey,stringReplace);
+	if (stringReplace.length==0) {
+		client.hdel(stringHkey,stringKey);
+	}
+}
+
 // exports.ClearAttackUnit = function clearAttackUnit2 (io,ID_User_Attack) {
 // 	functions.ShowLog(functions.ShowLogBool.On,'AttackFunc.js ClearAttackUnit ID_User_Attack',[ID_User_Attack]);
 
