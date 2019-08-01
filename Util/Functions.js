@@ -26,9 +26,9 @@ var redisData = {
 	TestUnit : 2,
 	Server: 2,
 }
-var redis 				= require("redis"),
-client 					= redis.createClient();
-client.select(redisData.TestUnit);
+// var redis 				= require("redis"),
+// client 					= redis.createClient();
+// client.select(redisData.TestUnit);
 
 exports.CaseClearAttack ={
 	Full 		:1,
@@ -64,6 +64,7 @@ var showLogBool = {
 	Off: 0,
 	On: 1,
 	Error: 2,
+	Check: 3,
 }
 
 exports.Test = function(para){
@@ -94,9 +95,15 @@ exports.ShowLog = function showLog (showBool,stringContent,param) {
 			if (err) throw err;
 		});
 		break;
+		case showLogBool.Check:
+		console.log('\x1b[34m%s\x1b[0m',"\n"+new Date()+": "+stringContent,param+"\n")
+	
+		break;
 	}
 }
-exports.AddValue = addValue;
+exports.AddValue = function (stringHKey,stringKey,stringAdd) {
+	addValue (stringHKey,stringKey,stringAdd)
+};
 function addValue (stringHKey,stringKey,stringAdd) {
 	client.hget(stringHKey,stringKey,function (error,rows) {
 		if (rows!=null) {

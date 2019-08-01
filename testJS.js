@@ -1,68 +1,67 @@
+// var data={
+// 	Server_ID : 1,
+// 	ID_Unit: 16,
+// 	ID_User: 9,
+// 	Position_Cell: '295,4,0',
+// 	ID: 32
+// }
 
-var data={
-	Server_ID : 1,
-	ID_Unit: 16,
-	ID_User: 9,
-	Position_Cell: '295,4,0',
-	ID: 32
-}
+// unitRange1 (data)
 
-unitRange1 (data)
+// function unitRange1 (data) {
+// 	// console.log('\x1b[33m%s\x1b[0m',data)
+// 	var posCenter = data.Position_Cell;;
+// 	var posX = parseInt(posCenter.split(",")[0]);
+// 	var posY = parseInt(posCenter.split(",")[1]);
 
-function unitRange1 (data) {
-	// console.log('\x1b[33m%s\x1b[0m',data)
-	var posCenter = data.Position_Cell;;
-	var posX = parseInt(posCenter.split(",")[0]);
-	var posY = parseInt(posCenter.split(",")[1]);
+// 	var stringHkey = "s"+data.Server_ID+"_pos";
+// 	var stringKey = [];
+// 	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
+// 	// console.log('\x1b[33m%s\x1b[0m',ID_Key)
+// 	stringKey[0] = data.Position_Cell;
 
-	var stringHkey = "s"+data.Server_ID+"_pos";
-	var stringKey = [];
-	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	// console.log('\x1b[33m%s\x1b[0m',ID_Key)
-	stringKey[0] = data.Position_Cell;
-
-	// if (posY%2==0) {
-	// 	//even
-	// 	stringKey[1] = (posX-1) +","+posY+",0";
-	// 	stringKey[2] = (posX-1) +","+(posY-1)+",0";
-	// 	stringKey[3] = (posX-1) +","+(posY+1)+",0";
-	// 	stringKey[4] = (posX) +","+(posY+1)+",0";
-	// 	stringKey[5] = (posX) +","+(posY-1)+",0";
-	// 	stringKey[6] = (posX-1) +","+(posY)+",0";
-	// }else{
-	// 	//odd
+// 	// if (posY%2==0) {
+// 	// 	//even
+// 	// 	stringKey[1] = (posX-1) +","+posY+",0";
+// 	// 	stringKey[2] = (posX-1) +","+(posY-1)+",0";
+// 	// 	stringKey[3] = (posX-1) +","+(posY+1)+",0";
+// 	// 	stringKey[4] = (posX) +","+(posY+1)+",0";
+// 	// 	stringKey[5] = (posX) +","+(posY-1)+",0";
+// 	// 	stringKey[6] = (posX-1) +","+(posY)+",0";
+// 	// }else{
+// 	// 	//odd
 
 
-	// 	stringKey[1] = (posX-1)+","+(posY)+",0";
-	// 	stringKey[2] = (posX)+","+(posY-1)+",0";
-	// 	stringKey[3] = (posX)+","+(posY+1)+",0";
-	// 	stringKey[4] = (posX+1)+","+(posY-1)+",0";
-	// 	stringKey[5] = (posX+1)+","+(posY+1)+",0";
-	// 	stringKey[6] = (posX+1)+","+(posY)+",0";
-	// }
+// 	// 	stringKey[1] = (posX-1)+","+(posY)+",0";
+// 	// 	stringKey[2] = (posX)+","+(posY-1)+",0";
+// 	// 	stringKey[3] = (posX)+","+(posY+1)+",0";
+// 	// 	stringKey[4] = (posX+1)+","+(posY-1)+",0";
+// 	// 	stringKey[5] = (posX+1)+","+(posY+1)+",0";
+// 	// 	stringKey[6] = (posX+1)+","+(posY)+",0";
+// 	// }
 
-	if (posY%2==0) {
-		//even
-		stringKey[1] = (posX-1)+","+(posY)+",0";
-		stringKey[2] = (posX)+","+(posY-1)+",0";
-		stringKey[3] = (posX)+","+(posY+1)+",0";
-		stringKey[4] = (posX+1)+","+(posY-1)+",0";
-		stringKey[5] = (posX+1)+","+(posY+1)+",0";
-		stringKey[6] = (posX+1)+","+(posY)+",0";
-	}else{
-		//odd
-		stringKey[1] = (posX-1) +","+posY+",0";
-		stringKey[2] = (posX-1) +","+(posY-1)+",0";
-		stringKey[3] = (posX-1) +","+(posY+1)+",0";
-		stringKey[4] = (posX) +","+(posY+1)+",0";
-		stringKey[5] = (posX) +","+(posY-1)+",0";
-		stringKey[6] = (posX+1) +","+(posY)+",0";	
-	}
-	console.log(stringKey)
-	// for (var i = 0; i < stringKey.length; i++) {
-	// 	checkValue (stringHkey,stringKey[i],ID_Key);
-	// }
-}
+// 	if (posY%2==0) {
+// 		//even
+// 		stringKey[1] = (posX-1)+","+(posY)+",0";
+// 		stringKey[2] = (posX)+","+(posY-1)+",0";
+// 		stringKey[3] = (posX)+","+(posY+1)+",0";
+// 		stringKey[4] = (posX+1)+","+(posY-1)+",0";
+// 		stringKey[5] = (posX+1)+","+(posY+1)+",0";
+// 		stringKey[6] = (posX+1)+","+(posY)+",0";
+// 	}else{
+// 		//odd
+// 		stringKey[1] = (posX-1) +","+posY+",0";
+// 		stringKey[2] = (posX-1) +","+(posY-1)+",0";
+// 		stringKey[3] = (posX-1) +","+(posY+1)+",0";
+// 		stringKey[4] = (posX) +","+(posY+1)+",0";
+// 		stringKey[5] = (posX) +","+(posY-1)+",0";
+// 		stringKey[6] = (posX+1) +","+(posY)+",0";	
+// 	}
+// 	console.log(stringKey)
+// 	// for (var i = 0; i < stringKey.length; i++) {
+// 	// 	checkValue (stringHkey,stringKey[i],ID_Key);
+// 	// }
+// }
 
 
 
@@ -92,23 +91,50 @@ function unitRange1 (data) {
 // var result = st.split("/").filter(String)
 // console.log(result)
 
-// var redis = require("redis"),
-// client = redis.createClient();
-// client.select(2)
-// var Promise = require('promise');
-// test ()
-// function test () {
-// 	new Promise((resolve,reject)=>{
-// 		client.hset('s1_attack','1_16_43_844','1_16_42_552/')
-// 		resolve()
-// 	}).then(()=>{
-// 		return new Promise((resolve,reject)=>{
-// 			client.hget('s1_attack','1_16_43_844',function (error,rows) {
-// 				console.log(rows)
-// 			})
-// 		})
-// 	})
-// }
+var redis = require("redis"),
+client = redis.createClient();
+client.select(2)
+var Promise = require('promise');
+
+test (1,'1_16_43_854','1_16_44_822')
+function test (Server_ID,ID_Defend,ID_Attack) {
+	
+	stringHAttack = "s"+Server_ID+"_attack";
+	stringHUnit = "s"+Server_ID+"_unit";
+	// console.log(Server_ID,ID_Defend,ID_Attack)
+	var defendAliveBool = false;
+	var attackAliveBool = false;
+	var resultUpdate = {};
+	
+	var dataUser = []
+	dataUser.push(ID_Defend);
+	dataUser.push(ID_Attack);
+	var dataDefend={};	
+	var dataAttack={};
+
+	new Promise((resolve,reject)=>{
+	
+		client.hmget(stringHUnit,dataUser,function (error,rows){
+			if (rows[0]!=null) {
+				defendAliveBool = true;
+				dataDefend = JSON.parse(rows[0]);
+				dataDefend.AttackedBool = 1;
+			}
+			if (rows[1]!=null) {
+				attackAliveBool = true;
+				dataAttack = JSON.parse(rows[1]);				
+				dataAttack.Attack_Unit_ID = ID_Defend;
+				dataAttack.Status = 2;	
+			}
+			resolve()
+		});
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{			
+			client.hmset(stringHUnit,ID_Defend,JSON.stringify(dataDefend),ID_Attack,JSON.stringify(dataAttack));
+			resolve();
+		});		
+	})
+}
 
 // client.hmget('s1_unit','1_16_43_824',function (error,rows) {
 // 	console.log(rows)

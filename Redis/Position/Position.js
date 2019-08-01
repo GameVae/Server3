@@ -101,9 +101,8 @@ function checkValue (stringHkey,stringKey,ID_Key) {
 
 function addValue (stringHkey,stringKey,data,ID_Key) {
 	// console.log(stringHkey,stringKey,data,ID_Key)
-	if (data!="") {functions.ShowLog(functions.ShowLogBool.Off,'Position.js addValue stringHkey,stringKey,data null,ID_Key',[stringHkey,stringKey,data,ID_Key])}
-
-		client.hset(stringHkey,stringKey,data+ID_Key+"/");
+	if (data!="") {functions.ShowLog(functions.ShowLogBool.Off,'Position.js addValue stringHkey,stringKey,data null,ID_Key',[stringHkey,stringKey,data,ID_Key]);}
+	client.hset(stringHkey,stringKey,data+ID_Key+"/");
 }
 
 function unitRange2 (data) {

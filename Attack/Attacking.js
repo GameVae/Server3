@@ -30,13 +30,13 @@ client.select(functions.RedisData.TestUnit);
 
 var dataAttack = 
 { Server_ID: '1',
-  ID_Attack: '54',
-  ID_Unit_Attack: '16',
-  ID_User_Attack: '42',
-  ID_Defend: '43',
-  ID_Unit_Defend: '16',
-  ID_User_Defend: '9',
-  Position_Cell_Attacker: '12,5,0' }
+ID_Attack: '54',
+ID_Unit_Attack: '16',
+ID_User_Attack: '42',
+ID_Defend: '43',
+ID_Unit_Defend: '16',
+ID_User_Defend: '9',
+Position_Cell_Attacker: '12,5,0' }
 
 //
 exports.Start = function start (io) {
@@ -60,15 +60,17 @@ function S_ATTACK (io,data) {
 	stringKeyDefend = Server_ID+"_"+data.ID_Unit_Defend+"_"+data.ID_User_Defend+"_"+data.ID_Defend;
 	stringHUnit = "s"+Server_ID+"_unit";
 
-	new Promise((resolve,reject)=>{
-		attackFunc.SetAttackData(Server_ID,stringKeyDefend,stringKeyAttack);
-		resolve();
-	}).then(()=>new Promise((resolve,reject)=>{
-		attackFunc.AttackInterval(io,Server_ID,stringKeyDefend);
-		checkUnitDefend (io,stringKeyAttack,stringKeyDefend,data.Position_Cell_Attacker);
-		resolve();
-	})
-	)
+	functions.ShowLog(functions.ShowLogBool.On,'Attacking.js S_ATTACK=>attackFunc.setAttackData Server_ID,stringKeyDefend,stringKeyAttack',[Server_ID,stringKeyDefend,stringKeyAttack]);
+	attackFunc.SetAttackData(io,Server_ID,stringKeyDefend,stringKeyAttack);
+	// new Promise((resolve,reject)=>{
+	// 	attackFunc.SetAttackData(io,Server_ID,stringKeyDefend,stringKeyAttack);
+	// 	resolve();
+	// }).then(()=>new Promise((resolve,reject)=>{
+	// 	attackFunc.AttackInterval(io,Server_ID,stringKeyDefend);
+	// 	// checkUnitDefend (io,stringKeyAttack,stringKeyDefend,data.Position_Cell_Attacker);
+	// 	resolve();
+	// })
+	// )
 	// if (data.ID_User_Attack!=data.ID_User_Defend) {
 	// 	stringHAttack = "s"+data.Server_ID+"_attack";
 	// 	stringKeyAttack = data.Server_ID+"_"+data.ID_Unit_Attack+"_"+data.ID_User_Attack+"_"+data.ID_Attack;
@@ -119,8 +121,8 @@ function checkUnitDefend (io,stringKeyAttack,stringKeyDefend,Position_Cell_Attac
 		if (result.Status==functions.UnitStatus.Standby||
 			result.Status==functions.UnitStatus.Attack_Unit&&result.Attack_Unit_ID==stringKeyAttack) {
 			counterUnitDefend(io,stringKeyAttack,stringKeyDefend,Position_Cell_Attacker);
-		}
-	})
+	}
+})
 }
 
 exports.Test = function (ar) {

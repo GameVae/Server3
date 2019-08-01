@@ -56,9 +56,12 @@ exports.Start = function start (io) {
 			// clearMoveAttackTimeout (stringUnit);	
 			stringHMovingAttack = "s"+dataMoveAttack.Server_ID+"_movingAttack";	
 
+
+
+
 			new Promise((resolve,reject)=>{
-				functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js Start=>clearAttackUnit stringUnit',[stringUnit]);
-				attackFunc.ClearAttackUnit (io,stringUnit);
+				// functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js Start=>clearAttackUnit stringUnit',[stringUnit]);
+				// attackFunc.ClearAttackUnit (io,stringUnit);
 				resolve();
 			}).then(()=>{
 				return new Promise((resolve,reject)=>{
@@ -87,6 +90,7 @@ exports.Start = function start (io) {
 
 		})
 	})
+	
 }
 
 exports.CheckMovePos = function (io,data,stringKey) {
