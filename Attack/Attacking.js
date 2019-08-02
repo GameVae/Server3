@@ -59,9 +59,24 @@ function S_ATTACK (io,data) {
 	stringKeyAttack = Server_ID+"_"+data.ID_Unit_Attack+"_"+data.ID_User_Attack+"_"+data.ID_Attack;
 	stringKeyDefend = Server_ID+"_"+data.ID_Unit_Defend+"_"+data.ID_User_Defend+"_"+data.ID_Defend;
 	stringHUnit = "s"+Server_ID+"_unit";
+	stringHAttack = "s"+Server_ID+"_attack";
 
+	var attackingNewUnitBool = true;
+	var oldAttackUnit,newAttackUnit;
+	var unitResult ;
 	functions.ShowLog(functions.ShowLogBool.On,'Attacking.js S_ATTACK=>attackFunc.setAttackData Server_ID,stringKeyDefend,stringKeyAttack',[Server_ID,stringKeyDefend,stringKeyAttack]);
-	attackFunc.SetAttackData(io,Server_ID,stringKeyDefend,stringKeyAttack);
+	new Promise((resolve,reject)=>{
+		attackFunc.ClearAttackUnit(io,stringKeyAttack);
+		resolve();
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			attackFunc.SetAttackData(io,Server_ID,stringKeyDefend,stringKeyAttack);
+			resolve()
+		})
+	})
+
+	
+	
 	// new Promise((resolve,reject)=>{
 	// 	attackFunc.SetAttackData(io,Server_ID,stringKeyDefend,stringKeyAttack);
 	// 	resolve();

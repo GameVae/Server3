@@ -1,3 +1,14 @@
+var db_position =  require('./Util/Database/Db_position.js');
+
+test ()
+function test () {
+	// var stringUpdate = "UPDATE `s1_unit` SET `Status`='2' WHERE `Status`='6'";
+	var stringUpdate = "UPDATE `s1_unit` SET `Status`='6' WHERE `Status`='2'";
+	db_position.query(stringUpdate,function (error,rows,result) {
+		console.log(rows)
+	})
+}
+
 // var data={
 // 	Server_ID : 1,
 // 	ID_Unit: 16,
@@ -89,52 +100,58 @@
 // }
 // var st = '1_16_44_527/1_16_44_505/1_16_44_504/1_16_43_575/'
 // var result = st.split("/").filter(String)
-// console.log(result)
+// test(result)
 
-var redis = require("redis"),
-client = redis.createClient();
-client.select(2)
-var Promise = require('promise');
+// function test (arr) {
+// 	arr.forEach( function(unit, index) {
+// 		// console.log(unit)
+// 		console.log(result[index])
+// 	});
+// }
+// var redis = require("redis"),
+// client = redis.createClient();
+// client.select(2)
+// var Promise = require('promise');
 
-test (1,'1_16_43_854','1_16_44_822')
-function test (Server_ID,ID_Defend,ID_Attack) {
+// test (1,'1_16_43_854','1_16_44_822')
+// function test (Server_ID,ID_Defend,ID_Attack) {
 	
-	stringHAttack = "s"+Server_ID+"_attack";
-	stringHUnit = "s"+Server_ID+"_unit";
-	// console.log(Server_ID,ID_Defend,ID_Attack)
-	var defendAliveBool = false;
-	var attackAliveBool = false;
-	var resultUpdate = {};
+// 	stringHAttack = "s"+Server_ID+"_attack";
+// 	stringHUnit = "s"+Server_ID+"_unit";
+// 	// console.log(Server_ID,ID_Defend,ID_Attack)
+// 	var defendAliveBool = false;
+// 	var attackAliveBool = false;
+// 	var resultUpdate = {};
 	
-	var dataUser = []
-	dataUser.push(ID_Defend);
-	dataUser.push(ID_Attack);
-	var dataDefend={};	
-	var dataAttack={};
+// 	var dataUser = []
+// 	dataUser.push(ID_Defend);
+// 	dataUser.push(ID_Attack);
+// 	var dataDefend={};	
+// 	var dataAttack={};
 
-	new Promise((resolve,reject)=>{
+// 	new Promise((resolve,reject)=>{
 	
-		client.hmget(stringHUnit,dataUser,function (error,rows){
-			if (rows[0]!=null) {
-				defendAliveBool = true;
-				dataDefend = JSON.parse(rows[0]);
-				dataDefend.AttackedBool = 1;
-			}
-			if (rows[1]!=null) {
-				attackAliveBool = true;
-				dataAttack = JSON.parse(rows[1]);				
-				dataAttack.Attack_Unit_ID = ID_Defend;
-				dataAttack.Status = 2;	
-			}
-			resolve()
-		});
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{			
-			client.hmset(stringHUnit,ID_Defend,JSON.stringify(dataDefend),ID_Attack,JSON.stringify(dataAttack));
-			resolve();
-		});		
-	})
-}
+// 		client.hmget(stringHUnit,dataUser,function (error,rows){
+// 			if (rows[0]!=null) {
+// 				defendAliveBool = true;
+// 				dataDefend = JSON.parse(rows[0]);
+// 				dataDefend.AttackedBool = 1;
+// 			}
+// 			if (rows[1]!=null) {
+// 				attackAliveBool = true;
+// 				dataAttack = JSON.parse(rows[1]);				
+// 				dataAttack.Attack_Unit_ID = ID_Defend;
+// 				dataAttack.Status = 2;	
+// 			}
+// 			resolve()
+// 		});
+// 	}).then(()=>{
+// 		return new Promise((resolve,reject)=>{			
+// 			client.hmset(stringHUnit,ID_Defend,JSON.stringify(dataDefend),ID_Attack,JSON.stringify(dataAttack));
+// 			resolve();
+// 		});		
+// 	})
+// }
 
 // client.hmget('s1_unit','1_16_43_824',function (error,rows) {
 // 	console.log(rows)

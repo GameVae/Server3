@@ -59,6 +59,7 @@ exports.ShowLogBool = {
 	Off: 0,
 	On: 1,
 	Error: 2,
+	Check: 3,
 }
 var showLogBool = {
 	Off: 0,
