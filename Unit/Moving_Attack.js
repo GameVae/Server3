@@ -57,7 +57,7 @@ exports.Start = function start (io) {
 			stringHMovingAttack = "s"+dataMoveAttack.Server_ID+"_movingAttack";	
 
 			new Promise((resolve,reject)=>{
-				// functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js Start=>clearAttackUnit stringUnit',[stringUnit]);
+				functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js Start=>attackFunc.ClearAttackUnit stringUnit',[stringUnit]);
 				attackFunc.ClearAttackUnit (io,stringUnit);
 				resolve();
 			}).then(()=>{

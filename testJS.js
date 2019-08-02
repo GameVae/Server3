@@ -3,10 +3,18 @@ var db_position =  require('./Util/Database/Db_position.js');
 test ()
 function test () {
 	// var stringUpdate = "UPDATE `s1_unit` SET `Status`='2' WHERE `Status`='6'";
-	var stringUpdate = "UPDATE `s1_unit` SET `Status`='6' WHERE `Status`='2'";
-	db_position.query(stringUpdate,function (error,rows,result) {
-		console.log(rows)
-	})
+	// var stringUpdate = "UPDATE `s1_unit` SET `Status`='6' WHERE `Status`='2'";
+	// db_position.query(stringUpdate,function (error,rows,result) {
+	// 	console.log(rows)
+	// })
+	var stringQuery = "SELECT * FROM `s1_unit` WHERE `ID`='882'"
+		db_position.query(stringQuery,function (error,rows) {
+			
+			if (rows[0]!=null) {
+				var result = rows[0]
+				console.log(result.Attack_Unit_ID)
+			}
+		})
 }
 
 // var data={

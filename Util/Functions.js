@@ -60,12 +60,14 @@ exports.ShowLogBool = {
 	On: 1,
 	Error: 2,
 	Check: 3,
+	Clear: 4
 }
 var showLogBool = {
 	Off: 0,
 	On: 1,
 	Error: 2,
 	Check: 3,
+	Clear: 4
 }
 
 exports.Test = function(para){
@@ -99,6 +101,21 @@ exports.ShowLog = function showLog (showBool,stringContent,param) {
 		case showLogBool.Check:
 		console.log('\x1b[34m%s\x1b[0m',"\n"+new Date()+": "+stringContent,param+"\n")
 	
+		break;
+		case showLogBool.Clear:
+
+		var nullBool = false;
+		for (var i = 0; i < param.length; i++) {
+			if(param[i]==null||param[i]==undefined||param[i].length==0){
+				nullBool = true;
+				break;
+			}
+		}
+		if (nullBool == true) {
+			console.log('\x1b[33m%s\x1b[0m',"\n"+new Date()+": "+stringContent,param+"\n")
+		}else{
+			// console.log(new Date()+": "+"\n"+stringContent,param+"\n")
+		}		
 		break;
 	}
 }

@@ -20,9 +20,16 @@ getUnitMight (client);
 unitData.GetUnitData(client,1);
 
 clearMovingAttackData (1)
+clearMoveData(1)
 function clearMovingAttackData (server_ID) {
 	var stringHMovingAttack = "s"+server_ID+"_movingAttack";
 	client.del(stringHMovingAttack,function (error) {
+		if(!!error){console.log(error);}
+	});
+}
+function clearMoveData (server_ID) {
+	var stringHMove = "s"+server_ID+"_move";
+	client.del(stringHMove,function (error) {
 		if(!!error){console.log(error);}
 	});
 }

@@ -56,69 +56,44 @@ function S_ATTACK (io,data) {
 	Server_ID = data.Server_ID;
 
 	stringHAttack = "s"+Server_ID+"_attack";
-	stringKeyAttack = Server_ID+"_"+data.ID_Unit_Attack+"_"+data.ID_User_Attack+"_"+data.ID_Attack;
+	stringKeyAttack = Server_ID+"_"+data.ID_Unit_Attack+"_"+data.ID_User_Attack+"_"+data.ID_Attack;//unit bản thân
 	stringKeyDefend = Server_ID+"_"+data.ID_Unit_Defend+"_"+data.ID_User_Defend+"_"+data.ID_Defend;
 	stringHUnit = "s"+Server_ID+"_unit";
 	stringHAttack = "s"+Server_ID+"_attack";
 
-	var attackingNewUnitBool = true;
-	var oldAttackUnit,newAttackUnit;
+	var attackingNewUnitBool = false;
+	
 	var unitResult ;
 	functions.ShowLog(functions.ShowLogBool.On,'Attacking.js S_ATTACK=>attackFunc.setAttackData Server_ID,stringKeyDefend,stringKeyAttack',[Server_ID,stringKeyDefend,stringKeyAttack]);
+	// new Promise((resolve,reject)=>{
+	// 	attackFunc.ClearAttackUnit(io,stringKeyAttack);
+	// 	resolve();
+	// }).then(()=>{
+	// 	return new Promise((resolve,reject)=>{
+	// 		attackFunc.SetAttackData(io,Server_ID,stringKeyDefend,stringKeyAttack);
+	// 		resolve()
+	// 	})
+	// })
+
 	new Promise((resolve,reject)=>{
-		attackFunc.ClearAttackUnit(io,stringKeyAttack);
-		resolve();
+		client.hget(stringHAttack,stringKeyDefend,function (error,rows) {
+			var arrayUnitAttacking = rows.split("/").fliter(String);
+			if (!arrayUnitAttacking.includes(stringKeyAttack)) {
+				attackingNewUnitBool = true;
+				attackFunc.ClearAttackUnit(io,stringKeyAttack);				
+			}
+			resolve();
+		})
+		
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
-			attackFunc.SetAttackData(io,Server_ID,stringKeyDefend,stringKeyAttack);
+			if (attackingNewUnitBool==true) {
+				attackFunc.SetAttackData(io,Server_ID,stringKeyDefend,stringKeyAttack);
+			}			
 			resolve()
 		})
 	})
 
-	
-	
-	// new Promise((resolve,reject)=>{
-	// 	attackFunc.SetAttackData(io,Server_ID,stringKeyDefend,stringKeyAttack);
-	// 	resolve();
-	// }).then(()=>new Promise((resolve,reject)=>{
-	// 	attackFunc.AttackInterval(io,Server_ID,stringKeyDefend);
-	// 	// checkUnitDefend (io,stringKeyAttack,stringKeyDefend,data.Position_Cell_Attacker);
-	// 	resolve();
-	// })
-	// )
-	// if (data.ID_User_Attack!=data.ID_User_Defend) {
-	// 	stringHAttack = "s"+data.Server_ID+"_attack";
-	// 	stringKeyAttack = data.Server_ID+"_"+data.ID_Unit_Attack+"_"+data.ID_User_Attack+"_"+data.ID_Attack;
-	// 	stringKeyDefend = data.Server_ID+"_"+data.ID_Unit_Defend+"_"+data.ID_User_Defend+"_"+data.ID_Defend;
-	// 	var checkBoolFriendData = false;
-	// 	var checkBoolGuildData = false;
-	// 	new Promise((resolve,reject)=>{
-	// 		friendData.CheckFriendData (data.ID_Attack,data.ID_Defend,function (returnBool) {
-	// 			checkBoolFriendData =returnBool;
-	// 			resolve();
-	// 		})
-	// 	}).then(()=>new Promise((resolve,reject)=>{
-	// 		guildData.CheckSameGuildID (data.ID_User_Attack,data.ID_User_Defend,function (returnBool) {
-	// 			checkBoolGuildData = returnBool;
-	// 			resolve();
-	// 		})						
-	// 	}).then(()=>new Promise((resolve,reject)=>{
-	// 		// console.log(checkBoolFriendData,checkBoolGuildData)
-	// 		if (checkBoolFriendData==false&&checkBoolGuildData==false) {
-	// 		//var ID_Defend = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
-	// 		attackFunc.SetAttackData(data.Server_ID,stringKeyDefend,stringKeyAttack);
-	// 		resolve();
-	// 	}
-	// }).then(()=>{
-
-	// 	attackFunc.AttackInterval(io,data.Server_ID,stringKeyDefend)
-	// 	// console.log(stringKeyAttack,stringKeyDefend,data.Position_Cell_Attacker)
-	// 	checkUnitDefend (io,stringKeyAttack,stringKeyDefend,data.Position_Cell_Attacker);
-	// })
-	// ))
-	// }else{
-	// 	console.log('same user')
-	// }
 }
 // #end: S_ATTACK
 
