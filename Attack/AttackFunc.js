@@ -1386,7 +1386,7 @@ exports.CheckAttackPosition = function (io,stringUnit,pos,attackingUnit) {
 }
 
 function checkAttackPosition (io,stringUnit,pos,attackingUnit) {
-	functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition stringUnit,pos,attackingUnit',[stringUnit,pos,attackingUnit]);
+	functions.ShowLog(functions.ShowLogBool.Check,'AttackFunc.js checkAttackPosition stringUnit,pos,attackingUnit',[stringUnit,pos,attackingUnit]);
 
 	var arrayUnitInPos = [], tempListUnitInPos = [], listUnitAttacking = [];
 
@@ -1394,7 +1394,10 @@ function checkAttackPosition (io,stringUnit,pos,attackingUnit) {
 	var ID_User = stringUnit.split("_")[2];
 
 	var getAttackBool = false;
+	var checkAttackBool = false;
+	var checkDefendBool = false;
 	var defendingUnit;
+	var resultUnit;
 
 	stringHUnit = "s"+Server_ID+"_unit";
 	stringHAttack = "s"+Server_ID+"_attack";
@@ -1404,18 +1407,94 @@ function checkAttackPosition (io,stringUnit,pos,attackingUnit) {
 
 	functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition returnPosArray',[returnPosArray]);
 
-	functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition hget stringHAttack,stringUnit',[stringHAttack,stringUnit]);
-	client.hget(stringHAttack,stringUnit,function (error,rows) {
-		if (rows!=null) {
-			listUnitAttacking = rows.split("/").filter(String);
-			functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition=>getAttackedUnit stringUnit,pos,listUnitAttacking,returnPosArray',[stringUnit,pos,listUnitAttacking,returnPosArray]);
-			getAttackedUnit(io,stringUnit,pos,listUnitAttacking,returnPosArray,attackingUnit)
-		}else {
-			functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition=>getUnitAttackInPos stringUnit,pos,returnPosArray',[stringUnit,pos,returnPosArray]);
-			getUnitAttackInPos(io,stringUnit,pos,returnPosArray,attackingUnit)
-		}
+	
+	new Promise((resolve,reject)=>{	
+		functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition hget stringUnit',[stringUnit]);
+		client.hget(stringHUnit,stringUnit,function (error,rows) {
+			if (rows!=null) {
+				resultUnit = JSON.parse(rows)	
+			}
+			resolve();
+		})
+	}).then(()=>{
+		functions.ShowLog(functions.ShowLogBool.Check,'AttackFunc.js checkAttackPosition hget resultUnit.Attack_Unit_ID,resultUnit.Attack_Unit_ID.length',[resultUnit.Attack_Unit_ID,resultUnit.Attack_Unit_ID.length]);
+		return new Promise((resolve,reject)=>{		
+			if (resultUnit.Attack_Unit_ID.length>5) {	
+				client.hget(stringHAttack,resultUnit.Attack_Unit_ID,function (error,rows) {
+					if (rows!=null) {
+						var listUnitAttacking = rows.split("_").filter(String);
+						if (!listUnitAttacking.includes(stringUnit)) {
+							checkAttackBool = true;
+						}
+					}else {
+						checkAttackBool = true;
+					}
 
+					resolve();
+				})
+			}else{
+				resolve();
+			}
+		})
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			client.hmget(stringHPos,returnPosArray,function (error,rows) {
+				if (rows!=null) {
+					for (var i = 0; i < rows.length; i++) {
+						if (rows[i]!=null) {
+							var arrayUnit = rows[i].split("/").filter(String);
+							if (arrayUnit.includes(resultUnit.Attack_Unit_ID)) {
+								checkDefendBool=true;
+								break;
+							}
+						}
+						
+					}
+				}
+				resolve();
+			})
+		})
+	}).then(()=>{
+
+		return new Promise((resolve,reject)=>{
+			if (checkDefendBool==true&&checkAttackBool==true){
+				functions.ShowLog(functions.ShowLogBool.Check,'AttackFunc.js checkAttackPosition=>setAttackData Server_ID,resultUnit.Attack_Unit_ID,stringUnit',[Server_ID,resultUnit.Attack_Unit_ID,stringUnit]);
+				setAttackData(io,Server_ID,resultUnit.Attack_Unit_ID,stringUnit);	
+			}
+			resolve();
+		})
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			if (checkAttackBool==false) {
+				client.hget(stringHAttack,stringUnit,function (error,rows) {
+					if (rows!=null) {
+						listUnitAttacking = rows.split("/").filter(String);
+						functions.ShowLog(functions.ShowLogBool.Check,'AttackFunc.js checkAttackPosition=>getAttackedUnit stringUnit,pos,listUnitAttacking,returnPosArray',[stringUnit,pos,listUnitAttacking,returnPosArray]);
+						getAttackedUnit(io,stringUnit,pos,listUnitAttacking,returnPosArray,attackingUnit);
+					}else{
+						functions.ShowLog(functions.ShowLogBool.Check,'AttackFunc.js checkAttackPosition=>getUnitAttackInPos stringUnit,pos,returnPosArray',[stringUnit,pos,returnPosArray]);
+						getUnitAttackInPos(io,stringUnit,pos,returnPosArray,attackingUnit);
+					}
+				})
+			}
+			resolve();
+
+		})
 	})
+
+
+
+	// client.hget(stringHAttack,stringUnit,function (error,rows) {
+	// 	if (rows!=null) {
+	// 		listUnitAttacking = rows.split("/").filter(String);
+	// 		functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition=>getAttackedUnit stringUnit,pos,listUnitAttacking,returnPosArray',[stringUnit,pos,listUnitAttacking,returnPosArray]);
+	// 		getAttackedUnit(io,stringUnit,pos,listUnitAttacking,returnPosArray,attackingUnit)
+	// 	}else {
+	// 		functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition=>getUnitAttackInPos stringUnit,pos,returnPosArray',[stringUnit,pos,returnPosArray]);
+	// 		getUnitAttackInPos(io,stringUnit,pos,returnPosArray,attackingUnit)
+	// 	}
+
+	// })
 
 }
 

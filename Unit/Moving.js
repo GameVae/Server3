@@ -100,7 +100,7 @@ function R_MOVE (io,Server_ID,stringKMove,stringUnit) {
 function sendToClient (io,stringKMove,socketID,stringUnit) {
 	
 	
-	functions.ShowLog(functions.ShowLogBool.Check,'Moving.js sendToClient stringKMove socketID',[stringKeyMove,socketID])
+	functions.ShowLog(functions.ShowLogBool.Clear,'Moving.js sendToClient stringKMove socketID',[stringKeyMove,socketID])
 	client.hget(stringKMove,stringUnit,function (error,rowData) {
 		io.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
 	})
@@ -253,19 +253,36 @@ function setTimerUpdateDatabase (io,socket,data,stringKey) {
 					updateDataMove.TimeFinishMove = null;
 					updateDataMove.Status = 6;
 
+					attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell,null);
+
 					// updateDataMove.Server_ID = parseInt(stringKey.split("_")[0])
-					functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase=>attackFunc.CheckAttackPosition stringKey,updateDataMove.Position_Cell',[stringKey,updateDataMove.Position_Cell]);
-					var attackBool = true;
+					// functions.ShowLog(functions.ShowLogBool.On,'Moving.js setTimerUpdateDatabase=>attackFunc.CheckAttackPosition stringKey,updateDataMove.Position_Cell',[stringKey,updateDataMove.Position_Cell]);
+					// var attackBool = true;
 
-					if (updateDataMove.Attack_Unit_ID==null) {attackBool = false;}
-					if (updateDataMove.Attack_Unit_ID=='null') {attackBool = false;}
-					if (updateDataMove.Attack_Unit_ID=='NULL') {attackBool = false;}
+					// if (updateDataMove.Attack_Unit_ID==null) {attackBool = false;}
+					// if (updateDataMove.Attack_Unit_ID=='null') {attackBool = false;}
+					// if (updateDataMove.Attack_Unit_ID=='NULL') {attackBool = false;}
 
-					if (attackBool == true) {
-						attackFunc.SetAttackData(io,data.Server_ID,updateDataMove.Attack_Unit_ID,stringKey)
-					}else{
-						attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell,null);
-					}
+					// if (attackBool == true) {
+					// 	attackFunc.SetAttackData(io,updateDataMove.Server_ID,updateDataMove.Attack_Unit_ID,stringKey)
+					// }else{
+					// 	attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell,null);
+					// }
+					// functions.ShowLog(functions.ShowLogBool.Check,'Moving.js setTimerUpdateDatabase=>checkAttack updateDatabase.Attack_Unit_ID',[updateDatabase.Attack_Unit_ID]);
+					// if (updateDatabase.Attack_Unit_ID.length>6) {
+					// 	functions.ShowLog(functions.ShowLogBool.Check,'Moving.js setTimerUpdateDatabase=>checkAttack updateDatabase.Attack_Unit_ID.length',[updateDatabase.Attack_Unit_ID.length]);
+					// 	stringHAttack = "s"+data.Server_ID+"_attack";
+					// 	client.hget(stringHAttack,updateDatabase.Attack_Unit_ID,function (error,rows) {
+					// 		if (rows!=null) {
+					// 			var listUnit = rows.split("/").filter(String);
+
+					// 		}
+							
+					// 	})
+					// }
+					
+
+
 					positionAdd.AddPosition(updateDataMove);
 				}
 

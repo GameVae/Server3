@@ -77,11 +77,14 @@ function S_ATTACK (io,data) {
 
 	new Promise((resolve,reject)=>{
 		client.hget(stringHAttack,stringKeyDefend,function (error,rows) {
-			var arrayUnitAttacking = rows.split("/").fliter(String);
-			if (!arrayUnitAttacking.includes(stringKeyAttack)) {
-				attackingNewUnitBool = true;
-				attackFunc.ClearAttackUnit(io,stringKeyAttack);				
+			if (rows!=null) {
+				var arrayUnitAttacking = rows.split("/").filter(String)
+				if (!arrayUnitAttacking.includes(stringKeyAttack)) {
+					attackingNewUnitBool = true;
+					attackFunc.ClearAttackUnit(io,stringKeyAttack);				
+				}
 			}
+			
 			resolve();
 		})
 		

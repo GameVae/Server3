@@ -1,21 +1,9 @@
-var db_position =  require('./Util/Database/Db_position.js');
+// var db_position =  require('./Util/Database/Db_position.js');
 
-test ()
-function test () {
-	// var stringUpdate = "UPDATE `s1_unit` SET `Status`='2' WHERE `Status`='6'";
-	// var stringUpdate = "UPDATE `s1_unit` SET `Status`='6' WHERE `Status`='2'";
-	// db_position.query(stringUpdate,function (error,rows,result) {
-	// 	console.log(rows)
-	// })
-	var stringQuery = "SELECT * FROM `s1_unit` WHERE `ID`='882'"
-		db_position.query(stringQuery,function (error,rows) {
-			
-			if (rows[0]!=null) {
-				var result = rows[0]
-				console.log(result.Attack_Unit_ID)
-			}
-		})
-}
+// test ()
+// function test () {
+
+// }
 
 // var data={
 // 	Server_ID : 1,
@@ -108,7 +96,7 @@ function test () {
 // }
 // var st = '1_16_44_527/1_16_44_505/1_16_44_504/1_16_43_575/'
 // var result = st.split("/").filter(String)
-// test(result)
+// console.log(result)
 
 // function test (arr) {
 // 	arr.forEach( function(unit, index) {
@@ -116,9 +104,16 @@ function test () {
 // 		console.log(result[index])
 // 	});
 // }
-// var redis = require("redis"),
-// client = redis.createClient();
-// client.select(2)
+var redis = require("redis"),
+client = redis.createClient();
+client.select(2)
+
+test ()
+function test () {
+	client.hget('s1_pos','300,9,0',function (error,rows) {
+		console.log(rows.split("/").filter(String))
+	})
+}
 // var Promise = require('promise');
 
 // test (1,'1_16_43_854','1_16_44_822')
