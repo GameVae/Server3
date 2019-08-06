@@ -114,7 +114,7 @@ function setTimeoutAddFriend (data,timeOut) {
 					var databaseTime = new Date(functions.ExportTimeDatabase(rows[0].AcceptTime)).getTime();
 					var currentTime = functions.GetTime();
 					if (databaseTime<=currentTime) {
-						console.log(data);
+						// console.log(data);
 						removeAddFriend (data.ID_User,data.ID_Player);
 						delete DictRemoveAddFriend[stringAddFriend];
 					}else{
@@ -313,11 +313,11 @@ function getFriendInfo (socket,ID_User) {
 
 	});
 }
-exports.UpdateDatabase = function () {
-	updateDatabase ();
+exports.UpdateDatabase = function (io) {
+	updateDatabase (io);
 }
 // updateDatabase ();
-function updateDatabase () {
+function updateDatabase (io) {
 	var queryString = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'all_friends' AND TABLE_NAME <> 'friends'";
 	db_friend.query(queryString,function (error,rows) {
 		if (rows!=undefined) {
@@ -325,13 +325,13 @@ function updateDatabase () {
 				tableQuery=rows[i].TABLE_NAME;
 				queryTableString = "SELECT * FROM `"+tableQuery+"`";
 				// console.log('tableQuery: '+tableQuery)
-				queryTableUpdate (queryTableString,tableQuery);				
+				queryTableUpdate (io,queryTableString,tableQuery);				
 			}
 		}
 	});
 }
 
-function queryTableUpdate (queryTableString,tableQuery) {
+function queryTableUpdate (io,queryTableString,tableQuery) {
 	db_friend.query(queryTableString,function (error,rows) {
 		if (rows!=undefined) {
 			for (var i = 0; i < rows.length; i++) {
@@ -344,14 +344,14 @@ function queryTableUpdate (queryTableString,tableQuery) {
 				}
 
 				if (rows[i].RemoveTime !=null) {
-					updateRemoveTime (rowData);
+					updateRemoveTime (io,rowData);
 				}
 			}
 		}
 	});
 }
 
-function updateAcceptTime (rowdata,tableQuery) {
+function updateAcceptTime (io,rowdata,tableQuery) {
 	var currentTime = functions.GetTime();
 	var databaseTime = new Date(functions.ExportTimeDatabase(rowdata.AcceptTime)).getTime();
 	// console.log('tableQuery: '+tableQuery)
@@ -363,7 +363,7 @@ function updateAcceptTime (rowdata,tableQuery) {
 	}
 }
 
-function updateRemoveTime (rowdata) {
+function updateRemoveTime (io,rowdata) {
 	var currentTime = functions.GetTime();
 	var databaseTime = new Date(functions.ExportTimeDatabase(rowdata.RemoveTime)).getTime();
 
@@ -373,8 +373,8 @@ function updateRemoveTime (rowdata) {
 		timeOut = databaseTime-currentTime;
 		var stringUnfriend1 = rowdata.ID_User+"_"+rowdata.ID_Player;
 		var stringUnfriend2 = rowdata.ID_Player+"_"+rowdata.ID_User;
-		deleteUnfriendData (null,stringUnfriend1,rowdata.ID_User,rowdata.ID_Player,timeOut);
-		deleteUnfriendData (null,stringUnfriend2,rowdata.ID_Player,rowdata.ID_User,timeOut);		
+		deleteUnfriendData (io,stringUnfriend1,rowdata.ID_User,rowdata.ID_Player,timeOut);
+		deleteUnfriendData (io,stringUnfriend2,rowdata.ID_Player,rowdata.ID_User,timeOut);		
 	}
 
 }

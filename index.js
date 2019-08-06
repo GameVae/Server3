@@ -56,7 +56,7 @@ training.UpdateDatabase(1);
 var info 					= require('./Info/GetInfo.js');
 
 var friend 					= require('./Friend/GetFriend.js');
-friend.UpdateDatabase();
+friend.UpdateDatabase(io);
 
 var guild 					= require('./Guild/GetGuild.js');
 
