@@ -6,7 +6,7 @@ var redis = require("redis"),
 client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-exports.GetFriendData = function getFriendData () {
+exports.GetFriendData = function () {
 	// var stringHkey = "all_friends";
 	// var queryStringFriend = "SELECT * FROM `"+TABLE_NAME+"`";
 	// // console.log(queryString)
@@ -34,7 +34,7 @@ exports.GetFriendData = function getFriendData () {
 // 		}
 // 	})
 // }
-exports.SetFriendData = function setDataBase2 (TABLE_NAME) {
+exports.SetFriendData = function (TABLE_NAME) {
 	setDataBase (TABLE_NAME);
 }
 function setDataBase (TABLE_NAME) {
@@ -50,18 +50,17 @@ function setDataBase (TABLE_NAME) {
 }
 
 function checkValue (stringHkey,stringKey,ID_Key) {
-	client.hexists(stringHkey,stringKey,function (error,resultBool) {
-		if (resultBool==1) {
-			client.hget(stringHkey,stringKey,function (error,rows) {
-				var result = rows.split("/");
-				if (!result.includes(ID_Key)) {
-					addValue (stringHkey,stringKey,rows,ID_Key);
-				}
-			});
+	client.hget(stringHkey,stringKey,function (error,rows) {
+		if (rows!=null) {
+			var result = rows.split("/").filter(String);
+			if (!result.includes(ID_Key)) {
+				addValue (stringHkey,stringKey,rows,ID_Key);
+			}
 		}else{
 			addValue (stringHkey,stringKey,"",ID_Key);
+			
 		}
-	});
+	})
 }
 
 function addValue (stringHkey,stringKey,data,ID_Key) {
@@ -78,9 +77,10 @@ exports.RemoveValueFriend = function removeValueFriend (stringKey,ID_Key) {
 	removeValue (stringHkey,stringKey,ID_Key);
 }
 
-function removeValue (stringHkey,stringKey,ID_Key) {	
+function removeValue (stringHkey,stringKey,ID_Key) {
+	functions.ShowLog(functions.ShowLogBool.Check,'FriendData.js removeValue stringHkey,stringKey,ID_Key',[stringHkey,stringKey,ID_Key]);
 	client.hget(stringHkey,stringKey,function (error,rows) {
-		var result = rows.split("/");
+		var result = rows.split("/").filter(String);
 		if (result.includes(ID_Key)) {
 			var stringReplace = rows.replace(ID_Key+"/","");
 			client.hset(stringHkey,stringKey,stringReplace);
@@ -117,7 +117,7 @@ function checkFriendData (ID_User,ID_Player,returnBool) {
 	// 	}
 	// }); 
 }
-exports.CheckListFriendData = function checkListFriendData2 (List_ID_User,ID_Player,returnListUnit) {
+exports.CheckListFriendData = function (List_ID_User,ID_Player,returnListUnit) {
 	var stringHkey = "all_friends";
 	var listBoolFriend = [];
 	var listIDUnitAttack = [];

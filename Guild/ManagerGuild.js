@@ -2,6 +2,8 @@
 var db_all_user			= require('./../Util/Database/Db_all_user.js');
 var db_all_guild		= require('./../Util/Database/Db_all_guild.js');
 
+var guildData  = require('./../Redis/Guild/GuildData.js')
+
 var functions 			= require('./../Util/Functions.js');
 
 var Promise 			= require('promise');
@@ -30,7 +32,7 @@ var dataKickOut={
 	ID_KickOut: 42,
 }
 
-var guildData  = require('./../Redis/Guild/GuildData.js')
+
 var redis = require('redis');
 var client = redis.createClient();
 client.select(functions.RedisData.TestUnit);

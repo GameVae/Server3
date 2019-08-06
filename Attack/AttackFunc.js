@@ -88,9 +88,10 @@ function checkCurrentPos2 (io,data,stringKey,pos,Server_ID) {
 			client.hget(stringHUnit,stringKey,function (error,rows) {
 				if (rows!=null) {
 					var resultUnit = JSON.parse(rows)
-					if (resultUnit.Attack_Unit_ID==null) {attackingBool = false;}
-					if (resultUnit.Attack_Unit_ID=='null') {attackingBool = false;}
-					if (resultUnit.Attack_Unit_ID=='NULL') {attackingBool = false;}
+					if (resultUnit.Attack_Unit_ID.length>5) {attackingBool = true}
+					// if (resultUnit.Attack_Unit_ID==null) {attackingBool = false;}
+					// if (resultUnit.Attack_Unit_ID=='null') {attackingBool = false;}
+					// if (resultUnit.Attack_Unit_ID=='NULL') {attackingBool = false;}
 				}
 				resolve();
 			})
@@ -1455,6 +1456,32 @@ function checkAttackPosition (io,stringUnit,pos,attackingUnit) {
 			})
 		})
 	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+
+		
+			
+			functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition=>friendData.CheckListFriendData listIDUnitAttack,stringUnit',[resultUnit.Attack_Unit_ID,stringUnit]);
+			friendData.CheckListFriendData(resultUnit.Attack_Unit_ID,stringUnit.split("_")[2],function (returnListUnit) {
+				if (returnListUnit.length>0) {
+					checkDefendBool=false;
+				}
+					// listIDUnitAttack = returnListUnit;
+					resolve();
+				})
+			
+
+		})
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition=>guildData.CheckListGuildData listIDUnitAttack,stringUnit',[resultUnit.Attack_Unit_ID,stringUnit]);
+			guildData.CheckListGuildData(resultUnit.Attack_Unit_ID,stringUnit.split("_")[2],function (returnListUnit) {
+				if (returnListUnit.length>0) {
+					checkDefendBool=false;
+				}
+				resolve();
+			})
+		})
+	}).then(()=>{
 
 		return new Promise((resolve,reject)=>{
 			if (checkDefendBool==true&&checkAttackBool==true){
@@ -1580,36 +1607,54 @@ function getUnitAttackInPos (io,stringUnit,pos,returnPosArray,attackingUnit) {
 		})
 
 	}).then(()=>{
-
 		return new Promise((resolve,reject)=>{
-			if (tempListUnitInPos.length==0) {console.log('tempListUnitInPos length 0');
-			resolve();
-		}else {
-			functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos hmget stringHUnit,tempListUnitInPos,attackingUnit',[stringHUnit,tempListUnitInPos,attackingUnit]);
-			client.hmget(stringHUnit,tempListUnitInPos,function (error,rowsUnit) {				
-				if (rowsUnit!=null) {
-					for (var i = 0; i < rowsUnit.length; i++) {
-						if (rowsUnit[i]!=null) {
-							var resultUnitAttack = JSON.parse(rowsUnit[i])
-							functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos returnPosArray,resultUnitAttack.Position_Cell,tempListUnitInPos[i]',[returnPosArray,resultUnitAttack.Position_Cell,tempListUnitInPos[i]]);
-							if (tempListUnitInPos[i]!=attackingUnit) {
-								if (returnPosArray.includes(resultUnitAttack.Position_Cell)) {
-									getAttackBool = true;
-									defendingUnit = tempListUnitInPos[i];
-									break;
-								}
-							}
-
-						}
-					}
-				}
-
+			functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos=>friendData.CheckListFriendData listIDUnitAttack,stringKey',[tempListUnitInPos,stringUnit]);
+			friendData.CheckListFriendData(tempListUnitInPos,stringUnit.split("_")[2],function (returnListUnit) {
+				tempListUnitInPos = returnListUnit;
 				resolve();
 			})
-		}
+		})
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js=>checkCurrentPos guildData.CheckListGuildData listIDUnitAttack,stringKey',[tempListUnitInPos,stringUnit]);
+			guildData.CheckListGuildData(tempListUnitInPos,stringUnit.split("_")[2],function (returnListUnit) {
+				tempListUnitInPos = returnListUnit;
+				resolve();
+			})
+		})
+	}).then(()=>{
+
+		return new Promise((resolve,reject)=>{
+			if (tempListUnitInPos.length==0) {
+				console.log('tempListUnitInPos length 0');
+				getAttackBool = false;
+				resolve();
+			}else {
+				functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos hmget stringHUnit,tempListUnitInPos,attackingUnit',[stringHUnit,tempListUnitInPos,attackingUnit]);
+				client.hmget(stringHUnit,tempListUnitInPos,function (error,rowsUnit) {				
+					if (rowsUnit!=null) {
+						for (var i = 0; i < rowsUnit.length; i++) {
+							if (rowsUnit[i]!=null) {
+								var resultUnitAttack = JSON.parse(rowsUnit[i])
+								functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos returnPosArray,resultUnitAttack.Position_Cell,tempListUnitInPos[i]',[returnPosArray,resultUnitAttack.Position_Cell,tempListUnitInPos[i]]);
+								if (tempListUnitInPos[i]!=attackingUnit) {
+									if (returnPosArray.includes(resultUnitAttack.Position_Cell)) {
+										getAttackBool = true;
+										defendingUnit = tempListUnitInPos[i];
+										break;
+									}
+								}
+
+							}
+						}
+					}
+
+					resolve();
+				})
+			}
 
 
-	})
+		})
 
 	}).then(()=>{
 		

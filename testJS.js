@@ -1,9 +1,104 @@
-// var db_position =  require('./Util/Database/Db_position.js');
+'use strict';
+var db_friend =  require('./Util/Database/Db_all_friend.js');
 
 // test ()
 // function test () {
 
 // }
+var redis = require("redis"),
+client = redis.createClient();
+client.select(2)
+// removeValueFriend ("44",'43')
+var stringT = 2;
+var DictTimeOutUnFriend={};
+var Promise = require('promise')
+
+removeValueFriend ('43','44')
+removeValueFriend ('44','43')
+function removeValueFriend (stringKey,ID_Key) {
+	var stringHkey = "all_friends"
+	functions.ShowLog(functions.ShowLogBool.Check,'GetFriend.js removeValueFriend stringHkey,stringKey,ID_Key',[stringHkey,stringKey,ID_Key]);
+	client.hget(stringHkey,stringKey,function (error,rows) {
+		if (rows!=null) {
+			var result = rows.split("/").filter(String);
+			if (result.includes(ID_Key)) {
+				var stringReplace = rows.replace(ID_Key+"/","");
+				client.hset(stringHkey,stringKey,stringReplace);
+				if (stringReplace.length==0) {
+					client.hdel(stringHkey,stringKey);
+				}
+			}
+		}
+
+	});
+
+}
+
+// deleteUnfriendData (null,stringT,'44','43',0)
+
+function deleteUnfriendData (io,stringUnfriend,ID_User,ID_Player,timeOutUnfriend) {
+	var unfriend = "SELECT * FROM `"+ID_User+"` WHERE `ID_Player`= '"+ID_Player+"'";
+db_friend.query(unfriend, function (error,rows) {
+	console.log(rows[0].AcceptTime)
+})
+
+
+	// // functions.ShowLog(functions.ShowLogBool.Check,'GetFriend.js S_UNFRIEND stringUnfriend,ID_User,ID_Player,timeOutUnfriend',[stringUnfriend,ID_User,ID_Player,timeOutUnfriend]);
+	// DictTimeOutUnFriend[stringUnfriend]= setTimeout(function (io,stringUnfriend,ID_User,ID_Player,nextTimeOut) {
+	// 	var unfriend = "SELECT * FROM `"+ID_User+"` WHERE `ID_Player`= "+ID_Player;
+		
+	// 	new Promise((solve,reject)=>{
+	// 		removeValueFriend (ID_User,ID_Player)
+	// 		resolve()
+	// 	}).then(()=>{
+	// 		return new Promise((solve,reject)=>{
+	// 			db_friend.query(unfriend, function (error,rows) {
+	// 				if (rows!=undefined) {
+	// 					if (rows[0].RemoveTime.length>5) {
+
+	// 						var currentTime = functions.GetTime();
+	// 						var databaseTime = new Date(functions.ExportTimeDatabase(rows[0].RemoveTime)).getTime();
+	// 						if (databaseTime<=currentTime) {
+	// 							var deleteString = "DELETE FROM `"+ID_User+"` WHERE `ID_Player`= '"+ID_Player+"'";
+	// 							db_friend.query(deleteString,function (error,result) {
+								
+	// 							});
+	// 							removeValueFriend(ID_User,ID_Player);
+	// 							delete DictTimeOutUnFriend[stringUnfriend];
+
+	// 						}else{
+	// 							var nextTimeOut = databaseTime-currentTime;
+	// 							if (nextTimeOut<0) {
+	// 								nextTimeOut = 0;
+	// 							}
+	// 							deleteUnfriendData (io,stringUnfriend,ID_User,ID_Player,nextTimeOut);
+	// 						}
+	// 						resolve();
+	// 					}
+	// 				}
+	// 			});
+	// 		})
+	// 	})
+
+	// }, timeOutUnfriend, io,stringUnfriend,ID_User,ID_Player);
+}
+
+function removeValueFriend (stringKey,ID_Key) {
+	var stringHkey = "all_friends"
+	// functions.ShowLog(functions.ShowLogBool.Check,'GetFriend.js removeValueFriend stringHkey,stringKey,ID_Key',[stringHkey,stringKey,ID_Key]);
+	client.hget(stringHkey,stringKey,function (error,rows) {
+		if (rows!=null) {
+		var result = rows.split("/").filter(String);
+		if (result.includes(ID_Key)) {
+			var stringReplace = rows.replace(ID_Key+"/","");
+			client.hset(stringHkey,stringKey,stringReplace);
+			if (stringReplace.length==0) {
+				client.hdel(stringHkey,stringKey);
+			}
+		}
+	}
+	});
+}
 
 // var data={
 // 	Server_ID : 1,
@@ -104,16 +199,14 @@
 // 		console.log(result[index])
 // 	});
 // }
-var redis = require("redis"),
-client = redis.createClient();
-client.select(2)
 
-test ()
-function test () {
-	client.hget('s1_pos','300,9,0',function (error,rows) {
-		console.log(rows.split("/").filter(String))
-	})
-}
+
+// test ()
+// function test () {
+// 	client.hget('s1_pos','300,9,0',function (error,rows) {
+// 		console.log(rows.split("/").filter(String))
+// 	})
+// }
 // var Promise = require('promise');
 
 // test (1,'1_16_43_854','1_16_44_822')
