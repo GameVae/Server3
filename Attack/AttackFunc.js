@@ -1458,8 +1458,6 @@ function checkAttackPosition (io,stringUnit,pos,attackingUnit) {
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
 
-		
-			
 			functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js checkAttackPosition=>friendData.CheckListFriendData listIDUnitAttack,stringUnit',[resultUnit.Attack_Unit_ID,stringUnit]);
 			friendData.CheckListFriendData(resultUnit.Attack_Unit_ID,stringUnit.split("_")[2],function (returnListUnit) {
 				if (returnListUnit.length>0) {
@@ -1584,25 +1582,52 @@ function getUnitAttackInPos (io,stringUnit,pos,returnPosArray,attackingUnit) {
 	stringHPos = "s"+Server_ID+"_pos";
 	stringHUnit = "s"+Server_ID+"_unit"
 	stringHAttack = "s"+Server_ID+"_attack";
+	var arrayUnit = [];
 	// console.log('stringUnit,pos,returnPosArray')
 	// console.log(stringUnit,pos,returnPosArray)
 	new Promise((resolve,reject)=>{		
 		functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos hget stringHPos,pos',[stringHPos,pos]);		
-		client.hget(stringHPos,pos,function (error,rows){
+		client.hmget(stringHPos,returnPosArray,function (error,rows){
 			if (rows!=null) {
-				var arrayUnitInPos = rows.split("/").filter(String);
-				functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos arrayUnitInPos,ID_User',[arrayUnitInPos,ID_User]);		
-				for (var i = 0; i < arrayUnitInPos.length; i++) {
-					if (arrayUnitInPos[i].split("_")[2] != ID_User) {
-						functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos arrayUnitInPos[i].split("_")[2],ID_User',[arrayUnitInPos[i].split("_")[2],ID_User]);		
-						tempListUnitInPos.push(arrayUnitInPos[i]);
-					}
+				for (var i = 0; i < rows.length; i++) {
+					arrayUnit = rows[i].split("/").filter(String);
+					if (arrayUnit.length>1) {
+						for (var j = 0; j < arrayUnit.length; j++) {
+							if (arrayUnit[j].split("_")[2]!=ID_User) {
+								tempListUnitInPos.push(arrayUnit[j])
+							}						
+						}
+					}else {
+						if (arrayUnit[0].split("_")[2]!=ID_User) {
+							tempListUnitInPos.push(arrayUnit[0])
+						}
+					}		
 				}
+
+				// for (var i = 0; i < rows.length; i++) {
+				// 	if (rows[i]!=null){
+				// 		var arrayUnitInPos = rows[i].split("/").filter(String);
+				// 		for (var j= 0; i < arrayUnitInPos.length; i++) {
+				// 			if (arrayUnitInPos[j].split("_")[2] != ID_User) {
+				// 				functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js getUnitAttackInPos arrayUnitInPos[j].split("_")[2],ID_User',[arrayUnitInPos[j].split("_")[2],ID_User]);		
+				// 				tempListUnitInPos.push(arrayUnitInPos[j]);
+				// 			}
+				// 		}
+				// 	}
+				// }				
+				// // functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos arrayUnitInPos,ID_User',[arrayUnitInPos,ID_User]);		
+				// // for (var i = 0; i < arrayUnitInPos.length; i++) {
+				// // 	if (arrayUnitInPos[i].split("_")[2] != ID_User) {
+				// // 		functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos arrayUnitInPos[i].split("_")[2],ID_User',[arrayUnitInPos[i].split("_")[2],ID_User]);		
+				// // 		tempListUnitInPos.push(arrayUnitInPos[i]);
+				// // 	}
+				// // }
+
 			}else{
 				functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos=>clearDefend not found any unit',[]);
 				// return null;
 			}
-			functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos tempListUnitInPos,pos',[tempListUnitInPos,pos]);	
+			functions.ShowLog(functions.ShowLogBool.Clear,'AttackFunc.js getUnitAttackInPos tempListUnitInPos,pos',[tempListUnitInPos,pos]);	
 			resolve();
 		})
 
@@ -1652,12 +1677,9 @@ function getUnitAttackInPos (io,stringUnit,pos,returnPosArray,attackingUnit) {
 					resolve();
 				})
 			}
-
-
 		})
 
-	}).then(()=>{
-		
+	}).then(()=>{		
 		return new Promise((resolve,reject)=>{
 			if (getAttackBool==true) {
 				functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js getUnitAttackInPos=>setAttackData Server_ID,defendingUnit,stringUnit',[Server_ID,defendingUnit,stringUnit]);

@@ -13,7 +13,7 @@ var dataCreateGuild={};
 var EnumCreateGuild={};
 var DictTimeOut ={};
 
-var dataGuild ={
+var dataGuild_S_CREATE_GUILD ={
 	GuildTag: 	'ABf',
 	GuildName: 	'123456a',
 	ID_User: 	9,

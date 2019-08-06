@@ -9,7 +9,7 @@ var redis = require('redis');
 var client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-exports.CheckPostion = function checkPostion2 (stringKeyCheck,positionCheck){
+exports.CheckPostion = function (stringKeyCheck,positionCheck){
 	return  checkPostion (stringKeyCheck,positionCheck)
 }
 // var strinkey = '1_16_44_528';
@@ -21,7 +21,11 @@ function checkPostion (stringKeyCheck,positionCheck) {
 
 	var ID_Unit = stringKeyCheck.split("_")[1]
 	var arrayPosition = [];
-	
+	console.log('stringKeyCheck')
+	console.log(stringKeyCheck)
+	console.log('positionCheck')
+	console.log(positionCheck)
+
 	if (ID_Unit>15&&ID_Unit<20) {
 		arrayPosition = unitRange1Check (positionCheck);
 	}

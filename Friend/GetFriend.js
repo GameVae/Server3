@@ -196,12 +196,8 @@ function S_UNFRIEND (io,data) {
 	functions.ShowLog(functions.ShowLogBool.Clear,'GetFriend.js S_UNFRIEND stringQuery',[stringQuery]);
 
 	db_friend.query(stringQuery,function (error,result) {
-		if (!!error){
-			functions.ShowLog(functions.ShowLogBool.Error,'GetFriend.js S_UNFRIEND stringQuery',[stringQuery]);
-		}
-		
-		var playerID = "SELECT `Socket` FROM `user_info` WHERE `ID_User` = '"+data.ID_Player+"' OR `ID_User` = '"+data.ID_User+"'";
-		
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetFriend.js S_UNFRIEND stringQuery',[stringQuery]);}		
+		var playerID = "SELECT `Socket` FROM `user_info` WHERE `ID_User` = '"+data.ID_Player+"' OR `ID_User` = '"+data.ID_User+"'";		
 		db_all_user.query(playerID,function (error,rows) {
 			if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetFriend.js S_UNFRIEND stringQuery',[stringQuery]);}
 			if (rows[0].Socket!=null) {io.to(rows[0].Socket).emit('R_UNFRIEND',{R_UNFRIEND:data.ID_User});}
