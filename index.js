@@ -58,7 +58,7 @@ var info 					= require('./Info/GetInfo.js');
 var friend 					= require('./Friend/GetFriend.js');
 friend.UpdateDatabase(io);
 
-var guild 					= require('./Guild/GetGuild.js');
+
 
 var getUnit 				= require('./Login/Login/GetUnit.js');
 
@@ -79,6 +79,9 @@ moving_Update.UpdateDataBase(1);
 
 // var updateAttack 			= require('./Redis/Attack/Attack_Update.js');
 // updateAttack.UpdateDataBase(1);
+var guild 					= require('./Guild/GetGuild.js');
+var guildData 				= require('./Redis/Guild/GuildData.js');
+guildData.GetGuildData()
 
 var guild_UpdateDatabase 	= require('./Guild/Guild_UpdateDatabase.js');
 guild_UpdateDatabase.UpdateDatabase();

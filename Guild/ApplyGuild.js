@@ -234,6 +234,31 @@ function updateApplyPlayer (io,data) {
 			data.GuildName = rows[0].GuildName;
 			resolve();
 		});
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			getUserServerID(data.ID_Apply,function (returnServer){
+				var stringUpdateUser = "UPDATE `game_info_s'"+returnServer+"'` SET `Guild_ID`='"+data.Guild_ID+"',`Guild_Name`='"+data.GuildName+"',`LastGuildID`=null";
+				db_all_user.query(stringUpdateUser,function (error,result) {
+					if (!!error){DetailError = ('ApplyGuild.js: stringUpdateUser: '+ stringUpdateUser);functions.WriteLogError(DetailError,2);}
+					LogChange = 'ApplyGuild.js: stringUpdateUser: '+stringUpdateUser;functions.LogChange(LogChange,2);
+					
+					resolve();
+				});
+			});
+		})
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			sendUserInfo (io,data);
+
+		})
+	})
+	new Promise((resolve,reject)=>{
+		var getGuildName = "SELECT `GuildName` FROM `guild_info` WHERE `Guild_ID`='"+data.Guild_ID+"'";
+		db_all_guild.query(getGuildName,function (error,rows) {
+			if (!!error){DetailError = ('ApplyGuild.js: updateApplyPlayer: '+ getGuildName);functions.WriteLogError(DetailError,2);}
+			data.GuildName = rows[0].GuildName;
+			resolve();
+		});
 	}).then(new Promise((resolve,reject)=>{
 		getUserServerID(data.ID_Apply,function (returnServer){
 			var stringUpdateUser = "UPDATE `game_info_s'"+returnServer+"'` SET `Guild_ID`='"+data.Guild_ID+"',`Guild_Name`='"+data.GuildName+"',`LastGuildID`=null";
@@ -245,10 +270,15 @@ function updateApplyPlayer (io,data) {
 		});
 	}).then(()=>{
 		sendUserInfo (io,data);
+		updateGuildMemberRedis (data.GuildID,data.ID_User)
 	}));
 	
 }
+function updateGuildMemberRedis (GuildID,data) {
+	var stringHGuild = "all_guild";
+	client.hset(stringHGuild,data.ID_User,GuildID);
 
+}
 function sendUserInfo (io,data) {
 	var stringQueryGuildMember = "SELECT `ID_User` FROM `"+data.Guild_ID+"` WHERE `ID_User`<>'"+data.ID_Player+"'";
 	db_all_guild.query(stringQueryGuildMember, function (error,rows) {
@@ -258,12 +288,13 @@ function sendUserInfo (io,data) {
 		}
 	});
 }
+
 function R_ACCEPT_APPLY (io,data) {
 	var stringQuery = "SELECT `io` FROM `user_info` WHERE `ID_User`='"+data+"'";
 	db_all_user.query(stringQuery,function (error,rows) {
 		if (!!error){DetailError = ('ApplyGuild.js: R_ACCEPT_APPLY: '+ stringQuery);functions.WriteLogError(DetailError,2);}
 		for (var i = 0; i < rows.length; i++) {
-			io.broadcast.to(rows[i].io).emit('R_ACCEPT_APPLY',{R_ACCEPT_APPLY:data});
+			io.to(rows[i].io).emit('R_ACCEPT_APPLY',{R_ACCEPT_APPLY:data});
 		}
 	});
 }

@@ -10,7 +10,7 @@ client.select(functions.RedisData.TestUnit)
 exports.Test = function test (para) {
 	console.log(para)
 }
-exports.GetGuildData = function getGuildData2 () {
+exports.GetGuildData = function() {
 	getGuildData ()
 }
 function getGuildData () {
@@ -54,10 +54,10 @@ exports.AddValueGuild = function addValueGuild (stringID_User,ID_Guild) {
 	client.hset(stringHkey,stringID_User,ID_Guild);
 }
 
-exports.RemoveValueGuild = function removeValueGuild (stringID_User) {
-	var stringHkey = "all_guilds";
-	client.hdel(stringHkey,stringID_User);
-}
+// exports.RemoveValueGuild = function removeValueGuild (stringID_User) {
+// 	var stringHkey = "all_guilds";
+// 	client.hdel(stringHkey,stringID_User);
+// }
 exports.CheckListGuildData = function checkListGuildData2 (List_ID_Unit_User,ID_Player,returnListUnit) {
 	var stringHkey = "all_guilds";
 	var listIDUnitAttack = [];
@@ -69,13 +69,14 @@ exports.CheckListGuildData = function checkListGuildData2 (List_ID_Unit_User,ID_
 		var unitId = List_ID_Unit_User[i].split("_")[2];
 		listIDUser.push(unitId);
 	}
+	listIDUser.push(ID_Player)
 
 	client.hmget(stringHkey,listIDUser,function (error,rows) {		
 		if (rows!=null) {
-			for (var i = 0; i < rows.length; i++) {
+			for (var i = 0; i < (rows.length-1); i++) {
 				if (rows[i]!=null) {
-					var result = rows[i].split("/").filter(String);
-					if (!result.includes(ID_Player)) {
+					var result = rows[i]
+					if (result != rows[rows.length]) {
 						listUnitAttack.push(List_ID_Unit_User[i]);
 					}
 				}else{

@@ -1692,7 +1692,6 @@ function getUnitAttackInPos (io,stringUnit,pos,returnPosArray,attackingUnit) {
 	
 }
 
-
 // #CheckAttackPosition
 function updateRemoveDefendData (server_ID,stringDefend) {
 	functions.ShowLog(functions.ShowLogBool.Off,'AttackFunc.js updateRemoveDefendData server_ID,stringDefend',[server_ID,stringDefend]);

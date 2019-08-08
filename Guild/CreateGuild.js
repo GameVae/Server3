@@ -88,7 +88,14 @@ function createNewGuild (data) {
 		dataCreateGuild.Guild_ID = result.insertId;
 		createGuildTable (dataCreateGuild);
 		//console.log(dataCreateGuild);
+		updateGuildRedis (GuildID,data)
 	});
+}
+
+function updateGuildRedis (GuildID,data) {
+	var stringHGuild = "all_guild";
+	client.hset(stringHGuild,data.ID_User,GuildID);
+
 }
 function createGuildTable (data) {
 	var stringCreateTable = "CREATE TABLE `"+data.Guild_ID+"` AS SELECT * FROM `guild`;"
@@ -126,6 +133,7 @@ function checkDiamond (data,checkReturn) {
 		checkReturn(returnBool,dataCreateGuild);
 	}); 
 }
+
 function checkLengData (data){
 	var returnBool = false;
 	if (data.GuildTag.length==3&&(data.GuildName.length<16&&data.GuildName!='')) {

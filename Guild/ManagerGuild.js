@@ -2,7 +2,7 @@
 var db_all_user			= require('./../Util/Database/Db_all_user.js');
 var db_all_guild		= require('./../Util/Database/Db_all_guild.js');
 
-var guildData  = require('./../Redis/Guild/GuildData.js')
+var guildData 			= require('./../Redis/Guild/GuildData.js')
 
 var functions 			= require('./../Util/Functions.js');
 
@@ -51,6 +51,7 @@ exports.S_KICKOUT_GUILD = function s_kickout_guild (io,data) {
 		}
 	});
 }
+
 function sendClientKickOut (io,data) {	
 	var stringQuery = "SELECT `ID_User` FROM `"+data.Guild_ID+"`";
 	// console.log(stringQuery);
@@ -64,13 +65,20 @@ function sendClientKickOut (io,data) {
 	});
 
 	var stringHSocket = "s"+data.Server_ID+"_socket";
-	client.hexists(stringHSocket,data.ID_KickOut,function (error,resultBool) {
-		if (resultBool == 1) {
-			client.hget(stringHSocket,data.ID_KickOut,function (error,rowsSocket) {
-				io.to(rowsSocket).emit('R_KICKOUT_GUILD',{R_KICKOUT_GUILD:data});
-			});
+	client.hget(stringHSocket,data.ID_KickOut,function (error,rowsSocket) {
+		if (rowsSocket!=null) {
+			io.to(rowsSocket).emit('R_KICKOUT_GUILD',{R_KICKOUT_GUILD:data});
 		}
 	});
+	
+	// client.hexists(stringHSocket,data.ID_KickOut,function (error,resultBool) {
+	// 	if (resultBool == 1) {
+	// 		client.hget(stringHSocket,data.ID_KickOut,function (error,rowsSocket) {
+	// 			io.to(rowsSocket).emit('R_KICKOUT_GUILD',{R_KICKOUT_GUILD:data});
+	// 		});
+	// 	}
+	// });
+
 }
 
 function R_KICKOUT_GUILD (io,row,data) {
@@ -119,15 +127,14 @@ function setTimeRemove (timeKickout,data) {
 		delete DictTimeOut[stringTimeOut];
 		db_all_guild.query(stringCheckGuild, function (error,rows) {
 			if (!!error){DetailError = ('ManagerGuild.js: setTimeRemove: '+ stringCheckGuild);functions.WriteLogError(DetailError,2);}
-			if (rows.length>0&&rows[0].RemoveTime!=null) {
+			if (rows[0]!=null&&rows[0].RemoveTime!=null) {
 				currentTime 	= functions.GetTime();
 				databaseTime 	= functions.ExportTimeDatabase(rows[0].RemoveTime);
 				if (databaseTime>currentTime) {
 					var timeOut = databaseTime - currentTime;
-					setTimeRemove (timeOut,data,enumTime);
+					setTimeRemove (timeOut,data);
 				}else {
 					deleteGuildMember (data);
-
 				}
 			}
 		});		
@@ -150,7 +157,12 @@ function deleteGuildMember (data) {
 		});
 	});	
 
-	guildData.RemoveValueGuild(data.ID_KickOut);
+	removeValueGuild(data.GuildID,data.ID_KickOut);
+}
+
+function removeValueGuild (stringID_User) {
+	var stringHkey = "all_guilds";
+	client.hdel(stringHkey,stringID_User);
 }
 
 function compareKickOutPosition (Guild_ID,ID_User,ID_KickOut,returnBool) {
@@ -291,4 +303,31 @@ function comparePromotePosition (data,returnBool) {
 		}
 		returnBool(checkBool);
 	});
+}
+
+var data_S_DELETE_GUILD ={
+	ID_User: 5,
+	ID_Guild: 13
+}
+
+exports.S_DELETE_GUILD = function (socket,data) {
+	var dataSend = {};
+	var guildQuery = "SELECT * FROM `"+data.ID_Guild+"`"
+	db_all_guild.query(guildQuery,function (error,rows) {
+		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'ManagerGuild.js S_DELETE_GUILD guildQuery',[guildQuery]);}
+		if (rows[0]!=null) {
+			if (rows[0].length==1 && rows[0].GuildPosition==5) {
+				dataSend ={
+					BoolDelete : 1,
+					MessageDelete : "OK"
+				}				
+			}else{
+				dataSend ={
+					BoolDelete : 0,
+					MessageDelete : "Need kick all member"
+				}
+			}
+			socket.emit('R_DELETE_GUILD',{R_DELETE_GUILD:dataSend})
+		}
+	})
 }
