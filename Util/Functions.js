@@ -60,14 +60,16 @@ exports.ShowLogBool = {
 	On: 1,
 	Error: 2,
 	Check: 3,
-	Clear: 4
+	Clear: 4,
+	LogChange: 5
 }
 var showLogBool = {
 	Off: 0,
 	On: 1,
 	Error: 2,
 	Check: 3,
-	Clear: 4
+	Clear: 4,
+	LogChange: 5
 }
 
 exports.Test = function(para){
@@ -100,10 +102,8 @@ exports.ShowLog = function showLog (showBool,stringContent,param) {
 		break;
 		case showLogBool.Check:
 		console.log('\x1b[34m%s\x1b[0m',"\n"+new Date()+": "+stringContent,param+"\n")
-	
 		break;
 		case showLogBool.Clear:
-
 		var nullBool = false;
 		for (var i = 0; i < param.length; i++) {
 			if(param[i]==null||param[i]==undefined||param[i].length==0){
@@ -116,6 +116,11 @@ exports.ShowLog = function showLog (showBool,stringContent,param) {
 		}else{
 			// console.log(new Date()+": "+"\n"+stringContent,param+"\n")
 		}		
+		break;
+		case showLogBool.LogChange:
+		fs.appendFile(getStringChangeFile (2), "\r\n LogChangeDetail "+ getTimeNow() +": "+"\n"+stringContent+"\nParam: \n"+param, (err) => {
+			if (err) throw err;
+		});
 		break;
 	}
 }

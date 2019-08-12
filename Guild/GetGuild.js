@@ -62,9 +62,11 @@ exports.Start = function start (io) {
 
 exports.R_USER_GUILD = function (socket,ID_User,Server_ID) {
 	var queryGuild_ID = "SELECT `Guild_ID` FROM `game_info_s"+Server_ID+"` WHERE `ID_User`='"+ID_User+"'";
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js R_USER_GUILD ID_User,Server_ID,queryGuild_ID',[ID_User,Server_ID,queryGuild_ID]);
 	db_all_user.query(queryGuild_ID,function (error,rows) {
 		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'GetGuild.js R_USER_GUILD queryGuild_ID',[queryGuild_ID]);}
 		if (rows[0].Guild_ID!=null) {
+			functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js R_USER_GUILD=>getGuildMember rows[0].Guild_ID',[rows[0].Guild_ID]);
 			getGuildMember (socket,rows[0].Guild_ID);
 		}
 	});
@@ -73,7 +75,7 @@ exports.R_USER_GUILD = function (socket,ID_User,Server_ID) {
 function getGuildMember (socket,Guild_ID) {
 	var stringGuildMember = "SELECT * FROM `"+Guild_ID+"`";
 	
-	functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js getGuildMember stringGuildMember',[stringGuildMember]);
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js getGuildMember stringGuildMember,Guild_ID',[stringGuildMember,Guild_ID]);
 	db_all_guild.query(stringGuildMember,function (error,rows) {
 		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'GetGuild.js getGuildMember stringGuildMember',[stringGuildMember]);}
 		var currentTime = functions.GetTime();
@@ -89,7 +91,7 @@ function getGuildMember (socket,Guild_ID) {
 				rows[i].LogOutTime = (new Date(functions.ExportTimeDatabase(rows[i].LogOutTime))-currentTime)*0.001;
 			}
 		}
-		functions.ShowLogBool.Clear,'GetGuild.js getGuildMember rows',[rows]
+		functions.ShowLogBool.Clear,'GetGuild.js getGuildMember emit rows',[rows]
 		socket.emit('R_USER_GUILD',{R_USER_GUILD:rows});
 	});
 }
