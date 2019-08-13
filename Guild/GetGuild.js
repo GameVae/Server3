@@ -15,29 +15,29 @@ var DetailError, LogChange;
 exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_CREATE_GUILD', function (data){
-			functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js Start=>createGuild.S_CREATE_GUILD data',[data]);
+			functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js Start=>createGuild.S_CREATE_GUILD data',[data]);
 			createGuild.S_CREATE_GUILD(socket,data);
 		});
 
 		socket.on('S_APPLY_GUILD', function (data){
-			functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js Start=>applyGuild.S_APPLY_GUILD data',[data]);
+			functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js Start=>applyGuild.S_APPLY_GUILD data',[data]);
 			applyGuild.S_APPLY_GUILD(io,socket,data);
 		});
 		socket.on('S_ACCEPT_APPLY',function (data) {
-			functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js Start=>applyGuild.S_ACCEPT_APPLY data',[data]);
+			functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js Start=>applyGuild.S_ACCEPT_APPLY data',[data]);
 			applyGuild.S_ACCEPT_APPLY(io,data);
 		});
 		socket.on('S_REJECT_APPLY',function (data) {
-			functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js Start=>applyGuild.S_REJECT_APPLY data',[data]);
+			functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js Start=>applyGuild.S_REJECT_APPLY data',[data]);
 			applyGuild.S_REJECT_APPLY(io,data);
 		});
 
 		socket.on('S_KICKOUT_GUILD',function (data) {
-			functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js Start=>managerGuild.S_KICKOUT_GUILD data',[data]);
+			functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js Start=>managerGuild.S_KICKOUT_GUILD data',[data]);
 			managerGuild.S_KICKOUT_GUILD(io,data);
 		});
 		socket.on('S_PROMOTE',function (data) {
-			functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js Start=>managerGuild.S_PROMOTE data',[data]);
+			functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js Start=>managerGuild.S_PROMOTE data',[data]);
 			managerGuild.S_DELETE_GUILD(socket,data);
 		});
 
@@ -62,11 +62,11 @@ exports.Start = function start (io) {
 
 exports.R_USER_GUILD = function (socket,ID_User,Server_ID) {
 	var queryGuild_ID = "SELECT `Guild_ID` FROM `game_info_s"+Server_ID+"` WHERE `ID_User`='"+ID_User+"'";
-	functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js R_USER_GUILD ID_User,Server_ID,queryGuild_ID',[ID_User,Server_ID,queryGuild_ID]);
+	functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js R_USER_GUILD ID_User,Server_ID,queryGuild_ID',[ID_User,Server_ID,queryGuild_ID]);
 	db_all_user.query(queryGuild_ID,function (error,rows) {
 		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'GetGuild.js R_USER_GUILD queryGuild_ID',[queryGuild_ID]);}
 		if (rows[0].Guild_ID!=null) {
-			functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js R_USER_GUILD=>getGuildMember rows[0].Guild_ID',[rows[0].Guild_ID]);
+			functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js R_USER_GUILD=>getGuildMember rows[0].Guild_ID',[rows[0].Guild_ID]);
 			getGuildMember (socket,rows[0].Guild_ID);
 		}
 	});
@@ -75,7 +75,7 @@ exports.R_USER_GUILD = function (socket,ID_User,Server_ID) {
 function getGuildMember (socket,Guild_ID) {
 	var stringGuildMember = "SELECT * FROM `"+Guild_ID+"`";
 	
-	functions.ShowLog(functions.ShowLogBool.Clear,'GetGuild.js getGuildMember stringGuildMember,Guild_ID',[stringGuildMember,Guild_ID]);
+	functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js getGuildMember stringGuildMember,Guild_ID',[stringGuildMember,Guild_ID]);
 	db_all_guild.query(stringGuildMember,function (error,rows) {
 		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'GetGuild.js getGuildMember stringGuildMember',[stringGuildMember]);}
 		var currentTime = functions.GetTime();
@@ -91,7 +91,7 @@ function getGuildMember (socket,Guild_ID) {
 				rows[i].LogOutTime = (new Date(functions.ExportTimeDatabase(rows[i].LogOutTime))-currentTime)*0.001;
 			}
 		}
-		functions.ShowLogBool.Clear,'GetGuild.js getGuildMember emit rows',[rows]
+		functions.ShowLogBool.Check,'GetGuild.js getGuildMember emit rows',[rows]
 		socket.emit('R_USER_GUILD',{R_USER_GUILD:rows});
 	});
 }

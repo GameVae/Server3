@@ -109,6 +109,8 @@ if (app.get('port') === process.env.PORT)
 	getUnit.Start(io);
 
 	// attackingUpdate.UpdateAttack (io,1);
+
+	guild.Start(io);
 }
 
 function checkConnect (connectCounter,io) {

@@ -88,11 +88,10 @@ function R_USER_INFO (socket,ID_User,Server_ID) {
 			getUserBase.R_BASE_INFO(socket,dataUser.ID_User,dataUser.Server_ID);
 			getUserBase.R_BASE_DEFEND(socket,dataUser.ID_User,dataUser.Server_ID);
 			getUserBase.R_BASE_UPGRADE(socket,dataUser.ID_User,dataUser.Server_ID);
-			// getGuild.R_USER_GUILD(socket,dataUser.ID_User,dataUser.Server_ID);
+			getGuild.R_USER_GUILD(socket,dataUser.ID_User,dataUser.Server_ID);
 
 			getUserBase.R_BASE_PLAYER(socket,rows[0].ID_User,rowsServer[0].Server_ID);
 			getUserBase.R_PLAYER_INFO(socket,rows[0].ID_User,rowsServer[0].Server_ID);
-
 
 			// getUnit.R_UNIT(socket,rows[0].ID_User,rowsServer[0].Server_ID);
 
