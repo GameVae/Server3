@@ -284,8 +284,8 @@ function getData (socket,dbInfo,dbUpgrade,rowsData) {
 	});
 }
 
-exports.R_PLAYER_INFO = function r_player_info (socket,ID_User,Server_ID) {
-	var stringQuery = "SELECT `ID_User`,`NameInGame`,`ChatWorldColor`,`Guild_ID`,`Might`,`Killed` FROM `game_info_s"+Server_ID+"` WHERE "+
+exports.R_PLAYER_INFO = function (socket,ID_User,Server_ID) {
+	var stringQuery = "SELECT `ID_User`,`NameInGame`,`ChatWorldColor`,`Guild_ID`,`Guild_Name`,`Might`,`Killed` FROM `game_info_s"+Server_ID+"` WHERE "+
 	"`ID_User`<>'"+ID_User+"'";
 	//console.log(stringQuery);
 	db_all_user.query(stringQuery,function (error,rows) {

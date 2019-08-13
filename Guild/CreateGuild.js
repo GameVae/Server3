@@ -132,7 +132,18 @@ function createGuildTable (data) {
 	db_all_guild.query(stringCreateTable,function (error,result) {
 		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'CreateGuild.js createGuildTable data,stringCreateTable',[data,stringCreateTable]);}
 		functions.ShowLog(functions.ShowLogBool.LogChange,'CreateGuild.js createGuildTable data,stringCreateTable',[data,stringCreateTable]);
+		updateUserInfo (data)
 	});
+}
+
+function updateUserInfo (data) {
+	var stringUpdate = "UPDATE `game_info_s"+data.Server_ID+"` SET `Guild_ID`='"+data.Guild_ID+"',"
+	+"`Guild_Name`='"+data.GuildName+"',"
+	+"`LastGuildID`= NULL WHERE `ID_User`='"+data.ID_User+"'";
+	db_all_user.query(stringUpdate,function (error,result) {
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'CreateGuild.js updateUserInfo stringUpdate',[stringUpdate]);}
+		functions.ShowLog(functions.ShowLogBool.LogChange,'CreateGuild.js updateUserInfo data',[data]);
+	})
 }
 
 function checkDiamond (data,checkReturn) {

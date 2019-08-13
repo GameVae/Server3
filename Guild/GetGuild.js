@@ -90,8 +90,9 @@ function getGuildMember (socket,Guild_ID) {
 			if (rows[i].LogOutTime!=null) {
 				rows[i].LogOutTime = (new Date(functions.ExportTimeDatabase(rows[i].LogOutTime))-currentTime)*0.001;
 			}
+			rows[i].Guild_ID = Guild_ID;
 		}
-		functions.ShowLogBool.Check,'GetGuild.js getGuildMember emit rows',[rows]
+		functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js getGuildMember emit rows',[rows]);
 		socket.emit('R_USER_GUILD',{R_USER_GUILD:rows});
 	});
 }
