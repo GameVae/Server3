@@ -80,6 +80,8 @@ moving_Update.UpdateDataBase(1);
 // var updateAttack 			= require('./Redis/Attack/Attack_Update.js');
 // updateAttack.UpdateDataBase(1);
 var guild 					= require('./Guild/GetGuild.js');
+var guildInfo				= require('./Guild/GuildInfo.js');
+
 var guildData 				= require('./Redis/Guild/GuildData.js');
 guildData.GetGuildData()
 
@@ -111,6 +113,7 @@ if (app.get('port') === process.env.PORT)
 	// attackingUpdate.UpdateAttack (io,1);
 
 	guild.Start(io);
+	guildInfo.Start(io);
 }
 
 function checkConnect (connectCounter,io) {

@@ -19,48 +19,29 @@
 // 	client.hset(stringHGuild,ID_User,GuildID.toString());
 // }
 
-var db_all_user			= require('./Util/Database/Db_all_user.js');
-var db_all_guild		= require('./Util/Database/Db_all_guild.js');
+var db_all_user				= require('./Util/Database/Db_all_user.js');
+var db_all_guild			= require('./Util/Database/Db_all_guild.js');
+var db_upgrade_database		= require('./Util/Database/Db_upgrade_database.js');
+
 var Promise = require('promise')
+
 test ()
 function test () {
-	// var stringQuery = "SELECT * FROM `13` INNER JOIN `guild_info` WHERE `Guild_ID`='13'"
-	// db_all_guild.query(stringQuery,function (error,rows) {
-	// 	if (!!error) {console.log(error);}
-	// 	console.log(rows)
+	// var stringQuery = "SELECT * FROM `farmharvesting` WHERE `Level`='5'"
+	// db_upgrade_database.query(stringQuery,function (error,rows) {
+	// 	console.log(rows[0].Unlock_ID)
+	// 	console.log(rows[0].Unlock_ID)
+	// 	if (rows[0].Unlock_ID==undefined) {console.log('a');}
+	// 	if (rows[0].Unlock_ID==null) {console.log('b');}
+	// 	if (rows[0].Unlock_ID!=0) {console.log('c');}
 	// })
-	// var stringQuery = "SELECT * FROM `all_guilds`.`13`"
-	// db_all_guild.query(stringQuery,function (error,rows) {
-	// 	if (!!error) {console.log(error);}
-	// 	console.log(rows)
-	// })
-
-	var dataSend = [];
-	new Promise((resolve,reject)=>{
-		var stringQueryGuildInfo = "SELECT * FROM `guild_info` WHERE `Guild_ID`='13'"
-		db_all_guild.query(stringQueryGuildInfo,function (error,rows) {
-			if (rows[0]!=null) {dataSend.push(rows[0]);}
-			else{
-				dataSend.push(null);
-			}
-			resolve();
-		})
-	}).then(()=>{
-		return new Promise((resolve,reject)=>{
-			var stringQueryGuildMember = "SELECT * FROM `13`"
-			db_all_guild.query(stringQueryGuildMember,function (error,rows) {
-				if (rows[0]!=null) {dataSend.push(rows[0]);}
-				else{
-					dataSend.push(null);
-				}
-				resolve();
-			})
-		})
-	}).then(()=>{
-		console.log(dataSend)
-		// socket.emit("S_GET_GUILD_INFO",{S_GET_GUILD_INFO:dataSend})
+	var stringQuery =  "SELECT `Name_Upgrade` FROM `upgrade`";
+	db_upgrade_database.query(stringQuery,function (error,rows) {
+		console.log(rows)
 	})
 }
+
+
 
 
 // var stringT = 2;
