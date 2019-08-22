@@ -55,6 +55,12 @@ exports.TimeMove ={
 	Diagonal : DiagonalTime,
 }
 
+exports.RssType ={
+	Farm: 3,
+	Wood: 6,
+	Stone: 9,
+	Metal: 12,
+}
 exports.ShowLogBool = {
 	Off: 0,
 	On: 1,

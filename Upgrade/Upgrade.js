@@ -15,7 +15,8 @@ var upgrade_Redis 			= require ('./Upgrade_Redis.js')
 
 var functions 				= require('./../Util/Functions.js');
 
-// var Promise 				= require('promise');
+var Promise 				= require('promise');
+
 var dbUpgrade,dbBase;
 var DetailError, LogChange;
 
@@ -250,21 +251,81 @@ function checkUnlock (dbUpgrade,data) {
 			}
 			functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js checkUnlock=>checkUnitInMap stringUpgrade',[stringUpgrade]);
 			checkUnitInMap (data,levelUpgrade,rows_tableQuery[0]);
-			checkUpgradeResource(data,levelUpgrade,rows_tableQuery[0]);
+
+			if (data.UpgradeType==2&&(data.ID_Upgrade>1 && data.ID_Upgrade<15)) {
+				checkUpgradeResource(data,levelUpgrade,rows_tableQuery[0]);
+			}
+			
 		});
 	});
 }
 
+
 function checkUpgradeResource (data,levelUpgrade,rows_tableQuery) {
 	functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js checkUpgradeResource data,levelUpgrade,rows_tableQuery',[data,levelUpgrade,rows_tableQuery]);
-	if (data.ID_Upgrade<15&&data.ID_Upgrade>1) {
-		if (data.UpgradeType==2) {
-			/*
-			di query loai upgrade => update loai nao
-			*/
-			var stringUpdate = "UPDATE `9` SET `Level`='"+levelUpgrade+"',`Harvest`=[value-7],`MaxStore`=[value-8] WHERE `ID_Upgrade`=''"
+	var dataUpgrade={}
+	new Promise((resolve,reject)=>{
+		var stringQueryTable = "SELECT * FROM `"+rows_tableQuery.Name_Upgrade+"` WHERE `Level` ='"+levelUpgrade+"'"
+		db_upgrade_database.query(stringQueryTable,function (error,rows) {
+			if (!!error) {console.log(error);}
+			dataUpgrade = rows[0]
+			resolve();
+		})
+	}).then(()=>{
+
+		var stringUpdate = "";
+		if (rows_tableQuery.Name_Upgrade.includes("harvesting")) {
+			stringUpdate="UPDATE `"+data.ID_User+"` SET "
+			+"`Level`='"+levelUpgrade+"',"
+			+"`Harvest`='"+dataUpgrade.Harvest+"',"
+			+"`MaxStore`='"+dataUpgrade.MaxStore
+			+"' WHERE `ID_Upgrade`='"+data.ID_Upgrade+"'";
+
+			if (levelUpgrade==1) {
+				var startTime = functions.GetTime();
+				var timeOut = (dataUpgrade.MaxStore/dataUpgrade.Harvest)*1000
+				var endTime = timeOut + startTime;
+				stringUpdate="UPDATE `"+data.ID_User+"` SET "
+				+"`Level`='"+levelUpgrade+"',"
+				+"`Harvest`='"+dataUpgrade.Harvest+"',"
+				+"`StartTime`='"+startTime+"',"
+				+"`EndTime`='"+endTime+"',"
+				+"`MaxStore`='"+dataUpgrade.MaxStore
+				+"' WHERE `ID_Upgrade`='"+data.ID_Upgrade+"'";
+				//setTimer
+			}
+			
+		}else if (rows_tableQuery.Name_Upgrade.includes("gathering")){
+			stringUpdate="";
 		}
-	}
+		db_all_harvest.query(stringUpdate,function (error,result) {
+			if (!!error) {console.log(error);}
+			resolve()
+		})
+		// return new Promise((resolve,reject)=>{
+		// 	var stringUpdate = "";
+		// 	if (rows_tableQuery.Name_Upgrade.includes("harvesting")) {
+
+		// 	}else if (rows_tableQuery.Name_Upgrade.includes("gathering")){
+		// 		stringUpdate="";
+		// 	}
+
+		// })
+
+	}).then(()=>{
+		return new Promise((resolve,reject)=>{
+			if (levelUpgrade==1&&rows_tableQuery.Name_Upgrade.includes("harvesting")) {
+				// StartHarvest()
+			}
+		})
+	})
+	
+	/*
+	di query loai upgrade => update loai nao
+	*/
+	var stringUpdate = "UPDATE `9` SET `Level`='"+levelUpgrade+"',`Harvest`=[value-7],`MaxStore`=[value-8] WHERE `ID_Upgrade`=''"
+
+
 }
 
 function checkUnitInMap (data,levelUpgrade,rows_tableQuery) {
@@ -276,7 +337,7 @@ function checkUnitInMap (data,levelUpgrade,rows_tableQuery) {
 		dataUnitUpgrade.Health = rows_tableQuery.Health;
 		dataUnitUpgrade.Attack = rows_tableQuery.Attack;
 		dataUnitUpgrade.Defend = rows_tableQuery.Defend;
-		
+
 		var stringQueryUnit = "SELECT * FROM `s"+data.ID_Server+"_unit` WHERE `ID_User`='"+data.ID_User+"' AND `BaseNumber`='"+data.BaseNumber+"' AND `ID_Unit` ='"+data.ID_Upgrade+"'"
 		db_positon.query(stringQueryUnit,function (error,rows) {
 			if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Upgrade.js checkUnitInMap stringQueryUnit',[stringQueryUnit]);}
