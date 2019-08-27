@@ -511,10 +511,10 @@ function sendReject (io,data) {
 	});
 
 	var stringHSocket = "s"+data.Server_ID+"_socket";
-	functions.ShowLog(functions.ShowLogBool.Check,'ApplyGuild.js sendReject stringHSocket',[stringHSocket);		
+	functions.ShowLog(functions.ShowLogBool.Check,'ApplyGuild.js sendReject stringHSocket',[stringHSocket]);		
 	client.hget(stringHSocket,data.ID_Reject,function (error,rowsSocket) {
 		if (rows!=null) {
-			functions.ShowLog(functions.ShowLogBool.Check,'ApplyGuild.js sendReject emit data',[data);		
+			functions.ShowLog(functions.ShowLogBool.Check,'ApplyGuild.js sendReject emit data',[data]);		
 			io.to(rowsSocket).emit('R_REJECT_APPLY',{R_REJECT_APPLY:data});
 		}
 	});
@@ -534,12 +534,12 @@ function R_REJECT_APPLY (io,data,row) {
 	// 	ID_Reject: data.ID_Reject,
 	// 	Guild_ID: data.Guild_ID
 	// }
-	functions.ShowLog(functions.ShowLogBool.Check,'ApplyGuild.js R_REJECT_APPLY stringQuery',[stringQuery);
+	functions.ShowLog(functions.ShowLogBool.Check,'ApplyGuild.js R_REJECT_APPLY stringQuery',[stringQuery]);
 
 	db_all_user.query(stringQuery,function (error,rows) {
-		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'ApplyGuild.js R_REJECT_APPLY stringQuery',[stringQuery);}
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'ApplyGuild.js R_REJECT_APPLY stringQuery',[stringQuery]);}
 		if (rows[0].Socket!=null) {
-			functions.ShowLog(functions.ShowLogBool.Check,'ApplyGuild.js R_REJECT_APPLY rows[0].Socket,data',[rows[0].Socket,data);
+			functions.ShowLog(functions.ShowLogBool.Check,'ApplyGuild.js R_REJECT_APPLY rows[0].Socket,data',[rows[0].Socket,data]);
 			io.to(rows[0].Socket).emit('R_REJECT_APPLY',{R_REJECT_APPLY:data});
 		}
 	});

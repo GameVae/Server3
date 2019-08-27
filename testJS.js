@@ -1,24 +1,60 @@
 'use strict';
-
-// var stringTest ="farmgarthering"
-var stringTest ="farmharvesting"
-var functions 				= require('./Util/Functions.js');
-var hpm = 65/60
-// 375
-console.log(375/60)
-console.log(6.25*60)
-console.log(375/hpm)
-console.log(parseInt(346.1538461538462*hpm))
+var listmove =[]
+console.log(JSON.parse(listmove))
+// // var stringTest ="farmgarthering"
+// var stringTest ="farmharvesting"
+// var functions 				= require('./Util/Functions.js');
+// var hpm = 65/60
+// // 375
+// console.log(375/60)
+// console.log(6.25*60)
+// console.log(375/hpm)
+// console.log(parseInt(346.1538461538462*hpm))
 // test()
 // function test () {
 // 	var startTime = functions.GetTime();
 // 	var timeOut =  (375*60/(65))*1000
+// var nodemailer    = require('nodemailer');
+// var functions = require('./Util/Functions.js');
+
+// reigister()
+// function reigister () {
+// 	  let transporter = nodemailer.createTransport({
+// 	  	service: 'gmail',
+// 	  	auth: {
+// 	  		user: "testdemanvi@gmail.com",
+// 	  		pass: "canthan112"
+// 	  	}
+// 	  });
+
+//     // setup email data with unicode symbols
+//     let mailOptions = {
+//         from: '"Game VAE-Đăng ký tài khoản tại GameTest" <gameVae@demandvi.com>', // sender address
+//         to: 'homanhquan87@gmail.com', // list of receivers
+//         subject: 'Thông báo đăng kí tài khoản', // Subject line
+//         text: '✔ Đăng kí tài khoản thành công', // plain text body
+//         html: "<b>Bạn đã đăng kí tài khoản thành công với tên: 123 và email: homanhquan87@gmail.com'</b>"
+//     };
+
+//     // send mail with defined transport object
+//     transporter.sendMail(mailOptions, (error, info) => 
+//     {
+//     	if (!!error) {
+//     		// console.log('error')
+//     		// console.log(error)
+//     		functions.ShowLog(functions.ShowLogBool.Error,'SendMail.js Register mailOptions',[mailOptions]);}
+//     	functions.ShowLog(functions.ShowLogBool.LogChange,'SendMail.js Register mailOptions',[mailOptions]);
+//     	// console.log('Message %s sent: %s', info.messageId, info.response);
+//     });
+// }
+
+
 // 	var endTime =  timeOut + startTime;
 // 	console.log('startTime')
 // 	console.log(startTime)
 // 	console.log('endTime')
 // 	console.log(endTime)
-	
+
 // 	console.log('timeOut')
 // 	console.log(timeOut)
 // 	var testTime = setTimeout(function () {
@@ -39,10 +75,14 @@ console.log(parseInt(346.1538461538462*hpm))
 // client = redis.createClient();
 // client.select(2)
 // // removeValueFriend ("44",'43')
-// test (43,12)
-// function test (ID_User,GuildID) {
-// 	var stringHGuild = "all_guilds";
-
+// test ()
+// function test () {
+// 	var stringHUnit = "s1_unit"
+// 	client.hget(stringHUnit,"1_17_42_957",function (error,rows) {
+// 		var result = JSON.parse(rows)
+// 		console.log(result.Position_Cell)
+// 	})
+// }
 // 	client.hset(stringHGuild,ID_User,GuildID.toString());
 // }
 

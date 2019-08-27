@@ -11,8 +11,6 @@ var db_all_harvest			= require('./../Util/Database/Db_all_harvest.js');
 var db_positon 				= require('./../Util/Database/Db_position.js');
 var db_upgrade_database		= require('./../Util/Database/Db_upgrade_database.js');
 
-var upgrade_Redis 			= require ('./Upgrade_Redis.js')
-
 var functions 				= require('./../Util/Functions.js');
 
 var Promise 				= require('promise');
@@ -80,7 +78,7 @@ exports.StartHarvest = function (io,ID_User,ID_Upgrade,ID_Server) {
 					stringUpdateUserRSS ="UPDATE `"+ID_User+"` SET `Metal`=`Metal`+'"+currentHarvest+"';"
 					break;
 				}				
-				switch (ID_Server) {
+				switch (parseInt(ID_Server)) {
 					case 1:
 					dbBase = db_s1_base_info;
 					break;
@@ -139,7 +137,7 @@ exports.StartHarvest = function (io,ID_User,ID_Upgrade,ID_Server) {
 			}else{
 				resolve();
 			}
-		}
+		})
 	}).then(()=>{
 
 		return new Promise((resolve,reject)=>{

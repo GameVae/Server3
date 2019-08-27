@@ -12,18 +12,19 @@ var DetailError,logChangeDetail;
 
 var Promise = require('promise')
 
-var DetailError,LogChange;
+
 var currentTime,offlineTime,calcTime;
 // move.Test(2)
-exports.UpdateDataBase = function updateDataBase2 (serverInt) {
+exports.UpdateDataBase = function (serverInt) {
+	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js UpdateDataBase=>updateDataBase serverInt',[serverInt]);
 	updateDataBase (serverInt);
 }
 // updateDataBase2 (1)
 function updateDataBase (serverInt) {
 	var stringQuery = "SELECT * FROM `s"+serverInt+"_unit` WHERE `TimeFinishMove`<> 'Null'";
-	
+	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDataBase serverInt,stringQuery',[serverInt,stringQuery]);
 	db_position.query(stringQuery,function (error,rows) {
-		if (!!error){DetailError = ('Moving_Update.js: updateDataBase TimeFinishMove: '+stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDataBase stringQuery',[stringQuery]);}
 		if (rows.length>0) {
 			for (var i = 0; i < rows.length; i++) {
 				// updateData = rows[i];
@@ -32,6 +33,7 @@ function updateDataBase (serverInt) {
 
 				// console.log('moving update unit')
 				// getDataUpdate (serverInt,updateData);
+				functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDataBase=>getDataUpdate serverInt,rows[i]',[serverInt,rows[i]]);
 				getDataUpdate (serverInt,rows[i]);
 				// console.log(updateData)
 			}
@@ -65,60 +67,65 @@ function updateDataBase (serverInt) {
 // getDataUpdate (1,S_MOVE_data)
 
 function getDataUpdate (serverInt,data){		
-	// console.log(data)
+	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js getDataUpdate serverInt,data',[serverInt,data]);
+
 	currentTime = functions.GetTime();
-	
-	var updateData = Object.create(data);
-	updateData.Server_ID = serverInt;
-	updateData.ID=data.ID;
-	updateData.ID_Unit=data.ID_Unit;
-	updateData.ID_User=data.ID_User;
-	updateData.BaseNumber=data.BaseNumber;
-	updateData.Level=data.Level;
-	updateData.Quality=data.Quality;
-	updateData.Hea_cur=data.Hea_cur;
-	updateData.Health=data.Health;
-	updateData.Attack=data.Attack;
-	updateData.Defend=data.Defend;
-	updateData.Position_Cell=data.Position_Cell;
-	updateData.Next_Cell=data.Next_Cell;
-	updateData.End_Cell=data.End_Cell;
+	var updateData = data;
+	// var updateData  = Object.create(data);
+	// updateData.Server_ID = serverInt;
+	// updateData.ID = data.ID;
+	// updateData.ID_Unit = data.ID_Unit;
+	// updateData.ID_User = data.ID_User;
+	// updateData.BaseNumber = data.BaseNumber;
+	// updateData.Level = data.Level;
+	// updateData.Quality = data.Quality;
+	// updateData.Hea_cur = data.Hea_cur;
+	// updateData.Health = data.Health;
+	// updateData.Attack = data.Attack;
+	// updateData.Defend = data.Defend;
+	// updateData.Position_Cell = data.Position_Cell;
+	// updateData.Next_Cell = data.Next_Cell;
+	// updateData.End_Cell = data.End_Cell;
 	
 	var TimeMoveNextCell = functions.TimeMove.Diagonal*0.5;
 	updateData.TimeMoveNextCell = TimeMoveNextCell;
-
-	updateData.TimeFinishMove = TimeMoveNextCell + functions.ExportTimeDatabase(data.TimeFinishMove) - functions.ExportTimeDatabase(data.TimeMoveNextCell)	
-
 	var ListMove = JSON.parse(data.ListMove);
-
-	if (updateData.ListMove.length>0) {
-		for (var i = 0; i < ListMove.length; i++) {
-			ListMove[i].TimeMoveNextCell = TimeMoveNextCell + functions.ExportTimeDatabase(ListMove[i].TimeMoveNextCell) - functions.ExportTimeDatabase(data.TimeMoveNextCell);
+	updateData.TimeFinishMove = TimeMoveNextCell + functions.ExportTimeDatabase(data.TimeFinishMove) - functions.ExportTimeDatabase(data.TimeMoveNextCell)	
+	
+	if (data.ListMove.length>0) {
+		if (updateData.ListMove.length>0) {
+			for (var i = 0; i < ListMove.length; i++) {
+				ListMove[i].TimeMoveNextCell = TimeMoveNextCell + functions.ExportTimeDatabase(ListMove[i].TimeMoveNextCell) - functions.ExportTimeDatabase(data.TimeMoveNextCell);
+			}
 		}
+		updateData.ListMove = ListMove;	
 	}
-	updateData.ListMove = ListMove;	
 	// console.log(updateData);
+
+	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js getDataUpdate=>updateDatabase updateData',[updateData]);
 	updateDatabase(updateData);
+	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js getDataUpdate=>move.MoveCalc updateData',[updateData]);
 	move.MoveCalc(null,null,updateData);	
 }
 
 function updateDatabase (data) {
+	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDatabase data',[data]);
 	var updateData = data;
 	// console.log(updateData)
 	// console.log(data.TimeMoveNextCell)
 	// console.log(currentTime)
 	updateData.TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(data.TimeMoveNextCell + currentTime).toISOString())
 	updateData.TimeFinishMove = functions.ImportTimeToDatabase(new Date(data.TimeFinishMove + currentTime).toISOString())
-	
 	var ListMove = data.ListMove;
-	
-	if (ListMove.length>0) {
-		for (var i = 0; i < ListMove.length; i++) {
-			ListMove[i].TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(ListMove[i].TimeMoveNextCell + currentTime).toISOString())
+	if (data.ListMove.length>0) {		
+		if (ListMove.length>0) {
+			for (var i = 0; i < ListMove.length; i++) {
+				ListMove[i].TimeMoveNextCell = functions.ImportTimeToDatabase(new Date(ListMove[i].TimeMoveNextCell + currentTime).toISOString())
+			}
 		}
+		// console.log(updateData)
 	}
-	// console.log(updateData)
-	
+	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDatabase data,updateData',[data,updateData]);
 	var stringUpdate;
 	if (updateData.ListMove.length==0) {
 		stringUpdate = "UPDATE `s"+updateData.Server_ID+"_unit` SET "
@@ -141,9 +148,9 @@ function updateDatabase (data) {
 		+"`Status`='"+functions.UnitStatus.Move+
 		"' WHERE `ID`='"+updateData.ID+"'";
 	}
-	// console.log(stringUpdate);
+	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDatabase stringUpdate',[stringUpdate]);
 	db_position.query(stringUpdate,function (error,result) {
-		if (!!error){DetailError = ('Moving_Update.js: updateDatabase: '+stringUpdate); functions.WriteLogError(DetailError,2);}
-		LogChange = ("Moving_Update.js: updateDatabase "+stringUpdate); functions.LogChange(LogChange,2);
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Moving_Update.js updateDatabase stringUpdate',[stringUpdate]);}
+		functions.ShowLog(functions.ShowLogBool.LogChange,'Moving_Update.js updateDatabase stringUpdate',[stringUpdate]);
 	});
 }

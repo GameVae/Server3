@@ -31,16 +31,25 @@ var dataSearchGuild ={
 function S_SEARCH_GUILD (socket,data) {
 	var stringQuery = "SELECT * FROM `guild_info` WHERE `GuildTag` LIKE '"+data.GuildTag+"' OR `GuildName` LIKE '"+data.GuildName+"'";
 	functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js S_SEARCH_GUILD data,stringQuery',[data,stringQuery]);
+	
+	var dataSend = [];
 	db_all_guild.query(stringQuery,function (error,rows) {
 		if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'GetGuild.js S_SEARCH_GUILD stringQuery',[stringQuery]);}
 		functions.ShowLog(functions.ShowLogBool.Check,'GetGuild.js S_SEARCH_GUILD emit',[rows]);
-		socket.emit("R_SEARCH_GUILD",{R_SEARCH_GUILD:rows})
+		if (rows!=null) {
+			if (rows.length<20) {
+				for (var i = 0; i < 20; i++) {
+					dataSend.push(rows[i]);
+				}
+			}
+		}
+		socket.emit("R_SEARCH_GUILD",{R_SEARCH_GUILD:dataSend})
 	})
 
 }
 
-var dataGuildInfo ={
-	Guild_ID: "",
+var dataGuildInfo = {
+	Guild_ID: ""
 }
 
 function S_GET_GUILD_INFO (socket,data) {

@@ -4,17 +4,17 @@ const nodemailer    = require('nodemailer');
 var functions = require("./../Functions.js");
 
 exports.Register = function reigister (UserName,Email) {
-	  let transporter = nodemailer.createTransport({
-	  	service: 'gmail',
-	  	auth: {
-	  		user: 'testdemanvi@gmail.com',
-	  		pass: 'canthan112'
-	  	}
-	  });
+ let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+       user: 'testdemanvi@gmail.com',
+       pass: 'canthan112'
+   }
+});
 
     // setup email data with unicode symbols
     let mailOptions = {
-        from: '"Game VAE" <gameVae@demandvi.com>', // sender address
+        from: '"Game VAE-Đăng ký tài khoản tại GameTest" <gameVae@demandvi.com>', // sender address
         to: Email, // list of receivers
         subject: 'Thông báo đăng kí tài khoản', // Subject line
         text: '✔ Đăng kí tài khoản thành công', // plain text body
@@ -24,10 +24,11 @@ exports.Register = function reigister (UserName,Email) {
     // send mail with defined transport object
     transporter.sendMail(mailOptions, (error, info) => 
     {
-    	if (error) {
-    		return console.log(error);
-    	}
-    	functions.LogChange("Send mail Register: "+UserName+"_Email: "+Email);
+    	if (!!error) {
+            functions.ShowLog(functions.ShowLogBool.Error,'SendMail.js Register mailOptions',[mailOptions]);
+            functions.ShowLog(functions.ShowLogBool.Error,'SendMail.js Register error',[error]);
+        }
+        functions.ShowLog(functions.ShowLogBool.LogChange,'SendMail.js Register mailOptions',[mailOptions]);
     	// console.log('Message %s sent: %s', info.messageId, info.response);
     });
 }

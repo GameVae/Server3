@@ -11,7 +11,8 @@ var db_all_harvest			= require('./../Util/Database/Db_all_harvest.js');
 var db_positon 				= require('./../Util/Database/Db_position.js');
 var db_upgrade_database		= require('./../Util/Database/Db_upgrade_database.js');
 
-var upgrade_Redis 			= require ('./Upgrade_Redis.js')
+var harvest 				= require('./../Harvest/Harvest.js');
+var upgrade_Redis 			= require ('./Upgrade_Redis.js');
 
 var functions 				= require('./../Util/Functions.js');
 
@@ -36,7 +37,7 @@ exports.Start = function start (io) {
 	io.on('connection', function(socket){
 		socket.on('S_UPGRADE', function (data){
 			//console.log('socketID: '+socket.id);
-			S_UPGRADE (data);
+			S_UPGRADE (io,data);
 		});
 		// socket.on('S_UPGRADE_SPEEDUP',function (data) {
 		// 	S_UPGRADE_SPEEDUP(socket,data);
@@ -44,7 +45,7 @@ exports.Start = function start (io) {
 	});
 }
 // S_UPGRADE (dataIns);
-function S_UPGRADE (data) {
+function S_UPGRADE (io,data) {
 	//console.log(data);
 	switch (parseInt(data.ID_Server)) {
 		case 1:
@@ -66,28 +67,28 @@ function S_UPGRADE (data) {
 		if (parseInt(data.UpgradeType)==1 && rows[0].UpgradeTime==null) {
 			if (data.Level==rows[0].Level||data.Level==0) {
 				functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js S_UPGRADE=>materialCalc1 data,rows[0]',[data,rows[0]]);
-				materialCalc (dbBase,data,rows[0]);
+				materialCalc (io,dbBase,data,rows[0]);
 			}
 		}else if (parseInt(data.UpgradeType)==2 && rows[0].ResearchTime==null) {
 			if (data.Level==rows[0].Level||data.Level==0) {
 				functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js S_UPGRADE=>materialCalc2 data,rows[0]',[data,rows[0]]);
-				materialCalc (dbBase,data,rows[0]);
+				materialCalc (io,dbBase,data,rows[0]);
 			}
 		}
 	});
 }
 
-function materialCalc (dbBase,data,rowUpgrade) {
+function materialCalc (io,dbBase,data,rowUpgrade) {
 	var stringMaterial = "SELECT * FROM `"+rowUpgrade.Name_Upgrade+"` WHERE `Level`= "+data.Level;
 	functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js materialCalc stringMaterial',[stringMaterial]);
 	db_upgrade_database.query(stringMaterial,function (error,rows) {
 		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Upgrade.js materialCalc stringMaterial',[stringMaterial]);}
 		functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js materialCalc=>checkMaterial data,rows[0]',[data,rows[0]]);
-		checkMaterial (dbBase,data,rows[0]);
+		checkMaterial (io,dbBase,data,rows[0]);
 	});
 }
 
-function checkMaterial (dbBase,data,rowsMaterial) {
+function checkMaterial (io,dbBase,data,rowsMaterial) {
 	var stringQuery = "SELECT `Farm`,`Wood`,`Stone`,`Metal` FROM `"+data.ID_User+"` WHERE `ID`="+data.BaseNumber;
 	functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js checkMaterial data,rowsMaterial,stringQuery',[data,rowsMaterial,stringQuery]);
 	dbBase.query(stringQuery,function (error,rows) {
@@ -98,7 +99,7 @@ function checkMaterial (dbBase,data,rowsMaterial) {
 			// console.log('fail material-reset scene-not enough rss');
 		}else{
 			updateUserMaterial (dbBase,data,rowsMaterial);
-			updateBaseUser (dbBase,data,rowsMaterial);
+			updateBaseUser (io,dbBase,data,rowsMaterial);
 		}
 	});
 }
@@ -117,7 +118,7 @@ function updateUserMaterial (dbBase,data,rowsMaterial) {
 	});
 }
 
-function updateBaseUser (dbBase,data,rowUpgrade) {	
+function updateBaseUser (io,dbBase,data,rowUpgrade) {	
 	var stringUpgrade;
 	var timeUpgrade = functions.GetTime()+rowUpgrade.TimeInt*1000;
 	var stringTime = new Date(timeUpgrade).toISOString();
@@ -141,11 +142,11 @@ function updateBaseUser (dbBase,data,rowUpgrade) {
 		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Upgrade.js updateBaseUser stringUpgrade',[stringUpgrade]);}
 		functions.ShowLog(functions.ShowLogBool.LogChange,'Upgrade.js updateBaseUser stringUpgrade',[stringUpgrade]);
 		functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js updateBaseUser=>setTimerUpdateDatabase rowUpgrade.TimeInt*1000,data',[rowUpgrade.TimeInt*1000,data]);
-		setTimerUpdateDatabase (rowUpgrade.TimeInt*1000,data);
+		setTimerUpdateDatabase (io,rowUpgrade.TimeInt*1000,data);
 	});
 }
 
-function setTimerUpdateDatabase (timeOut,data) {
+function setTimerUpdateDatabase (io,timeOut,data) {
 
 	var stringTimeOut = data.ID_User+"_"+data.BaseNumber+"_"+data.ID_Upgrade+"_"+data.UpgradeType;
 	//console.log("stringTimeOut: "+stringTimeOut)
@@ -189,7 +190,7 @@ function setTimerUpdateDatabase (timeOut,data) {
 				}
 
 				functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js setTimerUpdateDatabase=>checkUnlock data',[dbUpgrade,data]);
-				checkUnlock (dbUpgrade,data);
+				checkUnlock (io,dbUpgrade,data);
 
 				stringUpdateBaseUpgrade ="UPDATE `"+data.ID_User+"_"+data.BaseNumber+"` SET `Level`=`Level`+1 WHERE `ID` = "+ data.ID_Upgrade;
 				functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js setTimerUpdateDatabase ',[stringUpdateBaseUpgrade]);
@@ -226,7 +227,7 @@ function setTimerUpdateDatabase (timeOut,data) {
 
 }
 
-function checkUnlock (dbUpgrade,data) {
+function checkUnlock (io,dbUpgrade,data) {
 	var returnUnlockID = 0;
 	var levelUpgrade = parseInt(data.Level)+1;
 	//console.log(levelUpgrade)
@@ -252,8 +253,8 @@ function checkUnlock (dbUpgrade,data) {
 			functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js checkUnlock=>checkUnitInMap stringUpgrade',[stringUpgrade]);
 			checkUnitInMap (data,levelUpgrade,rows_tableQuery[0]);
 
-			if (data.UpgradeType==2&&(data.ID_Upgrade>1 && data.ID_Upgrade<15)) {
-				checkUpgradeResource(data,levelUpgrade,rows_tableQuery[0]);
+			if (data.ID_Upgrade>1 && data.ID_Upgrade<15) {
+				checkUpgradeResource(io,data,levelUpgrade,rows_tableQuery[0]);
 			}
 			
 		});
@@ -261,39 +262,42 @@ function checkUnlock (dbUpgrade,data) {
 }
 
 
-function checkUpgradeResource (data,levelUpgrade,rows_tableQuery) {
+function checkUpgradeResource (io,data,levelUpgrade,rows_tableQuery) {
 	functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js checkUpgradeResource data,levelUpgrade,rows_tableQuery',[data,levelUpgrade,rows_tableQuery]);
 	var dataUpgrade={}
 	new Promise((resolve,reject)=>{
 		var stringQueryTable = "SELECT * FROM `"+rows_tableQuery.Name_Upgrade+"` WHERE `Level` ='"+levelUpgrade+"'"
 		db_upgrade_database.query(stringQueryTable,function (error,rows) {
-			if (!!error) {console.log(error);}
-			dataUpgrade = rows[0]
+			if (!!error) {functions.ShowLog(functions.ShowLogBool.Error,'Upgrade.js checkUpgradeResource stringQueryTable',[stringQueryTable]);}
+			dataUpgrade = rows[0];
 			resolve();
 		})
 	}).then(()=>{
 
 		var stringUpdate = "";
 		if (rows_tableQuery.Name_Upgrade.includes("harvesting")) {
-			stringUpdate="UPDATE `"+data.ID_User+"` SET "
-			+"`Level`='"+levelUpgrade+"',"
-			+"`Harvest`='"+dataUpgrade.Harvest+"',"
-			+"`MaxStore`='"+dataUpgrade.MaxStore
-			+"' WHERE `ID_Upgrade`='"+data.ID_Upgrade+"'";
+			functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js checkUpgradeResource data,levelUpgrade,rows_tableQuery',[data,levelUpgrade,rows_tableQuery]);
+			harvest.StartHarvest(io,data.ID_User,data.ID_Upgrade,data.ID_Server);
 
-			if (levelUpgrade==1) {
-				var startTime = functions.GetTime();
-				var timeOut = (dataUpgrade.MaxStore/dataUpgrade.Harvest)*1000
-				var endTime = timeOut + startTime;
-				stringUpdate="UPDATE `"+data.ID_User+"` SET "
-				+"`Level`='"+levelUpgrade+"',"
-				+"`Harvest`='"+dataUpgrade.Harvest+"',"
-				+"`StartTime`='"+startTime+"',"
-				+"`EndTime`='"+endTime+"',"
-				+"`MaxStore`='"+dataUpgrade.MaxStore
-				+"' WHERE `ID_Upgrade`='"+data.ID_Upgrade+"'";
-				//setTimer
-			}
+			// stringUpdate="UPDATE `"+data.ID_User+"` SET "
+			// +"`Level`='"+levelUpgrade+"',"
+			// +"`Harvest`='"+dataUpgrade.Harvest+"',"
+			// +"`MaxStore`='"+dataUpgrade.MaxStore
+			// +"' WHERE `ID_Upgrade`='"+data.ID_Upgrade+"'";
+
+			// if (levelUpgrade==1) {
+			// 	var startTime = functions.GetTime();
+			// 	var timeOut = (dataUpgrade.MaxStore/dataUpgrade.Harvest)*1000
+			// 	var endTime = timeOut + startTime;
+			// 	stringUpdate="UPDATE `"+data.ID_User+"` SET "
+			// 	+"`Level`='"+levelUpgrade+"',"
+			// 	+"`Harvest`='"+dataUpgrade.Harvest+"',"
+			// 	+"`StartTime`='"+startTime+"',"
+			// 	+"`EndTime`='"+endTime+"',"
+			// 	+"`MaxStore`='"+dataUpgrade.MaxStore
+			// 	+"' WHERE `ID_Upgrade`='"+data.ID_Upgrade+"'";
+			// 	//setTimer
+			// }
 			
 		}else if (rows_tableQuery.Name_Upgrade.includes("gathering")){
 			stringUpdate="";
