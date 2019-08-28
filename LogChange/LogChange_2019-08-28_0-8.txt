@@ -1,0 +1,22 @@
+
+ logChangeDetail: 2019-08-28T01:23:59.008Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='289,5,0' WHERE `ID_Type`='42_0_1';
+ logChangeDetail: 2019-08-28T01:23:59.010Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='295,10,0' WHERE `ID_Type`='44_0_1';
+ logChangeDetail: 2019-08-28T01:23:59.014Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='265,0,0' WHERE `ID_Type`='45_0_1';
+ logChangeDetail: 2019-08-28T01:23:59.020Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='489,80,0' WHERE `ID_Type`='9_0_1';
+ logChangeDetail: 2019-08-28T01:23:59.017Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='343,0,0' WHERE `ID_Type`='46_0_1';
+ logChangeDetail: 2019-08-28T01:23:59.012Z: UpdateServerPosition.js: queryBaseTable UPDATE `s1_position` SET `Position_Cell`='299,0,0' WHERE `ID_Type`='43_0_1';
+ logChangeDetail: 2019-08-28T01:24:06.040Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:26:43.463Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:28:12.456Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:36:16.206Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:38:52.305Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:40:17.287Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:43:47.646Z: Login.js: queryUserNamePass: ndinhtoan46
+ logChangeDetail: 2019-08-28T01:44:20.077Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:45:19.600Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:48:04.570Z: Login.js: queryUserNamePass: ndinhtoan44
+ logChangeDetail: 2019-08-28T01:49:02.627Z: Login.js: queryUserNamePass: ndinhtoan46
+ logChangeDetail: 2019-08-28T01:50:01.470Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:52:08.063Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:57:59.621Z: Login.js: queryUserNamePass: ndinhtoan45
+ logChangeDetail: 2019-08-28T01:59:01.117Z: Login.js: queryUserNamePass: ndinhtoan45

@@ -8,6 +8,10 @@ namespace Generic.Contants
     public sealed class Constants : MonoSingle<Constants>
     {
         /// <summary>
+        /// Streaming Assets path for config file
+        /// </summary>
+        public const string ConfigFilePath = "/Config/game.config";
+        /// <summary>
         /// Length base on cell
         /// </summary>
         public const int TOTAL_COL = 522;
@@ -156,6 +160,12 @@ namespace Generic.Contants
             
         }
         
+        public static bool IsTargetInRange(Vector3Int cur,Vector3Int tar,int range)
+        {
+            Vector3Int[] pattern = GetNeighboursRange(cur, range);
+            return pattern.IsContaint(tar);
+        }
+
         /// <summary>
         /// determine client position is valid or not
         /// </summary>
@@ -237,8 +247,8 @@ namespace Generic.Contants
         {
             base.Awake();
 
-            //QualitySettings.vSyncCount = 0;
-            //Application.targetFrameRate = 30;
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 30;
 
             PixelDependencyDevice = 1.0f / Screen.dpi;
             ScreenRatio = Screen.width * 1.0f / Screen.height;
@@ -247,7 +257,7 @@ namespace Generic.Contants
 
         private void Start()
         {
-            // Debugger.Log("DPI: " + Screen.dpi + " - Dependency Device: " + PixelDependencyDevice + " ratio: " + ScreenRatio);
+             Debugger.Log("DPI: " + Screen.dpi + " - Dependency Device: " + PixelDependencyDevice + " ratio: " + ScreenRatio);
             // TODO:[TEST]
             //System.Threading.ThreadPool.GetMaxThreads(out int maxWorkerNum, out int maxCompletionPort);
             //System.Threading.ThreadPool.GetMinThreads(out int minWorkerNum, out int minCompletionPort);

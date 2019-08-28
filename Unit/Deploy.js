@@ -78,11 +78,11 @@ function sendUnitToMap (io,socket,dbDefend,dbUpgrade,data) {
 		checkPosition (data,resultPostion,function (checkBool) {
 			if (checkBool) {
 				getUnitLevel (data,dbUpgrade,function (returnValue) {
-					data["Level"]= returnValue.Level;
-					data["Hea_cur"]= returnValue.Hea_cur;
-					data["Health"]= returnValue.Health;
-					data["Attack"]= returnValue.Attack;
-					data["Defend"]= returnValue.Defend;
+					data["Level"] = returnValue.Level;
+					data["Hea_cur"] = returnValue.Hea_cur;
+					data["Health"] = returnValue.Health;
+					data["Attack"] = returnValue.Attack;
+					data["Defend"] = returnValue.Defend;
 					insertPosition (io,socket,data,resultPostion);
 					updateBaseDefend (dbDefend,data);
 			

@@ -90,7 +90,7 @@ function unitRange2 (data) {
 
 	var stringHkey = "s"+data.Server_ID+"_pos";
 	var stringKey=[];
-	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.BaseNumber;
+	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	
 	stringKey[0] = data.Position_Cell;
 
@@ -150,7 +150,7 @@ function unitRange3 (data) {
 
 	var stringHkey = "s"+data.Server_ID+"_pos";
 	var stringKey=[];
-	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.BaseNumber;
+	var ID_Key = data.Server_ID+"_"+data.ID_Unit+"_"+data.ID_User+"_"+data.ID;
 	
 	if (posY%2==0) {
 		//even

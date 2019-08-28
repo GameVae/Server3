@@ -151,12 +151,12 @@ function moveCalc (io,socket,data) {
 	positionRemove.PostionRemove(data);
 	functions.ShowLog(functions.ShowLogBool.Clear,'Moving.js moveCalc=>setTimerUpdateDatabase data,stringKey',[data,stringKey])
 	// setTimerUpdateDatabase (io,socket,data,stringKey);
-	setTimerUpdateDatabaseRange1 (io,socket,data,stringUnit);
+	setTimerUpdateDatabaseRange1 (io,socket,data,stringKey);
 
-	// if (data.ID_Unit>15&&data.ID_Unit<20){setTimerUpdateDatabaseRange1 (io,socket,data,stringUnit);}
-	// else if (data.ID_Unit>20&&data.ID_Unit<25){setTimerUpdateDatabaseRange2 (io,socket,data,stringUnit);}
-	// else if (data.ID_Unit>25&&data.ID_Unit<30){setTimerUpdateDatabaseRange1 (io,socket,data,stringUnit);}
-	// else if (data.ID_Unit>30&&data.ID_Unit<35){setTimerUpdateDatabaseRange3 (io,socket,data,stringUnit);}
+	// if (data.ID_Unit>15&&data.ID_Unit<20){setTimerUpdateDatabaseRange1 (io,socket,data,stringKey);}
+	// else if (data.ID_Unit>20&&data.ID_Unit<25){setTimerUpdateDatabaseRange2 (io,socket,data,stringKey);}
+	// else if (data.ID_Unit>25&&data.ID_Unit<30){setTimerUpdateDatabaseRange1 (io,socket,data,stringKey);}
+	// else if (data.ID_Unit>30&&data.ID_Unit<35){setTimerUpdateDatabaseRange3 (io,socket,data,stringKey);}
 }
 
 function updateDataBaseSMOVE (data) {
@@ -276,8 +276,9 @@ function setTimerUpdateDatabaseRange1 (io,socket,data,stringKey) {
 					updateDataMove.TimeMoveNextCell = null;
 					updateDataMove.TimeFinishMove = null;
 					updateDataMove.Status = 6;
-
-					attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell,null);
+// (io,stringUnit,pos,attackingUnit
+					attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell,updateDataMove.Attack_Unit_ID);
+					// attackFunc.CheckAttackPosition(io,stringKey,updateDataMove.Position_Cell,null);
 
 					positionAdd.AddPosition(updateDataMove);
 				}
@@ -499,6 +500,7 @@ function setTimerUpdateDatabaseRange3 (io,socket,data,stringKey) {
 		updateRedisDataPosition (stringKey,updateDataMove,Position_Cell);
 	}, timeOut, stringKey,data);
 }
+
 function updateRedisDataPosition (stringKey,updateDataM,Position_Cell) {
 
 	stringHUnit = "s"+updateDataM.Server_ID+"_unit";

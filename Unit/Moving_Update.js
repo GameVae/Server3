@@ -72,7 +72,7 @@ function getDataUpdate (serverInt,data){
 	currentTime = functions.GetTime();
 	var updateData = data;
 	// var updateData  = Object.create(data);
-	// updateData.Server_ID = serverInt;
+	updateData.Server_ID = serverInt;
 	// updateData.ID = data.ID;
 	// updateData.ID_Unit = data.ID_Unit;
 	// updateData.ID_User = data.ID_User;
@@ -89,7 +89,11 @@ function getDataUpdate (serverInt,data){
 	
 	var TimeMoveNextCell = functions.TimeMove.Diagonal*0.5;
 	updateData.TimeMoveNextCell = TimeMoveNextCell;
-	var ListMove = JSON.parse(data.ListMove);
+	var ListMove = data.ListMove;
+	if (data.ListMove.length>0) {
+		ListMove = JSON.parse(data.ListMove);
+	}
+
 	updateData.TimeFinishMove = TimeMoveNextCell + functions.ExportTimeDatabase(data.TimeFinishMove) - functions.ExportTimeDatabase(data.TimeMoveNextCell)	
 	
 	if (data.ListMove.length>0) {
