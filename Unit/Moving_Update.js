@@ -70,22 +70,22 @@ function getDataUpdate (serverInt,data){
 	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js getDataUpdate serverInt,data',[serverInt,data]);
 
 	currentTime = functions.GetTime();
-	var updateData = data;
-	// var updateData  = Object.create(data);
+	// var updateData = data;
+	var updateData  = Object.create(data);
 	updateData.Server_ID = serverInt;
-	// updateData.ID = data.ID;
-	// updateData.ID_Unit = data.ID_Unit;
-	// updateData.ID_User = data.ID_User;
-	// updateData.BaseNumber = data.BaseNumber;
-	// updateData.Level = data.Level;
-	// updateData.Quality = data.Quality;
-	// updateData.Hea_cur = data.Hea_cur;
-	// updateData.Health = data.Health;
-	// updateData.Attack = data.Attack;
-	// updateData.Defend = data.Defend;
-	// updateData.Position_Cell = data.Position_Cell;
-	// updateData.Next_Cell = data.Next_Cell;
-	// updateData.End_Cell = data.End_Cell;
+	updateData.ID = data.ID;
+	updateData.ID_Unit = data.ID_Unit;
+	updateData.ID_User = data.ID_User;
+	updateData.BaseNumber = data.BaseNumber;
+	updateData.Level = data.Level;
+	updateData.Quality = data.Quality;
+	updateData.Hea_cur = data.Hea_cur;
+	updateData.Health = data.Health;
+	updateData.Attack = data.Attack;
+	updateData.Defend = data.Defend;
+	updateData.Position_Cell = data.Position_Cell;
+	updateData.Next_Cell = data.Next_Cell;
+	updateData.End_Cell = data.End_Cell;
 	
 	var TimeMoveNextCell = functions.TimeMove.Diagonal*0.5;
 	updateData.TimeMoveNextCell = TimeMoveNextCell;
