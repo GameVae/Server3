@@ -1,6 +1,27 @@
 'use strict';
-var listmove =[]
-console.log(JSON.parse(listmove))
+var functions 				= require('./Util/Functions.js');
+var db_all_user 				=  require('./Util/Database/Db_all_user.js');
+var db_all_harvest				=  require('./Util/Database/Db_all_harvest.js');
+
+ test ()
+function test () {
+	var stringQuery = "SELECT * FROM `9` WHERE `Name_Upgrade` LIKE '%Harvesting'"
+	var dataSend=[];
+	db_all_harvest.query(stringQuery, function (error,rows) {
+		if (!!error) {console.log(error);}
+		for (var i = 0; i < rows.length; i++) {
+			if (rows[i].StartTime!=null) {
+				dataSend.push(rows[i])
+			}	
+		}
+		console.log(dataSend.length)
+	})
+
+	// console.log(functions.ImportTimeToDatabase(new Date(functions.GetTime()).toISOString()));
+}
+
+// var listmove =[]
+// console.log(JSON.parse(listmove))
 // // var stringTest ="farmgarthering"
 // var stringTest ="farmharvesting"
 // var functions 				= require('./Util/Functions.js');
@@ -62,7 +83,7 @@ console.log(JSON.parse(listmove))
 // 		console.log(functions.GetTime())
 // 	}, timeOut)
 // }
-// var db_friend =  require('./Util/Database/Db_all_friend.js');
+
 
 // // test ()
 // // function test () {

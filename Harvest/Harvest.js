@@ -98,13 +98,14 @@ exports.StartHarvest = function (io,ID_User,ID_Upgrade,ID_Server) {
 		})
 	}).then(()=>{
 		return new Promise((resolve,reject)=>{
-
-			stringUpdateFullHarvest = "UPDATE `"+ID_User+"` SET `StartTime`='"+currentTime+"',`EndTime`='"+timeFullHarvest+"' WHERE `ID_Upgrade`='"+ID_Upgrade+"';"
-			db_all_harvest.query(stringUpdateFullHarvest,function (error,result) {
-				if (!!error) {console.log(error);}
-				resolve();
-			})
-
+			if (currentHarvest>0) {
+				var endTime = functions.ImportTimeToDatabase(new Date(timeFullHarvest).toISOString());
+				stringUpdateFullHarvest = "UPDATE `"+ID_User+"` SET `StartTime`='"+currentTime+"',`EndTime`='"+endTime+"' WHERE `ID_Upgrade`='"+ID_Upgrade+"';"
+				db_all_harvest.query(stringUpdateFullHarvest,function (error,result) {
+					if (!!error) {console.log(error);}
+					resolve();
+				})
+			}
 		})
 
 	}).then(()=>{
@@ -116,6 +117,7 @@ exports.StartHarvest = function (io,ID_User,ID_Upgrade,ID_Server) {
 				dbInfo.query(stringQuery, function (error,rows) {
 					if (!!error){console.log(error);}
 					var currentTime = functions.GetTime();
+					
 					for (var i = 0; i < rows.length; i++) {
 						if (rows[i].UpgradeTime!=null) {
 							rows[i]["UpgradeTime"]= (new Date(functions.ExportTimeDatabase(rows[i].UpgradeTime))-currentTime)*0.001;
@@ -132,6 +134,7 @@ exports.StartHarvest = function (io,ID_User,ID_Upgrade,ID_Server) {
 						dataInfo = rows;
 						delete dataInfo["ID"];	
 					}
+
 					resolve();
 				})
 			}else{
@@ -160,6 +163,29 @@ exports.StartHarvest = function (io,ID_User,ID_Upgrade,ID_Server) {
 	})
 }
 
-exports.GetHarvest = function (ID_User) {
+exports.GetHarvest = function (io,ID_User) {
+	var stringQuery = "SELECT * FROM `"+ID_User+"` WHERE `Name_Upgrade` LIKE '%Harvesting'"
+	var dataSend =[];
+	var endTime = 0;
+	currentTime = functions.GetTime();
+	db_all_harvest.query(stringQuery, function (error,rows) {
+		if (!!error) {console.log(error);}
+		for (var i = 0; i < rows.length; i++) {
+			if (rows[i].StartTime!=null) {
+				delete rows[i].ID;
+				delete rows[i].StartTime;
+				endTime = parseInt((functions.ExportTimeDatabase(rows[i].EndTime)-functions.GetTime())*0.001);
+				if (endTime<0) {endTime=0;}
+				dataSend.push(rows[i])
+			}	
+		}
+		if (dataSend.length>0) {
+			client.hget("all_sockets",ID_User,function (error,socketID) {
+				if (socketID!=null) {
+					io.to(socketID).emit('R_USER_HARVEST',{R_USER_HARVEST:dataSend});
+				}
+			})
+		}
 
+	})
 }

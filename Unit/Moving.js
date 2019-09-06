@@ -97,20 +97,12 @@ function R_MOVE (io,Server_ID,stringKMove,stringUnit) {
 		}		
 	});
 }
-function sendToClient (io,stringKMove,socketID,stringUnit) {
-	
-	
+function sendToClient (io,stringKMove,socketID,stringUnit) {	
 	functions.ShowLog(functions.ShowLogBool.Clear,'Moving.js sendToClient stringKMove socketID',[stringKeyMove,socketID])
 	client.hget(stringKMove,stringUnit,function (error,rowData) {
 		io.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
 	})
 }
-// function sendToClient2 (io,stringKMove,socketID) {
-// 	functions.ShowLog(functions.ShowLogBool.Clear,'Moving.js sendToClient stringKMove socketID',[stringKeyMove,socketID])
-// 	client.get(stringKMove,function (error,rowData) {
-// 		io.to(socketID).emit('R_MOVE',{R_MOVE:JSON.parse(rowData)});
-// 	})
-// }
 // #R_MOVE
 
 //#S_MOVE

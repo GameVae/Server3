@@ -88,7 +88,7 @@ exports.Start = function start (io) {
 				if (attackUnit!=null) {
 					return new Promise((resolve,reject)=>{
 
-						var stringHkeyAttack = "s"+stringUnit.splice("_")+"_attack";
+						var stringHkeyAttack = "s"+stringUnit.splice("_")[0]+"_attack";
 						functions.ShowLog(functions.ShowLogBool.On,'Moving_Attack.js Start=>hget stringHkeyAttack,attackUnit',[stringHkeyAttack,attackUnit]);
 						client.hget(stringHAttack,attackUnit,function (error,rows) {
 							if (rows.includes(stringUnit)) {

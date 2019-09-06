@@ -14,7 +14,7 @@ var functions 				= require('./../../Util/Functions.js');
 
 var Promise 				= require('promise');
 var dbInfo,dbUpgrade,dbDefend;
-var DetailError;
+// var DetailError;
 var playerData ={};
 var dataInfo={};
 var stringHkey;
@@ -23,7 +23,8 @@ var redis = require("redis"),
 client = redis.createClient();
 client.select(functions.RedisData.TestUnit);
 
-exports.R_BASE_INFO = function r_base_info (socket,ID_User,Server_ID) {
+exports.R_BASE_INFO = function (socket,ID_User,Server_ID) {
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_INFO ID_User,Server_ID',[ID_User,Server_ID]);
 	switch (parseInt(Server_ID)) {
 		case 1:
 		dbInfo = db_s1_base_info;
@@ -33,8 +34,9 @@ exports.R_BASE_INFO = function r_base_info (socket,ID_User,Server_ID) {
 		break;
 	}
 	var stringQuery = "SELECT * FROM `"+ID_User+"`";
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_INFO stringQuery',[stringQuery]);
 	dbInfo.query(stringQuery, function (error,rows) {
-		if (!!error){DetailError = ('GetUserBase.js: query '+stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetUserBase.js R_BASE_INFO stringQuery',[stringQuery]);}
 		var currentTime = functions.GetTime();
 		for (var i = 0; i < rows.length; i++) {
 			if (rows[i].UpgradeTime!=null) {
@@ -52,12 +54,13 @@ exports.R_BASE_INFO = function r_base_info (socket,ID_User,Server_ID) {
 			dataInfo = rows;
 			delete dataInfo["ID"];		
 		}
-		
+		functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_INFO emit dataInfo',[dataInfo]);
 		socket.emit('R_BASE_INFO',{R_BASE_INFO:dataInfo});
 	});
 }
 
-exports.R_BASE_UPGRADE = function r_base_upgrade (socket,ID_User,Server_ID) {
+exports.R_BASE_UPGRADE = function (socket,ID_User,Server_ID) {
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_UPGRADE ID_User,Server_ID',[ID_User,Server_ID]);
 	switch (parseInt(Server_ID)) {
 		case 1:
 		dbInfo = db_s1_base_info;
@@ -69,11 +72,12 @@ exports.R_BASE_UPGRADE = function r_base_upgrade (socket,ID_User,Server_ID) {
 		break;
 	}
 	var stringQueryBaseNumber = "SELECT `BaseNumber` FROM `"+ID_User+"`";
-	//console.log(stringQueryBaseNumber)
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_UPGRADE stringQueryBaseNumber',[stringQueryBaseNumber]);
 	dbInfo.query(stringQueryBaseNumber,function (error,rows) {
-		if (!!error){DetailError = ('GetUserBase.js: stringQueryBaseNumber '+stringQueryBaseNumber); functions.WriteLogError(DetailError,2);}
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetUserBase.js R_BASE_UPGRADE stringQueryBaseNumber',[stringQueryBaseNumber]);}
 		if (rows!=undefined) {
 			for (var i = 0; i < rows.length; i++) {
+				functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_UPGRADE=>getBaseUpgrade ID_User,rows[i].BaseNumber',[ID_User,rows[i].BaseNumber]);
 				getBaseUpgrade (socket,dbUpgrade,ID_User,rows[i].BaseNumber);	
 			}
 		}
@@ -81,11 +85,18 @@ exports.R_BASE_UPGRADE = function r_base_upgrade (socket,ID_User,Server_ID) {
 }
 
 function getBaseUpgrade (socket,dbUpgrade,ID_User,BaseNumber) {
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js getBaseUpgrade ID_User,BaseNumber',[ID_User,BaseNumber]);
 	var queryBaseUpgrade = "SELECT * FROM `"+ID_User+"_"+BaseNumber+"`";
-	//console.log(queryBaseUpgrade)
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js getBaseUpgrade queryBaseUpgrade',[queryBaseUpgrade]);
 	dbUpgrade.query(queryBaseUpgrade,function(error,rows){
-		if (!!error){DetailError = ('GetUserBase.js: getBaseUpgrade '+queryBaseUpgrade); functions.WriteLogError(DetailError,2);}
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetUserBase.js getBaseUpgrade queryBaseUpgrade',[queryBaseUpgrade]);}
 		delete rows.ID;
+		// var dataSend = {
+		// 	ID_User: ID_User,
+		// 	BaseNumber: BaseNumber,
+		// 	R_BASE_UPGRADE: rows
+		// }
+		functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js getBaseUpgrade queryBaseUpgrade',[queryBaseUpgrade]);
 		socket.emit('R_BASE_UPGRADE',{
 			ID_User: ID_User,
 			BaseNumber: BaseNumber,
@@ -99,66 +110,9 @@ function getBaseUpgrade (socket,dbUpgrade,ID_User,BaseNumber) {
 	// 	R_BASE_UPGRADE: rowsUpgrade[0]
 	// }
 }
-// 
-//r_base_player (9,1)
-// function r_base_player (ID_User,Server_ID){
-// 	switch (parseInt(Server_ID)) {
-// 		case 1:
-// 		dbInfo = db_s1_base_info;
-// 		dbUpgrade = db_s1_upgrade;
-// 		break;
-// 		case 2:
-// 		dbInfo = db_s2_base_info;
-// 		dbUpgrade = db_s2_upgrade;
-// 		break;
-// 	}
 
-// 	var playerData ={};
-// 	stringHkey = "s"+Server_ID+"_base_info";
-
-// 	new Promise((resolve,reject)=>{
-// 		client.del(stringHkey,function (error,result) {
-// 			resolve();
-// 		});
-// 	}).then(()=>new Promise((resolve,reject)=>{
-// 		var stringID = "SELECT `ID_User`,`NameInGame`,`Guild_ID`,`Might`,`Killed` FROM `game_info_s"+Server_ID+"` WHERE `ID_User`<>'"+ID_User+"'"
-// 		db_all_user.query(stringID, function (error,rows) {
-// 			if (!!error){DetailError = ('GetUserBase.js: query stringID :'+ ID_User); functions.WriteLogError(DetailError,2);}
-// 			if (rows!=undefined) {
-// 				playerData =rows;
-// 				for (var i = 0; i < rows.length; i++) {
-// 					var stringKey = rows[i].ID_User;
-// 					client.hset(stringHkey,rows[i].ID_User,JSON.stringify(rows[i]))
-// 				}
-// 				resolve();
-// 			}
-// 		});
-// 	}).then(()=>new Promise((resolve,reject)=>{		
-// 		for (var i = 0; i < playerData.length; i++) {
-// 			var dataInfo = playerData[i];
-// 			getBaseInfo (dbInfo,dataInfo,resolve)	
-// 		}		
-// 	}).then(()=>new Promise((resolve,reject)=>{
-// 		client.hkeys(stringHkey,function (error,rows) {
-// 			for (var i = 0; i < rows.length; i++) {
-// 				getUpgrade (dbUpgrade,rows[i],resolve)
-// 			}			
-// 		})
-// 	}).then(()=> {
-// 		client.hkeys(stringHkey,function (error,rows) {	
-// 			client.hvals(stringHkey,function (error,rowsAll) {	
-// 				var result = rowsAll;
-// 				console.log(result.length)
-// 				//socket.emit('R_BASE_PLAYER',{R_BASE_PLAYER:rowsAll});
-// 			})
-// 			// client.hgetall(stringHkey,function (error,rowsAll) {	
-// 			// 	socket.emit('R_BASE_PLAYER',{R_BASE_PLAYER:rowsAll});
-// 			// })
-// 		})
-// 	})
-// 	)));
-// }
-exports.R_BASE_PLAYER  = function r_base_player (socket,ID_User,Server_ID){
+exports.R_BASE_PLAYER  = function (socket,ID_User,Server_ID){
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_PLAYER queryBaseUpgrade',[queryBaseUpgrade]);
 	switch (parseInt(Server_ID)) {
 		case 1:
 		dbInfo = db_s1_base_info;
@@ -172,19 +126,21 @@ exports.R_BASE_PLAYER  = function r_base_player (socket,ID_User,Server_ID){
 
 	var playerData ={};
 	stringHkey = "s"+Server_ID+"_base_info";
-	
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_PLAYER stringHkey',[stringHkey]);
 	new Promise((resolve,reject)=>{
 		client.del(stringHkey,function (error,result) {
 			resolve();
 		});
 	}).then(()=>new Promise((resolve,reject)=>{
 		var stringID = "SELECT `ID_User`,`NameInGame` FROM `game_info_s"+Server_ID+"` WHERE `ID_User`<>'"+ID_User+"'"
+		functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_PLAYER stringID',[stringID]);
 		db_all_user.query(stringID, function (error,rows) {
-			if (!!error){DetailError = ('GetUserBase.js: query stringID :'+ ID_User); functions.WriteLogError(DetailError,2);}
+			if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetUserBase.js R_BASE_PLAYER stringID',[stringID]);}
 			if (rows!=undefined) {
 				playerData =rows;
 				for (var i = 0; i < rows.length; i++) {
 					var stringKey = rows[i].ID_User;
+					functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_PLAYER hset stringHkey,rows[i].ID_User,JSON.stringify(rows[i])',[stringHkey,rows[i].ID_User,JSON.stringify(rows[i])]);
 					client.hset(stringHkey,rows[i].ID_User,JSON.stringify(rows[i]))
 				}
 				resolve();
@@ -193,15 +149,19 @@ exports.R_BASE_PLAYER  = function r_base_player (socket,ID_User,Server_ID){
 	}).then(()=>new Promise((resolve,reject)=>{		
 		for (var i = 0; i < playerData.length; i++) {
 			var dataInfo = playerData[i];
+			functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_PLAYER=>getBaseInfo dataInfo)',[dataInfo]);
 			getBaseInfo (dbInfo,dataInfo,resolve)	
 		}		
 	}).then(()=>new Promise((resolve,reject)=>{
+		functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_PLAYER hkeys stringHkey)',[stringHkey]);
 		client.hkeys(stringHkey,function (error,rows) {
 			for (var i = 0; i < rows.length; i++) {
+				functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_BASE_PLAYER hkeys=>getUpgrade rows[i])',[rows[i]]);
 				getUpgrade (dbUpgrade,rows[i],resolve)
 			}			
 		})
 	}).then(()=> {
+		functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js hkeys=>getBasePlayerData stringHkey)',[stringHkey]);
 		getBasePlayerData (socket,stringHkey);
 	})
 	)));
@@ -209,11 +169,13 @@ exports.R_BASE_PLAYER  = function r_base_player (socket,ID_User,Server_ID){
 
 function getBasePlayerData (socket,stringHkey) {
 	var array=[]
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js getBasePlayerData stringHkey)',[stringHkey]);
 	client.hkeys(stringHkey,function (error,rows) {
 		client.hvals(stringHkey,function (error,rowsAll) {
 			for (var i = 0; i < rowsAll.length; i++) {
 				array.push(JSON.parse(rowsAll[i]))
 			}
+			functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js getBasePlayerData emit R_BASE_PLAYER array)',[array]);
 			socket.emit('R_BASE_PLAYER',{R_BASE_PLAYER:array});
 		})
 	})
@@ -223,7 +185,7 @@ function getUpgrade (dbUpgrade,ID_User,resolve) {
 	var stringQuery = "SELECT `Level` From `"+ID_User+"_1"+"` WHERE `ID`= 1"
 	// console.log(stringQuery);
 	dbUpgrade.query(stringQuery,function(error,rowsLevel){
-		if (!!error){DetailError = ('GetUserBase.js: query getUpgrade :'+ stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetUserBase.js getBasePlayerData emit R_BASE_PLAYER array)',[array]);}
 		if (rowsLevel!=undefined) {
 			client.hget(stringHkey,ID_User,function (error,rows) {
 				var result = JSON.parse(rows);
@@ -238,13 +200,16 @@ function getUpgrade (dbUpgrade,ID_User,resolve) {
 function getBaseInfo (dbInfo,playerData,resolve) {
 	var stringQuery = "SELECT `BaseNumber`,`Position` FROM `"+playerData.ID_User+"`";
 	dbInfo.query(stringQuery,function (error,rowsBaseInfo) {
-		if (!!error){DetailError = ('GetUserBase.js: query getBaseInfo :'+ stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetUserBase.js getBaseInfo stringQuery)',[stringQuery]);}
 		if (rowsBaseInfo!=undefined) {
+			functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js getBaseInfo hget stringHkey,playerData.ID_User)',[stringHkey,playerData.ID_User]);
 			client.hget(stringHkey,playerData.ID_User,function (error,rows) {
 				var result = JSON.parse(rows);
 				result.Position = rowsBaseInfo[0].Position;
 				result.BaseNumber = rowsBaseInfo[0].BaseNumber;
+				functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js getBaseInfo hset stringHkey,playerData.ID_User,JSON.stringify(result))',[stringHkey,playerData.ID_User,result]);
 				client.hset(stringHkey,playerData.ID_User,JSON.stringify(result));
+
 				resolve();
 			})			
 		}
@@ -253,15 +218,17 @@ function getBaseInfo (dbInfo,playerData,resolve) {
 
 function getData (socket,dbInfo,dbUpgrade,rowsData) {
 	var stringQuery = "SELECT `ID_User`,`BaseNumber`,`Position` FROM `"+rowsData.ID_User+"`";
-	//console.log(stringQuery);	
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js getData dbUpgrade,rowsData)',[dbUpgrade,rowsData]);
+	
 	dbInfo.query(stringQuery,function (error,rows) {
-		if (!!error){DetailError = ('GetUserBase.js: query getData :'+ stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetUserBase.js getData dbUpgrade,rowsData)',[dbUpgrade,rowsData]);}
 		if (rows!=undefined) {
 			//console.log(rows.length);
 			var dataSend =  rows;
 			for (var i = 0; i < rows.length; i++) {
 				//console.log(rows[i])
 				var dataPlayer = rows[i];
+				functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js getData=>getUpgrade rows[i])',[rows[i]]);
 
 				getUpgrade (dbUpgrade,rows[i],function (level) {
 					playerData={
@@ -274,6 +241,7 @@ function getData (socket,dbInfo,dbUpgrade,rowsData) {
 						Level: level,
 						Position: dataPlayer.Position
 					}
+					functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js getData getUpgrade emit R_BASE_PLAYER playerData',[rows[i],playerData]);
 					socket.emit('R_BASE_PLAYER',{R_BASE_PLAYER:playerData});
 					
 					//console.log(playerData);
@@ -287,10 +255,12 @@ function getData (socket,dbInfo,dbUpgrade,rowsData) {
 exports.R_PLAYER_INFO = function (socket,ID_User,Server_ID) {
 	var stringQuery = "SELECT `ID_User`,`NameInGame`,`ChatWorldColor`,`Guild_ID`,`Guild_Name`,`Might`,`Killed` FROM `game_info_s"+Server_ID+"` WHERE "+
 	"`ID_User`<>'"+ID_User+"'";
-	//console.log(stringQuery);
+	
+	functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_PLAYER_INFO ID_User,Server_ID,stringQuery',[ID_User,Server_ID,stringQuery]);
 	db_all_user.query(stringQuery,function (error,rows) {
 		// console.log(rows);
-		if (!!error){DetailError = ('GetUserBase.js: query R_PLAYER_INFO: '+ stringQuery); functions.WriteLogError(DetailError,2);}
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetUserBase.js R_PLAYER_INFO ID_User,Server_ID,stringQuery',[ID_User,Server_ID,stringQuery]);}
+		functions.ShowLog(functions.ShowLogBool.Clear,'GetUserBase.js R_PLAYER_INFO emit rows',[rows]);
 		socket.emit('R_PLAYER_INFO',{R_PLAYER_INFO:rows});
 	});
 }

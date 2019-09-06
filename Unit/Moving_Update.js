@@ -16,15 +16,15 @@ var Promise = require('promise')
 var currentTime,offlineTime,calcTime;
 // move.Test(2)
 exports.UpdateDataBase = function (serverInt) {
-	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js UpdateDataBase=>updateDataBase serverInt',[serverInt]);
+	functions.ShowLog(functions.ShowLogBool.Clear,'Moving_Update.js UpdateDataBase=>updateDataBase serverInt',[serverInt]);
 	updateDataBase (serverInt);
 }
 // updateDataBase2 (1)
 function updateDataBase (serverInt) {
 	var stringQuery = "SELECT * FROM `s"+serverInt+"_unit` WHERE `TimeFinishMove`<> 'Null'";
-	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDataBase serverInt,stringQuery',[serverInt,stringQuery]);
+	functions.ShowLog(functions.ShowLogBool.Clear,'Moving_Update.js updateDataBase serverInt,stringQuery',[serverInt,stringQuery]);
 	db_position.query(stringQuery,function (error,rows) {
-		if (!!error){functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDataBase stringQuery',[stringQuery]);}
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Clear,'Moving_Update.js updateDataBase stringQuery',[stringQuery]);}
 		if (rows.length>0) {
 			for (var i = 0; i < rows.length; i++) {
 				// updateData = rows[i];
@@ -33,7 +33,7 @@ function updateDataBase (serverInt) {
 
 				// console.log('moving update unit')
 				// getDataUpdate (serverInt,updateData);
-				functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDataBase=>getDataUpdate serverInt,rows[i]',[serverInt,rows[i]]);
+				functions.ShowLog(functions.ShowLogBool.Clear,'Moving_Update.js updateDataBase=>getDataUpdate serverInt,rows[i]',[serverInt,rows[i]]);
 				getDataUpdate (serverInt,rows[i]);
 				// console.log(updateData)
 			}
@@ -67,7 +67,7 @@ function updateDataBase (serverInt) {
 // getDataUpdate (1,S_MOVE_data)
 
 function getDataUpdate (serverInt,data){		
-	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js getDataUpdate serverInt,data',[serverInt,data]);
+	functions.ShowLog(functions.ShowLogBool.Clear,'Moving_Update.js getDataUpdate serverInt,data',[serverInt,data]);
 
 	currentTime = functions.GetTime();
 	// var updateData = data;
@@ -106,14 +106,14 @@ function getDataUpdate (serverInt,data){
 	}
 	// console.log(updateData);
 
-	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js getDataUpdate=>updateDatabase updateData',[updateData]);
+	functions.ShowLog(functions.ShowLogBool.Clear,'Moving_Update.js getDataUpdate=>updateDatabase updateData',[updateData]);
 	updateDatabase(updateData);
-	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js getDataUpdate=>move.MoveCalc updateData',[updateData]);
+	functions.ShowLog(functions.ShowLogBool.Clear,'Moving_Update.js getDataUpdate=>move.MoveCalc updateData',[updateData]);
 	move.MoveCalc(null,null,updateData);	
 }
 
 function updateDatabase (data) {
-	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDatabase data',[data]);
+	functions.ShowLog(functions.ShowLogBool.Clear,'Moving_Update.js updateDatabase data',[data]);
 	var updateData = data;
 	// console.log(updateData)
 	// console.log(data.TimeMoveNextCell)
@@ -129,7 +129,7 @@ function updateDatabase (data) {
 		}
 		// console.log(updateData)
 	}
-	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDatabase data,updateData',[data,updateData]);
+	functions.ShowLog(functions.ShowLogBool.Clear,'Moving_Update.js updateDatabase data,updateData',[data,updateData]);
 	var stringUpdate;
 	if (updateData.ListMove.length==0) {
 		stringUpdate = "UPDATE `s"+updateData.Server_ID+"_unit` SET "
@@ -152,7 +152,7 @@ function updateDatabase (data) {
 		+"`Status`='"+functions.UnitStatus.Move+
 		"' WHERE `ID`='"+updateData.ID+"'";
 	}
-	functions.ShowLog(functions.ShowLogBool.Check,'Moving_Update.js updateDatabase stringUpdate',[stringUpdate]);
+	functions.ShowLog(functions.ShowLogBool.Clear,'Moving_Update.js updateDatabase stringUpdate',[stringUpdate]);
 	db_position.query(stringUpdate,function (error,result) {
 		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Moving_Update.js updateDatabase stringUpdate',[stringUpdate]);}
 		functions.ShowLog(functions.ShowLogBool.LogChange,'Moving_Update.js updateDatabase stringUpdate',[stringUpdate]);
