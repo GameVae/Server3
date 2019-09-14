@@ -267,7 +267,7 @@ exports.R_PLAYER_INFO = function (socket,ID_User,Server_ID) {
 
 
 //R_BASE_DEFEND (9,1);
-exports.R_BASE_DEFEND = function r_base_defend(socket,ID_User,Server_ID) {
+exports.R_BASE_DEFEND = function (socket,ID_User,Server_ID) {
 	switch (Server_ID) {
 		case 1:
 		dbDefend = db_s1_base_defend;
@@ -279,12 +279,8 @@ exports.R_BASE_DEFEND = function r_base_defend(socket,ID_User,Server_ID) {
 	
 	var stringQuery = "SELECT * FROM `"+ID_User+"` ORDER BY `BaseNumber` ASC ";
 	dbDefend.query(stringQuery,function (error,rows) {
-		if (!!error){DetailError = ('GetUserBase.js: query R_BASE_DEFEND: '+ stringQuery); functions.WriteLogError(DetailError,2);}
-		//console.log(rows);
-
+		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'GetUserBase.js R_BASE_DEFEND stringQuery',[stringQuery]);}
+		functions.ShowLog(functions.ShowLogBool.Error,'GetUserBase.js R_BASE_DEFEND emit rows',[rows]);
 		socket.emit('R_BASE_DEFEND',{R_BASE_DEFEND:rows});
 	});
-	
-
 }
-

@@ -20,6 +20,7 @@ exports.Start = function (io) {
 	io.on('connection', function(socket){
 		socket.on('S_LOGIN', function (data){
 			functions.ShowLog(functions.ShowLogBool.Clear,'Login.js Start=>S_LOGIN data',[data]);
+			R_CHECK_DUPLICATE_LOGIN(io,socket,data);
 			S_LOGIN (socket,data);
 		});
 	});
@@ -145,12 +146,14 @@ function updateSetBlockTime (blockTime,socket,data) {
 	}, blockTime, data);
 }
 
-function R_CHECK_DUPLICATE_LOGIN (socket,data) {
+function R_CHECK_DUPLICATE_LOGIN (io,socket,data) {
 	var queryCheckDuplicate = "SELECT `Socket` FROM `user_info` WHERE `UserName`='"+data.UserName+"'";
 	db_all_user.query(queryCheckDuplicate,function (error,rows) {
 		if (!!error){functions.ShowLog(functions.ShowLogBool.Error,'Login.js R_CHECK_DUPLICATE_LOGIN queryCheckDuplicate',[queryCheckDuplicate]);}
-		if (rows[0].Socket!=null||rows[0].Socket!=socket.id) {
+		if (rows[0].Socket!=null&&rows[0].Socket!=socket.id) {
+			// co nguoi khac dang nhap, kickout user cu
 			functions.ShowLog(functions.ShowLogBool.LogChange,'Login.js R_CHECK_DUPLICATE_LOGIN queryCheckDuplicate',[queryCheckDuplicate])
+			io.to(rows[0].Socket).emit("R_CHECK_DUPLICATE_LOGIN",{R_CHECK_DUPLICATE_LOGIN:1});
 		}
 	});
 }
