@@ -254,6 +254,7 @@ function checkUnlock (io,dbUpgrade,data) {
 			checkUnitInMap (data,levelUpgrade,rows_tableQuery[0]);
 
 			if (data.ID_Upgrade>1 && data.ID_Upgrade<15) {
+				functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js checkUnlock=>checkUpgradeResource data,levelUpgrade,rows_tableQuery[0]',[data,levelUpgrade,rows_tableQuery[0]]);
 				checkUpgradeResource(io,data,levelUpgrade,rows_tableQuery[0]);
 			}
 			
@@ -276,7 +277,7 @@ function checkUpgradeResource (io,data,levelUpgrade,rows_tableQuery) {
 
 		var stringUpdate = "";
 		if (rows_tableQuery.Name_Upgrade.includes("harvesting")) {
-			functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js checkUpgradeResource data,levelUpgrade,rows_tableQuery',[data,levelUpgrade,rows_tableQuery]);
+			functions.ShowLog(functions.ShowLogBool.Check,'Upgrade.js checkUpgradeResource=>harvest.StartHarvest data.ID_User,data.ID_Upgrade,data.ID_Server',[data.ID_User,data.ID_Upgrade,data.ID_Server]);
 			harvest.StartHarvest(io,data.ID_User,data.ID_Upgrade,data.ID_Server);
 
 			// stringUpdate="UPDATE `"+data.ID_User+"` SET "

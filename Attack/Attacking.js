@@ -81,6 +81,7 @@ function S_ATTACK (io,data) {
 				var arrayUnitAttacking = rows.split("/").filter(String)
 				if (!arrayUnitAttacking.includes(stringKeyAttack)) {
 					attackingNewUnitBool = true;
+					functions.ShowLog(functions.ShowLogBool.On,'Attacking.js S_ATTACK=>attackFunc.ClearAttackUnit stringKeyAttack',[stringKeyAttack]);
 					attackFunc.ClearAttackUnit(io,stringKeyAttack);				
 				}
 			}
